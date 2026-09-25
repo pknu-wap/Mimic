@@ -1,33 +1,62 @@
-예시 리드미입니다.
-[.github/CODEOWNERS](.github/CODEOWNERS)의 octocat을 실제 팀원으로 수정해주세요.
-프로젝트에 맞춰 아래 내용을 작성하고 이 문구와 각 설명을 삭제해주세요.
-리드미는 아래 양식과 관계 없이 팀 색깔에 맞춰 자유롭게 꾸며주셔도 됩니다.
 
-# 프로젝트 이름으로 수정해주세요
+# 미믹세포
 
-프로젝트의 목적, 대상 사용자, 활용 상황 등을 설명해 주세요.
+<br>
+<br>
 
-### 요구 사항
+## 🧬 지구의 생물체를 복제해 살아남는 2D 생태 서바이벌 액션 게임
 
-필요한 런타임, 도구, 버전 및 외부 서비스를 적어 주세요.
+> ### **"복제하라, 생존하라, 송신하라!"**
+>
+> 당신은 고등 외계 문명의 생태 조사체, **미믹 세포**입니다.  
+> 예기치 못한 불시착으로 모행성과의 통신 장비가 파괴되었습니다.  
+> 
+> 관찰 일지를 본국으로 보낼 유일한 희망은, 지구의 지적 생명체가 우주를 향해 전파를 송신하는 그날까지 버텨내는 것뿐.  
+> 
+> 캄브리아기의 원시 심해부터 2030년 인류의 시대까지—  
+> 끊임없이 다른 생명체로 변신하여 멸종의 위기를 넘기고, 5억 년의 관찰 기록을 우주로 쏘아 올리세요.
 
-## 시작하기
+<br>
+<br>
 
-저장소 다운로드부터 의존성 설치까지 실제 명령어를 순서대로 작성하세요.
-환경 변수가 필요하면 변수 이름과 용도를 적어 주세요.
-실행 명령어와 최소 사용 예시를 작성하세요.
-UI가 있는 경우 스크린샷을 추가해도 좋습니다.
+
+## 🎮 주요 특징 (Key Features)
+
+* **타격형 DNA 추출 & 변신**: 서열이 높은 생물일수록 더 많이 타격해야 복제 가능하며, 고위험·고보상 액션을 유도합니다.
+* **동화(Assimilation) 제한**: 한 폼을 오래 유지하면 자아를 잃고 게임 오버됩니다. 지속적으로 다른 숙주로 갈아타야 하는 생존 압박을 제공합니다.
+* **동적 입체 생태계**: 3단계 먹이사슬, 수심별 수압 제약, 군집 연쇄 경보 AI 등 다양한 요소가 유기적으로 얽힌 실시간 생태계 상호작용을 구현합니다.
+* **지질학적 대격변 퍼즐**: 유독가스 분출 등 재앙 발생 시, 환경에 맞는 생물로 빠르게 갈아타 탈출하는 실시간 탈출 기믹을 선보입니다.
+* **성향 기반 멀티 엔딩**: 무자비한 포식과 절제된 공생 중 플레이어의 생태계 개입 방식에 따라 최종 2030년 결말이 분기됩니다.
+
+<br>
+<br>
+
+
+## 🛠️ 기술 스택 (Tech Stack)
+
+| 구분 | 기술 / 도구 |
+| :--- | :--- |
+| **Engine** | Unity |
+| **Language** | C# |
+| **Art & Design** | Figma, ibis Paint |
+| **Collaboration** | GitHub, Notion, Discord, KakaoTalk |
+
+<br>
+<br>
 
 ## 팀 소개
 
-팀원 수에 맞게 열을 추가하거나 삭제하고, 이름과 역할을 수정하세요.
-프로필 이미지와 깃허브 링크를 각 팀원의 실제 주소로 교체하세요.
 
-| <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> |
+| 팀장 | 개발자 | 개발자 | 개발자 |
 | :---: | :---: | :---: | :---: |
-| [팀원 1](https://github.com/octocat) | [팀원 2](https://github.com/octocat) | [팀원 3](https://github.com/octocat) | [팀원 4](https://github.com/octocat) |
-| 역할 | 역할 | 역할 | 역할 |
+| <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> |
+| [강민영](https://github.com/nuilche) | [이종민](https://github.com/fish7576) | [김서연](https://github.com/elbuwhale272) | [구동하](https://github.com/komm-tod) |
+| 기획<br>시스템 | 개발총괄<br>플레이어 | 몬스터 | 코어 시스템 |
 
-## 라이선스
+| 디자이너 | 디자이너 |
+| :---: | :---: |
+| <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> |
+| 유다은 | 최인아 |
+| 아트 | UI |
 
-프로젝트의 라이선스를 선택한 뒤 LICENSE 파일을 추가하고 이 섹션에 연결하세요.
+
