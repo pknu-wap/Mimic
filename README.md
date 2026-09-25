@@ -2,9 +2,10 @@
 # 미믹세포
 
 <br>
-<br>
 
-## 🧬 지구의 생물체를 복제해 살아남는 2D 생태 서바이벌 액션 게임
+### 🧬 지구의 생물체를 복제해 살아남는 2D 생태 서바이벌 액션 게임
+
+<br>
 
 > ### **"복제하라, 생존하라, 송신하라!"**
 >
@@ -22,6 +23,8 @@
 
 ## 🎮 주요 특징 (Key Features)
 
+<br>
+
 * **타격형 DNA 추출 & 변신**: 서열이 높은 생물일수록 더 많이 타격해야 복제 가능하며, 고위험·고보상 액션을 유도합니다.
 * **동화(Assimilation) 제한**: 한 폼을 오래 유지하면 자아를 잃고 게임 오버됩니다. 지속적으로 다른 숙주로 갈아타야 하는 생존 압박을 제공합니다.
 * **동적 입체 생태계**: 3단계 먹이사슬, 수심별 수압 제약, 군집 연쇄 경보 AI 등 다양한 요소가 유기적으로 얽힌 실시간 생태계 상호작용을 구현합니다.
@@ -33,6 +36,8 @@
 
 
 ## 🛠️ 기술 스택 (Tech Stack)
+
+<br>
 
 | 구분 | 기술 / 도구 |
 | :--- | :--- |
@@ -46,10 +51,11 @@
 
 ## 팀 소개
 
+<br>
 
 | 팀장 | 개발자 | 개발자 | 개발자 |
 | :---: | :---: | :---: | :---: |
-| <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> | <img src="https://github.com/octocat.png" width="100"> |
+| <img src="https://github.com/nuilche.png" width="100"> | <img src="https://github.com/fish7576.png" width="100"> | <img src="https://github.com/elbuwhale272.png" width="100"> | <img src="https://github.com/komm-tod.png" width="100"> |
 | [강민영](https://github.com/nuilche) | [이종민](https://github.com/fish7576) | [김서연](https://github.com/elbuwhale272) | [구동하](https://github.com/komm-tod) |
 | 기획<br>시스템 | 개발총괄<br>플레이어 | 몬스터 | 코어 시스템 |
 
