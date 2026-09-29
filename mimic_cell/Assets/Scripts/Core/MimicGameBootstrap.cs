@@ -4,6 +4,7 @@ using MimicCell.Gameplay;
 using MimicCell.Player;
 using MimicCell.Prototype;
 using MimicCell.UI;
+using MimicCell.World;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -76,10 +77,6 @@ namespace MimicCell.Core
             {
                 EnsureModernBackdrop(root.transform);
             }
-            else
-            {
-                EnsureCambrianBackdrop(root.transform);
-            }
 
             PrototypePlayer player = EnsurePlayer(root.transform);
             PlayerMovementController playerMovement = player.GetComponent<PlayerMovementController>();
@@ -87,7 +84,17 @@ namespace MimicCell.Core
             CameraFollow2D follow = sceneCamera.GetComponent<CameraFollow2D>();
             follow.SetTarget(player.transform);
             follow.SetOffset(new Vector3(0f, 0f, -10f));
-            follow.SetBounds(new Vector2(-22f, -10f), new Vector2(22f, 10f));
+
+            if (sceneName == MimicSceneNames.Modern)
+            {
+                follow.SetBounds(new Vector2(-22f, -10f), new Vector2(22f, 10f));
+            }
+            else
+            {
+                CambrianOceanWorld oceanWorld = EnsureCambrianOceanWorld(root.transform, sceneCamera, player.transform);
+                oceanWorld.GetCameraBounds(sceneCamera, out Vector2 minBounds, out Vector2 maxBounds);
+                follow.SetBounds(minBounds, maxBounds);
+            }
 
             Transform visual = player.transform.Find("Visual");
             LineRenderer aimLine = EnsureAimLine(player.transform);
@@ -263,21 +270,25 @@ namespace MimicCell.Core
             return line;
         }
 
-        private static void EnsureCambrianBackdrop(Transform root)
+        private static CambrianOceanWorld EnsureCambrianOceanWorld(Transform root, Camera sceneCamera, Transform player)
         {
-            if (root.Find("Cambrian Depth Zones") != null)
+            Transform legacyZones = root.Find("Cambrian Depth Zones");
+            if (legacyZones != null)
             {
-                return;
+                legacyZones.gameObject.SetActive(false);
             }
 
-            Transform zones = new GameObject("Cambrian Depth Zones").transform;
-            zones.SetParent(root, false);
+            CambrianOceanWorld oceanWorld = root.GetComponentInChildren<CambrianOceanWorld>(true);
+            if (oceanWorld == null)
+            {
+                GameObject worldObject = new GameObject("Cambrian Ocean World");
+                worldObject.transform.SetParent(root, false);
+                oceanWorld = worldObject.AddComponent<CambrianOceanWorld>();
+            }
 
-            CreateRuntimeBlock(zones, "A Surface Zone", new Vector2(0f, 6f), new Vector2(44f, 4f), new Color(0.13f, 0.58f, 0.75f, 0.42f), -100);
-            CreateRuntimeBlock(zones, "AB Buffer Zone", new Vector2(0f, 3.5f), new Vector2(44f, 1f), new Color(0.10f, 0.48f, 0.66f, 0.38f), -99);
-            CreateRuntimeBlock(zones, "B Middle Zone", new Vector2(0f, 0f), new Vector2(44f, 6f), new Color(0.06f, 0.32f, 0.52f, 0.46f), -100);
-            CreateRuntimeBlock(zones, "BC Buffer Zone", new Vector2(0f, -3.5f), new Vector2(44f, 1f), new Color(0.04f, 0.24f, 0.42f, 0.42f), -99);
-            CreateRuntimeBlock(zones, "C Deep Zone", new Vector2(0f, -6f), new Vector2(44f, 4f), new Color(0.02f, 0.11f, 0.24f, 0.58f), -100);
+            oceanWorld.gameObject.SetActive(true);
+            oceanWorld.Configure(sceneCamera, player);
+            return oceanWorld;
         }
 
         private static void EnsureModernBackdrop(Transform root)
