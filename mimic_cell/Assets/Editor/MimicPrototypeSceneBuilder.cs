@@ -3,6 +3,7 @@ using MimicCell.Creatures;
 using MimicCell.Gameplay;
 using MimicCell.Player;
 using MimicCell.Prototype;
+using MimicCell.World;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -292,7 +293,8 @@ namespace MimicCell.EditorTools
                     includeCambrianCreatures
                         ? new Color(0.02f, 0.12f, 0.24f, 1f)
                         : new Color(0.53f, 0.74f, 0.82f, 1f),
-                    includeCambrianCreatures ? 5.5f : 6f);
+                    includeCambrianCreatures ? 5.5f : 6f,
+                    includeCambrianCreatures);
 
                 LineRenderer aimLine = CreateAimLine(player.transform, aimMaterial);
                 PlayerMovementController movement = player.GetComponent<PlayerMovementController>();
@@ -370,7 +372,12 @@ namespace MimicCell.EditorTools
             return cameraObject.AddComponent<Camera>();
         }
 
-        private static void ConfigureCamera(Camera sceneCamera, Transform target, Color background, float size)
+        private static void ConfigureCamera(
+            Camera sceneCamera,
+            Transform target,
+            Color background,
+            float size,
+            bool useCambrianWorldBounds)
         {
             sceneCamera.orthographic = true;
             sceneCamera.orthographicSize = size;
@@ -386,7 +393,20 @@ namespace MimicCell.EditorTools
 
             follow.SetTarget(target);
             follow.SetOffset(new Vector3(0f, 0f, -10f));
-            follow.SetBounds(new Vector2(-22f, -10f), new Vector2(22f, 10f));
+
+            if (useCambrianWorldBounds)
+            {
+                float horizontalMargin = size * (16f / 9f);
+                float worldMinY = CambrianOceanWorld.DefaultSurfaceY - CambrianOceanWorld.DefaultDeepBasinDepth - 16f;
+                follow.SetBounds(
+                    new Vector2(-CambrianOceanWorld.DefaultWorldHalfWidth + horizontalMargin, worldMinY + size),
+                    new Vector2(CambrianOceanWorld.DefaultWorldHalfWidth - horizontalMargin, CambrianOceanWorld.DefaultSurfaceY - size));
+            }
+            else
+            {
+                follow.SetBounds(new Vector2(-22f, -10f), new Vector2(22f, 10f));
+            }
+
             EditorUtility.SetDirty(sceneCamera);
             EditorUtility.SetDirty(follow);
         }
@@ -429,14 +449,9 @@ namespace MimicCell.EditorTools
 
         private static void CreateCambrianBackdrop(Transform root)
         {
-            Transform zones = new GameObject("Cambrian Depth Zones").transform;
-            zones.SetParent(root, false);
-
-            CreateBlock(zones, "A Surface Zone", new Vector2(0f, 6f), new Vector2(44f, 4f), new Color(0.13f, 0.58f, 0.75f, 0.42f), -100);
-            CreateBlock(zones, "AB Buffer Zone", new Vector2(0f, 3.5f), new Vector2(44f, 1f), new Color(0.10f, 0.48f, 0.66f, 0.38f), -99);
-            CreateBlock(zones, "B Middle Zone", Vector2.zero, new Vector2(44f, 6f), new Color(0.06f, 0.32f, 0.52f, 0.46f), -100);
-            CreateBlock(zones, "BC Buffer Zone", new Vector2(0f, -3.5f), new Vector2(44f, 1f), new Color(0.04f, 0.24f, 0.42f, 0.42f), -99);
-            CreateBlock(zones, "C Deep Zone", new Vector2(0f, -6f), new Vector2(44f, 4f), new Color(0.02f, 0.11f, 0.24f, 0.58f), -100);
+            GameObject worldObject = new GameObject("Cambrian Ocean World");
+            worldObject.transform.SetParent(root, false);
+            worldObject.AddComponent<CambrianOceanWorld>();
         }
 
         private static void CreateModernBackdrop(Transform root)
