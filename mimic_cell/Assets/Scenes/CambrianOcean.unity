@@ -171,20 +171,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5824003858303212285, guid: 5134a1e483625de49b323f07b17b32fb, type: 3}
-      propertyPath: visualRoot
-      value: 
-      objectReference: {fileID: 2017420075}
     - target: {fileID: 6021030491659640245, guid: 5134a1e483625de49b323f07b17b32fb, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6021030491659640245, guid: 5134a1e483625de49b323f07b17b32fb, type: 3}
       propertyPath: m_WasSpriteAssigned
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7914205698889909906, guid: 5134a1e483625de49b323f07b17b32fb, type: 3}
-      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -821,7 +813,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ComponentVersion: 3
+  m_ComponentVersion: 2
   m_LightType: 4
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
@@ -1212,82 +1204,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!1 &1016083241
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1016083243}
-  - component: {fileID: 1016083242}
-  m_Layer: 0
-  m_Name: Creature Spawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1016083242
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016083241}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d44cb94cbdd1894684a0475ba3c9bfa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureSpawner
-  targetCamera: {fileID: 519420031}
-  spawnedCreaturesParent: {fileID: 0}
-  spawnEntries:
-  - prefab: {fileID: 5100830523769901341, guid: 5134a1e483625de49b323f07b17b32fb, type: 3}
-    spawnMode: 0
-    minGroupSize: 0
-    maxGroupSize: 0
-  - prefab: {fileID: 5036345649703934483, guid: 535b61fa28c2363489910e256ae01b09, type: 3}
-    spawnMode: 1
-    minGroupSize: 3
-    maxGroupSize: 5
-  - prefab: {fileID: 1394167773299898169, guid: b863ecb282fd91145bb6a1fea9c5f2ed, type: 3}
-    spawnMode: 0
-    minGroupSize: 0
-    maxGroupSize: 0
-  - prefab: {fileID: 4807689555913272783, guid: c4e114fcea38bab46869198f1a0917e7, type: 3}
-    spawnMode: 1
-    minGroupSize: 3
-    maxGroupSize: 5
-  - prefab: {fileID: 5397405091998303646, guid: 1d25814ca9d50a94782efc01dc215d42, type: 3}
-    spawnMode: 0
-    minGroupSize: 0
-    maxGroupSize: 0
-  minSpawnInterval: 2
-  maxSpawnInterval: 5
-  maxAliveCreatures: 25
-  worldBoundsMin: {x: -21, y: -8.5}
-  worldBoundsMax: {x: 21, y: 8.5}
-  outsidePadding: 2.5
-  groupRadius: 1.5
-  maxPositionAttempts: 50
-  spawnPlaneZ: 0
---- !u!4 &1016083243
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016083241}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1102915320
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1441,11 +1357,6 @@ Transform:
   - {fileID: 2057346730}
   m_Father: {fileID: 809548029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &2017420075 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 54910889850090819, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
-  m_PrefabInstance: {fileID: 1102915320}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2053573610
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1702,4 +1613,3 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 809548029}
-  - {fileID: 1016083243}
