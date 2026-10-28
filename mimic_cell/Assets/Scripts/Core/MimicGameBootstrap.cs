@@ -80,10 +80,11 @@ namespace MimicCell.Core
 
             PrototypePlayer player = EnsurePlayer(root.transform);
             PlayerMovementController playerMovement = player.GetComponent<PlayerMovementController>();
-            Camera sceneCamera = EnsureCamera(player.transform, GetGameplayBackground(sceneName), sceneName == MimicSceneNames.Modern ? 6f : 5.5f);
+            Camera sceneCamera = EnsureCamera(player.transform, GetGameplayBackground(sceneName), 7.5f);
             CameraFollow2D follow = sceneCamera.GetComponent<CameraFollow2D>();
             follow.SetTarget(player.transform);
             follow.SetOffset(new Vector3(0f, 0f, -10f));
+            follow.SetDeadZone(new Vector2(1.8f, 1.1f));
 
             if (sceneName == MimicSceneNames.Modern)
             {

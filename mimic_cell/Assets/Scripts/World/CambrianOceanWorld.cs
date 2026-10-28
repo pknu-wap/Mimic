@@ -338,7 +338,7 @@ namespace MimicCell.World
 
             float verticalMargin = sceneCamera != null && sceneCamera.orthographic
                 ? sceneCamera.orthographicSize
-                : 5.5f;
+                : 7.5f;
             float horizontalMargin = sceneCamera != null
                 ? verticalMargin * sceneCamera.aspect
                 : verticalMargin * (16f / 9f);

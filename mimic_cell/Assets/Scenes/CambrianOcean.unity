@@ -272,6 +272,7 @@ MonoBehaviour:
   target: {fileID: 1196324024}
   offset: {x: 0, y: 0, z: -10}
   smoothTime: 0.12
+  deadZone: {x: 1.8, y: 1.1}
   useBounds: 1
   minBounds: {x: -1014.2222, y: -170.5}
   maxBounds: {x: 1014.2222, y: 4.5}

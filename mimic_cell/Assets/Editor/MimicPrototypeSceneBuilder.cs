@@ -7,6 +7,7 @@ using MimicCell.World;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace MimicCell.EditorTools
@@ -18,8 +19,10 @@ namespace MimicCell.EditorTools
         private const string ModernScenePath = "Assets/Scenes/Modern.unity";
         private const string PrototypePrefabFolder = "Assets/Prefabs/Prototype";
         private const string PlayerPrefabPath = PrototypePrefabFolder + "/PlayerPrototype.prefab";
+        private const string PlayerSpritePath = "Assets/Sprites/Player/플레이어 (초기 버전).psd";
         private const string AimMaterialPath = PrototypePrefabFolder + "/PrototypeAimLine.mat";
         private const float PixelsPerUnit = 16f;
+        private const float PlayerVisualScale = 0.5f;
 
         private sealed class CreatureSpec
         {
@@ -132,6 +135,23 @@ namespace MimicCell.EditorTools
             Debug.Log("Mimic prototype prefabs and scene objects were built successfully.");
         }
 
+        [MenuItem("Mimic/Rebuild Player Prototype", priority = 11)]
+        public static void RebuildPlayerPrototype()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                Debug.LogWarning("Stop Play Mode before rebuilding the Mimic player prototype.");
+                return;
+            }
+
+            EnsureAssetFolders();
+            GameObject playerPrefab = CreatePlayerPrefab();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Selection.activeObject = playerPrefab;
+            Debug.Log("Mimic player sprite prefab was rebuilt successfully.");
+        }
+
         private static void EnsureAssetFolders()
         {
             if (!AssetDatabase.IsValidFolder("Assets/Prefabs"))
@@ -176,14 +196,9 @@ namespace MimicCell.EditorTools
                 body.interpolation = RigidbodyInterpolation2D.Interpolate;
 
                 CircleCollider2D playerCollider = player.AddComponent<CircleCollider2D>();
-                playerCollider.radius = 0.42f;
+                playerCollider.radius = 0.5f;
 
-                GameObject visual = CreateVisual(
-                    player.transform,
-                    new Vector2Int(16, 16),
-                    new Color(0.26f, 0.95f, 1f, 0.72f),
-                    new Color(0.9f, 1f, 1f, 0.95f),
-                    10);
+                GameObject visual = CreatePlayerSpriteVisual(player.transform);
 
                 player.AddComponent<WasdSwimMovement>();
                 player.AddComponent<MouseHoldMovement>();
@@ -201,6 +216,122 @@ namespace MimicCell.EditorTools
             {
                 Object.DestroyImmediate(player);
             }
+        }
+
+        private static GameObject CreatePlayerSpriteVisual(Transform parent)
+        {
+            UnityEngine.Object[] spriteAssets = AssetDatabase.LoadAllAssetsAtPath(PlayerSpritePath);
+            Sprite bodySprite = RequirePlayerLayerSprite(spriteAssets, 7);
+            Sprite coreSprite = RequirePlayerLayerSprite(spriteAssets, 11);
+            Sprite extractionSprite = RequirePlayerLayerSprite(spriteAssets, 9);
+            Sprite legOneSprite = RequirePlayerLayerSprite(spriteAssets, 1);
+            Sprite legThreeSprite = RequirePlayerLayerSprite(spriteAssets, 3);
+            Sprite legFiveSprite = RequirePlayerLayerSprite(spriteAssets, 5);
+
+            GameObject visual = new GameObject("Visual");
+            visual.transform.SetParent(parent, false);
+            visual.transform.localScale = Vector3.one * PlayerVisualScale;
+
+            SortingGroup sortingGroup = visual.AddComponent<SortingGroup>();
+            sortingGroup.sortingOrder = 10;
+
+            Vector2 bodyLowerLeft = new Vector2(282f, 495f);
+            Vector2 bodyCenter = bodyLowerLeft + (bodySprite.rect.size * 0.5f);
+
+            GameObject bodyRoot = new GameObject("Body Jelly");
+            bodyRoot.transform.SetParent(visual.transform, false);
+            SpriteRenderer bodyRenderer = CreatePlayerLayer(
+                bodyRoot.transform,
+                "Layer 7 - Body",
+                bodySprite,
+                Vector2.zero,
+                7);
+            SpriteRenderer coreRenderer = CreatePlayerLayer(
+                bodyRoot.transform,
+                "Layer 11 - Core",
+                coreSprite,
+                CalculatePlayerLayerOffset(coreSprite, new Vector2(344f, 525f), bodyCenter),
+                11);
+
+            SpriteRenderer[] legs =
+            {
+                CreatePlayerLayer(
+                    visual.transform,
+                    "Layer 1 - Leg",
+                    legOneSprite,
+                    CalculatePlayerLayerOffset(legOneSprite, new Vector2(339f, 83f), bodyCenter),
+                    1),
+                CreatePlayerLayer(
+                    visual.transform,
+                    "Layer 3 - Leg",
+                    legThreeSprite,
+                    CalculatePlayerLayerOffset(legThreeSprite, new Vector2(174f, 71f), bodyCenter),
+                    3),
+                CreatePlayerLayer(
+                    visual.transform,
+                    "Layer 5 - Leg",
+                    legFiveSprite,
+                    CalculatePlayerLayerOffset(legFiveSprite, new Vector2(391f, 83f), bodyCenter),
+                    5)
+            };
+
+            SpriteRenderer extractionTentacle = CreatePlayerLayer(
+                visual.transform,
+                "Layer 9 - Extraction Tentacle",
+                extractionSprite,
+                CalculatePlayerLayerOffset(extractionSprite, new Vector2(376f, 146f), bodyCenter),
+                9);
+
+            PlayerJellyVisual jellyVisual = parent.gameObject.AddComponent<PlayerJellyVisual>();
+            jellyVisual.Configure(
+                visual.transform,
+                bodyRoot.transform,
+                bodyRenderer,
+                coreRenderer.transform,
+                legs,
+                extractionTentacle);
+            return visual;
+        }
+
+        private static Sprite RequirePlayerLayerSprite(UnityEngine.Object[] assets, int layerNumber)
+        {
+            string layerName = "레이어 " + layerNumber;
+            for (int i = 0; i < assets.Length; i++)
+            {
+                if (assets[i] is Sprite sprite && sprite.name == layerName)
+                {
+                    return sprite;
+                }
+            }
+
+            throw new System.InvalidOperationException(
+                "Player PSD is missing the required sprite layer '" + layerName + "'.");
+        }
+
+        private static SpriteRenderer CreatePlayerLayer(
+            Transform parent,
+            string objectName,
+            Sprite sprite,
+            Vector2 localPosition,
+            int layerOrder)
+        {
+            GameObject layer = new GameObject(objectName);
+            layer.transform.SetParent(parent, false);
+            layer.transform.localPosition = new Vector3(localPosition.x, localPosition.y, 0f);
+
+            SpriteRenderer renderer = layer.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.sortingOrder = layerOrder;
+            return renderer;
+        }
+
+        private static Vector2 CalculatePlayerLayerOffset(
+            Sprite sprite,
+            Vector2 sourceLowerLeft,
+            Vector2 bodyCenter)
+        {
+            Vector2 layerCenter = sourceLowerLeft + (sprite.rect.size * 0.5f);
+            return (layerCenter - bodyCenter) / sprite.pixelsPerUnit;
         }
 
         private static void CreateCreaturePrefab(CreatureSpec spec)
@@ -290,7 +421,7 @@ namespace MimicCell.EditorTools
                     includeCambrianCreatures
                         ? new Color(0.02f, 0.12f, 0.24f, 1f)
                         : new Color(0.53f, 0.74f, 0.82f, 1f),
-                    includeCambrianCreatures ? 5.5f : 6f,
+                    7.5f,
                     includeCambrianCreatures);
 
                 LineRenderer aimLine = CreateAimLine(player.transform, aimMaterial);
@@ -390,6 +521,7 @@ namespace MimicCell.EditorTools
 
             follow.SetTarget(target);
             follow.SetOffset(new Vector3(0f, 0f, -10f));
+            follow.SetDeadZone(new Vector2(1.8f, 1.1f));
 
             if (useCambrianWorldBounds)
             {
