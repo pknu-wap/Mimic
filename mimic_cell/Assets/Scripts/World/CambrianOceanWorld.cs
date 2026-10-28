@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using MimicCell.Creatures;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace MimicCell.World
 {
     [DisallowMultipleComponent]
-    public sealed class CambrianOceanWorld : MonoBehaviour
+    public sealed class CambrianOceanWorld :
+    MonoBehaviour,
+    ICreatureEnvironment
     {
         public const float DefaultWorldHalfWidth = 1024f;
         public const float DefaultSurfaceY = 10f;
@@ -142,6 +145,30 @@ namespace MimicCell.World
         public event Action<int, int, Transform> ChunkActivated;
         public event Action<int> ChunkDeactivated;
 
+        public event Action<int, int, Transform> RegionActivated
+        {
+            add
+            {
+                ChunkActivated += value;
+            }
+            remove
+            {
+                ChunkActivated -= value;
+            }
+        }
+
+        public event Action<int> RegionDeactivated
+        {
+            add
+            {
+                ChunkDeactivated += value;
+            }
+            remove
+            {
+                ChunkDeactivated -= value;
+            }
+        }
+
         private void Awake()
         {
             InitializeIfNeeded();
@@ -207,9 +234,59 @@ namespace MimicCell.World
             return GetColumnProfile(worldPosition.x).GetZone(worldPosition.y);
         }
 
+        public CreatureHabitatMask GetHabitatAt(
+            Vector2 worldPosition)
+        {
+            OceanDepthZone zone = GetZoneAt(worldPosition);
+
+            switch (zone)
+            {
+                case OceanDepthZone.AA:
+                    return CreatureHabitatMask.OceanAA;
+
+                case OceanDepthZone.AB:
+                    return CreatureHabitatMask.OceanAB;
+
+                case OceanDepthZone.BB:
+                    return CreatureHabitatMask.OceanBB;
+
+                case OceanDepthZone.BC:
+                    return CreatureHabitatMask.OceanBC;
+
+                case OceanDepthZone.CC:
+                    return CreatureHabitatMask.OceanCC;
+
+                default:
+                    return CreatureHabitatMask.None;
+            }
+        }
+
         public float GetSeabedY(float worldX)
         {
             return GetColumnProfile(worldX).SeabedY;
+        }
+
+        public bool IsInsidePlayableArea(
+            Vector2 worldPosition)
+        {
+            InitializeIfNeeded();
+
+            if (worldPosition.x < worldMinX ||
+                worldPosition.x > worldMaxX)
+            {
+                return false;
+            }
+
+            OceanColumnProfile profile =
+                GetColumnProfile(worldPosition.x);
+
+            bool isBelowSurface =
+                worldPosition.y <= profile.SurfaceY;
+
+            bool isAboveSeabed =
+                worldPosition.y >= profile.SeabedY;
+
+            return isBelowSurface && isAboveSeabed;
         }
 
         public int GetStableChunkSeed(float worldX)
@@ -231,6 +308,28 @@ namespace MimicCell.World
 
             chunkRoot = null;
             return false;
+        }
+
+        public int GetRegionId(
+            Vector2 worldPosition)
+        {
+            InitializeIfNeeded();
+            return GetChunkIndex(worldPosition.x);
+        }
+
+        public int GetStableRegionSeed(
+            Vector2 worldPosition)
+        {
+            return GetStableChunkSeed(worldPosition.x);
+        }
+
+        public bool TryGetActiveRegionRoot(
+            Vector2 worldPosition,
+            out Transform regionRoot)
+        {
+            return TryGetActiveChunkRoot(
+                worldPosition.x,
+                out regionRoot);
         }
 
         public void GetCameraBounds(Camera sceneCamera, out Vector2 minBounds, out Vector2 maxBounds)
