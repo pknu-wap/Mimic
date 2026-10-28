@@ -18,11 +18,17 @@ namespace MimicCell.Player
         [SerializeField, Min(0f)] private float swimDeceleration = 2f;
 
         [Header("Facing")]
+        [Tooltip("Time used by the body to settle toward a new 8-direction movement heading.")]
+        [SerializeField, Min(0.01f)] private float facingSmoothTime = 0.18f;
+        [SerializeField, Min(0f)] private float maximumFacingSpeed = 360f;
+        [Tooltip("When enabled, WASD selects the target heading while thrust follows the body's current forward direction.")]
+        [SerializeField] private bool thrustAlongFacing = true;
         [SerializeField] private Transform visualRoot;
 
         private Rigidbody2D attachedRigidbody;
         private Vector2 moveInput;
-        private Vector2 lastFacingDirection = Vector2.right;
+        private float headingAngle;
+        private float headingVelocity;
 
         private void Awake()
         {
@@ -34,11 +40,14 @@ namespace MimicCell.Player
         private void OnEnable()
         {
             moveInput = Vector2.zero;
+            headingVelocity = 0f;
+            headingAngle = visualRoot != null ? visualRoot.localEulerAngles.z : 0f;
         }
 
         private void OnDisable()
         {
             moveInput = Vector2.zero;
+            headingVelocity = 0f;
             StopMovement();
         }
 
@@ -54,7 +63,10 @@ namespace MimicCell.Player
 
             if (moveInput.sqrMagnitude > 0.001f)
             {
-                velocity += moveInput * (swimAcceleration * Time.fixedDeltaTime);
+                Vector2 thrustDirection = thrustAlongFacing && visualRoot != null
+                    ? (Vector2)visualRoot.up
+                    : moveInput;
+                velocity += thrustDirection.normalized * (swimAcceleration * Time.fixedDeltaTime);
                 velocity = Vector2.ClampMagnitude(velocity, swimSpeed);
             }
             else
@@ -94,14 +106,20 @@ namespace MimicCell.Player
 
         private void UpdateFacing(Vector2 direction)
         {
-            if (direction.sqrMagnitude <= 0.001f)
+            if (visualRoot == null || direction.sqrMagnitude <= 0.001f)
             {
                 return;
             }
 
-            lastFacingDirection = direction.normalized;
-            float angle = Mathf.Atan2(lastFacingDirection.y, lastFacingDirection.x) * Mathf.Rad2Deg;
-            visualRoot.rotation = Quaternion.Euler(0f, 0f, angle);
+            float targetAngle = (Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg) - 90f;
+            headingAngle = Mathf.SmoothDampAngle(
+                headingAngle,
+                targetAngle,
+                ref headingVelocity,
+                facingSmoothTime,
+                maximumFacingSpeed,
+                Time.deltaTime);
+            visualRoot.localRotation = Quaternion.Euler(0f, 0f, headingAngle);
         }
 
         private void StopMovement()
