@@ -90,7 +90,7 @@ namespace MimicCell.Core
             {
                 follow.SetBounds(new Vector2(-22f, -10f), new Vector2(22f, 10f));
             }
-            else
+            else if (sceneName == MimicSceneNames.CambrianOcean)
             {
                 CambrianOceanWorld oceanWorld = EnsureCambrianOceanWorld(root.transform, sceneCamera, player.transform);
                 oceanWorld.GetCameraBounds(sceneCamera, out Vector2 minBounds, out Vector2 maxBounds);
@@ -106,7 +106,7 @@ namespace MimicCell.Core
             {
                 EnsureModernMarkers(root.transform);
             }
-            else
+            else if (sceneName == MimicSceneNames.SampleScene)
             {
                 EnsureCambrianCreatureMarkers(root.transform, player);
             }
