@@ -21,6 +21,9 @@ namespace MimicCell.Player
         [SerializeField, Range(0, 2)] private int movementMouseButton = 0;
 
         [Header("Aim")]
+        [Tooltip("Time used by the body to settle toward the pointer direction.")]
+        [SerializeField, Min(0.01f)] private float facingSmoothTime = 0.1f;
+        [SerializeField, Min(0f)] private float maximumFacingSpeed = 540f;
         [SerializeField] private Transform visualRoot;
         [SerializeField] private Camera aimCamera;
         [SerializeField] private LineRenderer aimLine;
@@ -29,6 +32,8 @@ namespace MimicCell.Player
         private Vector2 aimDirection = Vector2.right;
         private float pointerDistance;
         private bool movementButtonHeld;
+        private float headingAngle;
+        private float headingVelocity;
 
         private void Awake()
         {
@@ -40,12 +45,15 @@ namespace MimicCell.Player
         private void OnEnable()
         {
             movementButtonHeld = false;
+            headingVelocity = 0f;
+            headingAngle = visualRoot != null ? visualRoot.localEulerAngles.z : 0f;
             SetAimLineVisible(aimLine != null);
         }
 
         private void OnDisable()
         {
             movementButtonHeld = false;
+            headingVelocity = 0f;
             SetAimLineVisible(false);
             StopMovement();
         }
@@ -113,8 +121,15 @@ namespace MimicCell.Player
                 return;
             }
 
-            float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
-            visualRoot.rotation = Quaternion.Euler(0f, 0f, angle);
+            float targetAngle = (Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg) - 90f;
+            headingAngle = Mathf.SmoothDampAngle(
+                headingAngle,
+                targetAngle,
+                ref headingVelocity,
+                facingSmoothTime,
+                maximumFacingSpeed,
+                Time.deltaTime);
+            visualRoot.localRotation = Quaternion.Euler(0f, 0f, headingAngle);
         }
 
         private void UpdateAimLine()
