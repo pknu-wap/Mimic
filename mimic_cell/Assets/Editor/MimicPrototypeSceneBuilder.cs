@@ -112,7 +112,7 @@ namespace MimicCell.EditorTools
             }
         };
 
-        [MenuItem("Mimic/Build Prototype Scene Objects", priority = 10)]
+        [MenuItem("Mimic/Build Prototype Assets", priority = 10)]
         public static void BuildPrototypeSceneObjects()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
@@ -122,16 +122,13 @@ namespace MimicCell.EditorTools
             }
 
             EnsureAssetFolders();
-            Material aimMaterial = EnsureAimMaterial();
-            GameObject playerPrefab = CreatePlayerPrefab();
+            EnsureAimMaterial();
+            CreatePlayerPrefab();
 
             for (int i = 0; i < CambrianCreatures.Length; i++)
             {
                 CreateCreaturePrefab(CambrianCreatures[i]);
             }
-
-            BuildGameplayScene(CambrianScenePath, playerPrefab, aimMaterial, true);
-            BuildGameplayScene(ModernScenePath, playerPrefab, aimMaterial, false);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

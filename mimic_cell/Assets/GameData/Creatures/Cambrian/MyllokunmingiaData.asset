@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
+  m_Name: MyllokunmingiaData
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
+  creatureId: Myllokunmingia
+  displayName: "\uBC00\uB85C\uCFE4\uBC0D\uAE30\uC544"
+  prefab: {fileID: 3406898719834894668, guid: 7e2df48d8a8f370419cadfe497e41de3, type: 3}
+  spawnKind: 1
+  foodTier: 1
+  bodySize: 0
+  allowedHabitats: 3
+  traits: 1
+  disposition: 1
+  designSizeRange:
+    min: {x: 17, y: 8}
+    max: {x: 23, y: 12}
+  healthRange:
+    min: 20
+    max: 25
+  attackRange:
+    min: 0
+    max: 0
+  reflectionDamageRange:
+    min: 0
+    max: 0
+  swimSpeed: 2.2
+  sprintSpeed: 4.3
+  wanderRadius: 4.5
+  usePerceptionRadiusOverride: 0
+  perceptionRadius: 5
+  spawnWeight: 1
+  maxAlive: 14
+  groupSizeRange:
+    min: 5
+    max: 7
+  maxGroupCount: 2
