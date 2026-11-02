@@ -8,6 +8,7 @@ using MimicCell.World;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using MimicCell.StatusEffects;
 
 namespace MimicCell.Core
 {
@@ -124,14 +125,21 @@ namespace MimicCell.Core
         }
 
         private static PrototypePlayer EnsurePlayer(Transform root)
-        {
-            PrototypePlayer existingPlayer = Object.FindFirstObjectByType<PrototypePlayer>();
-            if (existingPlayer != null)
-            {
-                existingPlayer.Configure(20);
-                return existingPlayer;
-            }
+{
+    PrototypePlayer existingPlayer = Object.FindFirstObjectByType<PrototypePlayer>();
 
+    if (existingPlayer != null)
+    {
+        existingPlayer.Configure(20);
+
+        // 기존 플레이어에게 상태이상 관리자가 없으면 추가
+        if (existingPlayer.GetComponent<StatusEffectController>() == null)
+        {
+            existingPlayer.gameObject.AddComponent<StatusEffectController>();
+        }
+
+        return existingPlayer;
+    }
             PlayerMovementController existingMovement = Object.FindFirstObjectByType<PlayerMovementController>();
             if (existingMovement != null)
             {
@@ -141,11 +149,16 @@ namespace MimicCell.Core
                     existingObject.AddComponent<ActorHealth>();
                 }
 
-                PrototypePlayer upgradedPlayer = existingObject.GetComponent<PrototypePlayer>();
-                if (upgradedPlayer == null)
-                {
-                    upgradedPlayer = existingObject.AddComponent<PrototypePlayer>();
-                }
+            PrototypePlayer upgradedPlayer = existingObject.GetComponent<PrototypePlayer>();
+if (upgradedPlayer == null)
+{
+    upgradedPlayer = existingObject.AddComponent<PrototypePlayer>();
+}
+
+if (existingObject.GetComponent<StatusEffectController>() == null)
+{
+    existingObject.AddComponent<StatusEffectController>();
+}
 
                 upgradedPlayer.Configure(20);
                 return upgradedPlayer;
@@ -179,8 +192,16 @@ namespace MimicCell.Core
             playerObject.AddComponent<MouseHoldMovement>();
             playerObject.AddComponent<PlayerMovementController>();
             playerObject.AddComponent<ActorHealth>();
+            // 플레이어에게 상태이상 관리 기능 추가
+            playerObject.AddComponent<StatusEffectController>();
 
-            PrototypePlayer player = playerObject.AddComponent<PrototypePlayer>();
+
+if (playerObject.GetComponent<StatusEffectController>() == null)
+{
+    playerObject.AddComponent<StatusEffectController>();
+}
+
+PrototypePlayer player = playerObject.AddComponent<PrototypePlayer>();
             player.Configure(20);
             return player;
         }
