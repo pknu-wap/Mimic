@@ -11,9 +11,9 @@ namespace MimicCell.Player
     public sealed class MouseHoldMovement : MonoBehaviour
     {
         [Header("Mouse Hold Movement")]
-        [SerializeField, Min(0f)] private float moveSpeed = 3f;
+        [SerializeField, Min(0f)] private float moveSpeed = 3.6f;
         [Tooltip("Acceleration applied as thrust while the movement button is held.")]
-        [SerializeField, Min(0f)] private float moveAcceleration = 6f;
+        [SerializeField, Min(0f)] private float moveAcceleration = 7.2f;
         [Tooltip("Speed lost per second after releasing the movement button. Lower values create a longer glide.")]
         [SerializeField, Min(0f)] private float moveDeceleration = 2f;
         [SerializeField, Min(0f)] private float pointerDeadZone = 0.1f;

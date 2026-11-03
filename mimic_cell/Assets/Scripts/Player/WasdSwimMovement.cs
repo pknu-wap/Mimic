@@ -11,9 +11,9 @@ namespace MimicCell.Player
     public sealed class WasdSwimMovement : MonoBehaviour
     {
         [Header("WASD Swim")]
-        [SerializeField, Min(0f)] private float swimSpeed = 3f;
+        [SerializeField, Min(0f)] private float swimSpeed = 3.6f;
         [Tooltip("Acceleration applied as thrust while movement input is held.")]
-        [SerializeField, Min(0f)] private float swimAcceleration = 6f;
+        [SerializeField, Min(0f)] private float swimAcceleration = 7.2f;
         [Tooltip("Speed lost per second after releasing movement input. Lower values create a longer glide.")]
         [SerializeField, Min(0f)] private float swimDeceleration = 2f;
 

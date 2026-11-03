@@ -93,6 +93,7 @@ namespace MimicCell.Core
             else if (sceneName == MimicSceneNames.CambrianOcean)
             {
                 CambrianOceanWorld oceanWorld = EnsureCambrianOceanWorld(root.transform, sceneCamera, player.transform);
+                EnsureSeabedTerrain(root.transform, oceanWorld, sceneCamera, player.transform);
                 oceanWorld.GetCameraBounds(sceneCamera, out Vector2 minBounds, out Vector2 maxBounds);
                 follow.SetBounds(minBounds, maxBounds);
             }
@@ -290,6 +291,22 @@ namespace MimicCell.Core
             oceanWorld.gameObject.SetActive(true);
             oceanWorld.Configure(sceneCamera, player);
             return oceanWorld;
+        }
+
+        private static void EnsureSeabedTerrain(
+            Transform root, CambrianOceanWorld oceanWorld, Camera sceneCamera, Transform player)
+        {
+            SeabedTerrainWorld terrain = root.GetComponentInChildren<SeabedTerrainWorld>(true);
+            if (terrain == null)
+            {
+                GameObject terrainObject = new GameObject("Seabed Terrain");
+                terrainObject.transform.SetParent(root, false);
+                terrain = terrainObject.AddComponent<SeabedTerrainWorld>();
+            }
+
+            terrain.gameObject.SetActive(true);
+            terrain.Configure(oceanWorld, sceneCamera, player);
+            oceanWorld.RegisterTerrain(terrain);
         }
 
         private static void EnsureModernBackdrop(Transform root)
