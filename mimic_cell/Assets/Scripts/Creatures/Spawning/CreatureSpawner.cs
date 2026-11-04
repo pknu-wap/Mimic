@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MimicCell.Player;
 using UnityEngine;
+using MimicCell.StatusEffects;
 
 namespace MimicCell.Creatures
 {
@@ -653,6 +654,17 @@ namespace MimicCell.Creatures
                     spawnPosition,
                     Quaternion.identity,
                     regionRoot);
+// NPC에 상태이상 관리 컴포넌트가 없으면 자동 추가
+StatusEffectController statusController =
+    instance.GetComponent<StatusEffectController>();
+
+if (statusController == null)
+{
+    statusController = instance.AddComponent<StatusEffectController>();
+}
+
+// NPC 전용으로 설정
+statusController.SetOwnerType(StatusEffectTarget.Creature);
 
             instance.name =
                 definition.CreatureId +
