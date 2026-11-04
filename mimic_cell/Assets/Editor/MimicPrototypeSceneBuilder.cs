@@ -421,7 +421,7 @@ namespace MimicCell.EditorTools
                     includeCambrianCreatures
                         ? new Color(0.02f, 0.12f, 0.24f, 1f)
                         : new Color(0.53f, 0.74f, 0.82f, 1f),
-                    7.5f,
+                    includeCambrianCreatures ? 13f : 7.5f,
                     includeCambrianCreatures);
 
                 LineRenderer aimLine = CreateAimLine(player.transform, aimMaterial);

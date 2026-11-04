@@ -5,16 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/StartMenu.unity
     guid: f8d1d5b78c0c4cf9807f6ed64e75fa01
   - enabled: 1
     path: Assets/Scenes/CambrianOcean.unity
     guid: 2b4ef7d6e0834a39a2c7da8a53a9f15a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/CambrianExtinctionTest.unity
     guid: 5e4e0af6d95347f7832767917cb59864
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Modern.unity
     guid: 97c5f1f2a9f34e4bb8f4f5df086b7712
   m_configObjects:

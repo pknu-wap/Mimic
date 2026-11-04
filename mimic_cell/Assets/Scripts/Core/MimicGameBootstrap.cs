@@ -81,7 +81,8 @@ namespace MimicCell.Core
 
             PrototypePlayer player = EnsurePlayer(root.transform);
             PlayerMovementController playerMovement = player.GetComponent<PlayerMovementController>();
-            Camera sceneCamera = EnsureCamera(player.transform, GetGameplayBackground(sceneName), 7.5f);
+            float cameraSize = sceneName == MimicSceneNames.CambrianOcean ? 13f : 7.5f;
+            Camera sceneCamera = EnsureCamera(player.transform, GetGameplayBackground(sceneName), cameraSize);
             CameraFollow2D follow = sceneCamera.GetComponent<CameraFollow2D>();
             follow.SetTarget(player.transform);
             follow.SetOffset(new Vector3(0f, 0f, -10f));

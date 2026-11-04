@@ -714,7 +714,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16493a7d503345a6a839d24dcb1293ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.WasdSwimMovement
-  swimSpeed: 3.6
+  swimSpeed: 4
   swimAcceleration: 7.2
   swimDeceleration: 2
   facingSmoothTime: 0.18
