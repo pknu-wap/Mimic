@@ -1,5 +1,6 @@
 using MimicCell.Gameplay;
 using UnityEngine;
+using MimicCell.StatusEffects;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -27,13 +28,18 @@ namespace MimicCell.Player
         [SerializeField] private Transform visualRoot;
 
         private Rigidbody2D attachedRigidbody;
+        private StatusEffectController statusEffectController;
         private Vector2 moveInput;
         private float headingAngle;
         private float headingVelocity;
+        private bool isForcedMoving;
+private Vector2 forcedMoveDirection;
+private float forcedMoveSpeed;
 
         private void Awake()
         {
             attachedRigidbody = GetComponent<Rigidbody2D>();
+            statusEffectController = GetComponent<StatusEffectController>();
             ConfigureRigidbody();
             ResolveVisualRoot();
         }
@@ -60,7 +66,14 @@ namespace MimicCell.Player
 
         private void FixedUpdate()
         {
+            if (isForcedMoving)
+{
+    attachedRigidbody.linearVelocity =
+        forcedMoveDirection * forcedMoveSpeed;
+    return;
+}
             Vector2 velocity = attachedRigidbody.linearVelocity;
+            
 
             if (moveInput.sqrMagnitude > 0.001f)
             {
@@ -68,9 +81,22 @@ namespace MimicCell.Player
                     ? (Vector2)visualRoot.up
                     : moveInput;
                 velocity += thrustDirection.normalized * (swimAcceleration * Time.fixedDeltaTime);
-                ExtinctionStatusEffects status = GetComponent<ExtinctionStatusEffects>();
-                velocity = Vector2.ClampMagnitude(velocity,
-                    swimSpeed * (status != null ? status.SpeedMultiplier : 1f));
+               if (statusEffectController == null)
+{
+    statusEffectController = GetComponent<StatusEffectController>();
+}
+
+float speedMultiplier = statusEffectController != null
+    ? statusEffectController.GetSwimSpeedMultiplier()
+    : 1f;
+
+float finalSwimSpeed = swimSpeed * speedMultiplier;
+if (Mathf.Abs(speedMultiplier - 1f) > 0.001f)
+{
+    Debug.Log("도파민 적용 중! 최대 이동속도: " + finalSwimSpeed);
+}
+
+velocity = Vector2.ClampMagnitude(velocity, finalSwimSpeed);
             }
             else
             {
@@ -82,6 +108,25 @@ namespace MimicCell.Player
 
             attachedRigidbody.linearVelocity = velocity;
         }
+
+public void StartForcedMovement(Vector2 direction, float speed)
+{
+    if (direction.sqrMagnitude <= 0.001f)
+    {
+        return;
+    }
+
+    forcedMoveDirection = direction.normalized;
+    forcedMoveSpeed = Mathf.Max(0f, speed);
+    isForcedMoving = true;
+}
+
+public void StopForcedMovement()
+{
+    isForcedMoving = false;
+    moveInput = Vector2.zero;
+    StopMovement();
+}
 
         public void Configure(Transform newVisualRoot)
         {

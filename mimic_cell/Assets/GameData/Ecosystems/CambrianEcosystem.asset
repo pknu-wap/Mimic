@@ -17,6 +17,9 @@ MonoBehaviour:
   creatures:
   - {fileID: 11400000, guid: 98f6b35a84ead0e479b05795f93dbec8, type: 2}
   - {fileID: 11400000, guid: 8143815d75cf5e146829c4d1af1dfaed, type: 2}
+  - {fileID: 11400000, guid: 9b1dad70da20fd14da8ab11ba97c5bdd, type: 2}
+  - {fileID: 11400000, guid: c1483d1d102b8b84dafd86fa43c2c643, type: 2}
+  - {fileID: 11400000, guid: a4f7d7e42c45fcb4881863cf16961b9a, type: 2}
   spawnSettings:
     firstSpawnDelay: 2
     spawnInterval: 4
@@ -36,6 +39,8 @@ MonoBehaviour:
     sensingDurationMultiplier: 1.4
   groupSettings:
     targetSpacing: 1.5
+    roamDirectionMinDuration: 2
+    roamDirectionMaxDuration: 4
     returnDistanceMultiplier: 3
     isolationDistanceMultiplier: 6
     groupSearchRadius: 5

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MimicCell.Player;
 using UnityEngine;
+using MimicCell.StatusEffects;
 
 namespace MimicCell.Creatures
 {
@@ -38,6 +39,10 @@ namespace MimicCell.Creatures
         private readonly List<CreatureController>
             aliveCreatures =
                 new List<CreatureController>();
+
+        private readonly List<CreatureGroupController> 
+            activeGroups =
+                new List<CreatureGroupController>();
 
         private readonly Dictionary<CreatureController, float> 
             despawnTimers =
@@ -85,6 +90,7 @@ namespace MimicCell.Creatures
             }
 
             CleanupAliveCreatures();
+            CleanupActiveGroups();
             UpdateDespawnTimers();
 
             spawnTimer -= Time.deltaTime * extinctionSpawnRateMultiplier;
@@ -119,6 +125,31 @@ namespace MimicCell.Creatures
 
                     aliveCreatures.RemoveAt(index);
                 }
+            }
+        }
+
+        private void CleanupActiveGroups()
+        {
+            for (int index = activeGroups.Count - 1;
+                index >= 0;
+                index--)
+            {
+                CreatureGroupController group =
+                    activeGroups[index];
+
+                if (group == null)
+                {
+                    activeGroups.RemoveAt(index);
+                    continue;
+                }
+
+                if (group.MemberCount >= 2)
+                {
+                    continue;
+                }
+
+                activeGroups.RemoveAt(index);
+                group.Disband();
             }
         }
 
@@ -445,6 +476,31 @@ namespace MimicCell.Creatures
             return false;
         }
 
+        private int CountActiveGroups(CreatureDefinition definition)
+        {
+            int count = 0;
+
+            for (int index = 0;
+                index < activeGroups.Count;
+                index++)
+            {
+                CreatureGroupController group =
+                    activeGroups[index];
+
+                if (group == null)
+                {
+                    continue;
+                }
+
+                if (group.Definition == definition)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
         private int CountAlive(
             CreatureDefinition definition)
         {
@@ -486,6 +542,13 @@ namespace MimicCell.Creatures
             }
 
             if ((definition.AllowedHabitats & habitat) == 0)
+            {
+                return false;
+            }
+
+            if (definition.SpawnKind == CreatureSpawnKind.Group && 
+                CountActiveGroups(definition) >=
+                definition.MaxGroupCount)
             {
                 return false;
             }
@@ -597,6 +660,17 @@ namespace MimicCell.Creatures
                     spawnPosition,
                     Quaternion.identity,
                     regionRoot);
+// NPC에 상태이상 관리 컴포넌트가 없으면 자동 추가
+StatusEffectController statusController =
+    instance.GetComponent<StatusEffectController>();
+
+if (statusController == null)
+{
+    statusController = instance.AddComponent<StatusEffectController>();
+}
+
+// NPC 전용으로 설정
+statusController.SetOwnerType(StatusEffectTarget.Creature);
 
             instance.name =
                 definition.CreatureId +
@@ -655,13 +729,63 @@ namespace MimicCell.Creatures
             return controller;
         }
 
+        private CreatureGroupController CreateGroupController(
+            CreatureDefinition definition,
+            Vector2 groupCenter,
+            Transform regionRoot)
+        {
+            GameObject groupObject = new GameObject(
+                definition.CreatureId + "_Group_" +
+                (activeGroups.Count + 1));
+
+            groupObject.transform.SetParent(regionRoot);
+            groupObject.transform.position = groupCenter;
+
+            CreatureGroupController groupController =
+                groupObject.AddComponent<CreatureGroupController>();
+
+            bool initializedGroup = groupController.Initialize(
+                definition,
+                ecosystem,
+                environment,
+                player);
+
+            if (!initializedGroup)
+            {
+                Destroy(groupObject);
+                return null;
+            }
+
+            activeGroups.Add(groupController);
+            return groupController;
+        }
+
         private int SpawnDefinition(
             CreatureDefinition definition,
             Vector2 groupCenter,
             Transform regionRoot)
         {
-            int requestedCount =
-                GetSpawnCount(definition);
+            int requestedCount = GetSpawnCount(definition);
+
+            if (requestedCount <= 0)
+            {
+                return 0;
+            }
+
+            CreatureGroupController groupController = null;
+
+            if (definition.SpawnKind == CreatureSpawnKind.Group)
+            {
+                groupController = CreateGroupController(
+                    definition,
+                    groupCenter,
+                    regionRoot);
+
+                if (groupController == null)
+                {
+                    return 0;
+                }
+            }
 
             int spawnedCount = 0;
 
@@ -685,6 +809,11 @@ namespace MimicCell.Creatures
                 if (creature != null)
                 {
                     spawnedCount++;
+
+                    if (groupController != null)
+                    {
+                        groupController.AddMember(creature);
+                    }
                 }
             }
 

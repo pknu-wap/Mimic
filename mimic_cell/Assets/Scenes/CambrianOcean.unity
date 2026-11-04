@@ -360,6 +360,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1163678592 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+  m_PrefabInstance: {fileID: 1196324023}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1175212826
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,13 +522,66 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5270640567023923783, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1918069292}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324033}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324035}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324034}
   m_SourcePrefab: {fileID: 100100000, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
 --- !u!4 &1196324024 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5270640567023923783, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
   m_PrefabInstance: {fileID: 1196324023}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1196324033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163678592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f320169601cc2e419dbaf70b55852eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.TunnelVisionEffect
+  blurMaterial: {fileID: 2100000, guid: b3e528529f2696640846ded54576bdfc, type: 2}
+  tunnelVisionDefinition: {fileID: 11400000, guid: 7ea99e1b393cd6e4faceae8339660e0a, type: 2}
+--- !u!114 &1196324034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163678592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74a3289200a609e4f8b31ac317b0e045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.StatusEffectTester
+  dopamineRelease: {fileID: 11400000, guid: 5b61560198cae734184348c31f65cc5a, type: 2}
+--- !u!114 &1196324035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163678592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2a5614de9882204ab0c0c2dd3c1f307, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PanicEffect
+  panicDefinition: {fileID: 11400000, guid: 5351c5c526f3cc148ae4da7cc314c478, type: 2}
+  dashSpeed: 7
+  dashDuration: 2
+  cooldown: 3
+  randomAngle: 30
 --- !u!1 &1918069291
 GameObject:
   m_ObjectHideFlags: 0
