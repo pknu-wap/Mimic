@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dd08f11111d8394abb7f979c6e619e2, type: 3}
+  m_Name: CambrianEcosystem
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.EcosystemDefinition
+  ecosystemId: Cambrian
+  displayName: "\uCE84\uBE0C\uB9AC\uC544\uAE30"
+  creatures:
+  - {fileID: 11400000, guid: 98f6b35a84ead0e479b05795f93dbec8, type: 2}
+  - {fileID: 11400000, guid: 8143815d75cf5e146829c4d1af1dfaed, type: 2}
+  spawnSettings:
+    firstSpawnDelay: 2
+    spawnInterval: 4
+    maxTotalAlive: 40
+    candidateAttempts: 12
+    offscreenPadding: 2
+    maxSpawnDistance: 30
+    allowSpawnDuringCombat: 1
+  perceptionSettings:
+    commonPerceptionRadius: 5
+    decisionInterval: 0.15
+    tier1FleeDuration: 3
+    tier2ChaseDuration: 3
+    tier2FleeDuration: 4
+    tier3ChaseDuration: 5
+    tier3FleeDuration: 5
+    sensingDurationMultiplier: 1.4
+  groupSettings:
+    targetSpacing: 1.5
+    returnDistanceMultiplier: 3
+    isolationDistanceMultiplier: 6
+    groupSearchRadius: 5
+    regroupCompletionMultiplier: 1.25
+    scatterAngle: 35
+  despawnSettings:
+    distance: 45
+    conditionDuration: 3
+    requireOffscreen: 1

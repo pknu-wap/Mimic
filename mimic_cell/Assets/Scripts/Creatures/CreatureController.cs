@@ -23,7 +23,6 @@ namespace MimicCell.Creatures
 
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(BoxCollider2D))]
     [RequireComponent(typeof(ActorHealth))]
     public sealed class CreatureController : MonoBehaviour
     {
@@ -33,6 +32,7 @@ namespace MimicCell.Creatures
 
         [Header("Movement")]
         [SerializeField, Min(0f)] private float moveSpeed = 1.5f;
+        [SerializeField, Min(0f)] private float sprintSpeed = 2.5f;
         [SerializeField, Min(0f)] private float acceleration = 7f;
         [SerializeField, Min(0.1f)] private float wanderRadius = 4f;
 
@@ -53,11 +53,25 @@ namespace MimicCell.Creatures
         [SerializeField] private CreatureState currentState;
 
         private Rigidbody2D attachedRigidbody;
-        private BoxCollider2D attachedCollider;
+        private Collider2D attachedCollider;
         private ActorHealth actorHealth;
         private PrototypePlayer player;
+
+        private CreatureDefinition definition;
+        private EcosystemDefinition ecosystem;
+        private ICreatureEnvironment environment;
+
+        private float instanceVariation;
+        private int spawnRegionId;
+        private int spawnStableSeed;
+        private bool initializedFromDefinition;
+
         private Vector2 homePosition;
         private Vector2 wanderDirection = Vector2.right;
+
+        private Vector2 groupMovementDirection;
+        private bool hasGroupMovementDirection;
+
         private float stateTimeRemaining;
         private float decisionTimeRemaining;
         private float contactCooldownRemaining;
@@ -65,6 +79,31 @@ namespace MimicCell.Creatures
         public string SpeciesName
         {
             get { return speciesName; }
+        }
+
+        public CreatureDefinition Definition
+        {
+            get { return definition; }
+        }
+
+        public float InstanceVariation
+        {
+            get { return instanceVariation; }
+        }
+
+        public int SpawnRegionId
+        {
+            get { return spawnRegionId; }
+        }
+
+        public int SpawnStableSeed
+        {
+            get { return spawnStableSeed; }
+        }
+
+        public bool IsInitializedFromDefinition
+        {
+            get { return initializedFromDefinition; }
         }
 
         public CreatureState CurrentState
@@ -133,8 +172,8 @@ namespace MimicCell.Creatures
             Vector2 movementDirection = GetMovementDirection();
             movementDirection = KeepDirectionInsideBounds(movementDirection);
 
-            float speedMultiplier = GetStateSpeedMultiplier();
-            Vector2 targetVelocity = movementDirection * moveSpeed * speedMultiplier;
+            float currentSpeed = GetCurrentSpeed();
+            Vector2 targetVelocity = movementDirection * currentSpeed;
             attachedRigidbody.linearVelocity = Vector2.MoveTowards(
                 attachedRigidbody.linearVelocity,
                 targetVelocity,
@@ -142,6 +181,76 @@ namespace MimicCell.Creatures
 
             ClampPositionToBounds();
             UpdateVisualFacing(movementDirection);
+        }
+
+        public bool Initialize(
+            CreatureDefinition newDefinition,
+            EcosystemDefinition newEcosystem,
+            CreatureSpawnContext spawnContext,
+            ICreatureEnvironment newEnvironment,
+            PrototypePlayer targetPlayer)
+        {
+            if (newDefinition == null)
+            {
+                Debug.LogError(
+                    "CreatureDefinition is required.",
+                    this);
+
+                return false;
+            }
+
+            if (newEcosystem == null)
+            {
+                Debug.LogError(
+                    "EcosystemDefinition is required.",
+                    this);
+
+                return false;
+            }
+
+            if (newEnvironment == null)
+            {
+                Debug.LogError(
+                    "Creature environment is required.",
+                    this);
+
+                return false;
+            }
+
+            ResolveComponents();
+
+            if (attachedCollider == null)
+            {
+                Debug.LogError(
+                    "A Collider2D is required on the creature prefab.",
+                    this);
+
+                return false;
+            }
+
+            definition = newDefinition;
+            ecosystem = newEcosystem;
+            environment = newEnvironment;
+            player = targetPlayer;
+
+            instanceVariation = spawnContext.Variation;
+            spawnRegionId = spawnContext.RegionId;
+            spawnStableSeed = spawnContext.StableSeed;
+
+            attachedRigidbody.position = spawnContext.Position;
+            attachedRigidbody.linearVelocity = Vector2.zero;
+
+            ApplyDefinitionStats();
+            ApplyDefinitionScale();
+
+            homePosition = attachedRigidbody.position;
+            attachedCollider.enabled = true;
+
+            RestoreVisualColor();
+            BeginWanderCycle();
+
+            initializedFromDefinition = true;
+            return true;
         }
 
         public void Configure(
@@ -170,6 +279,118 @@ namespace MimicCell.Creatures
             attachedCollider.enabled = true;
             RestoreVisualColor();
             BeginWanderCycle();
+        }
+
+        public void SetGroupMovementDirection(Vector2 direction)
+        {
+            if (CurrentState == CreatureState.Dead)
+            {
+                return;
+            }
+
+            if (direction.sqrMagnitude <= 0.001f)
+            {
+                ClearGroupMovementDirection();
+                return;
+            }
+
+            groupMovementDirection = direction.normalized;
+            hasGroupMovementDirection = true;
+        }
+
+        public void ClearGroupMovementDirection()
+        {
+            groupMovementDirection = Vector2.zero;
+            hasGroupMovementDirection = false;
+        }
+
+        private void ApplyDefinitionStats()
+        {
+            speciesName =
+                string.IsNullOrWhiteSpace(definition.DisplayName)
+                    ? definition.CreatureId
+                    : definition.DisplayName;
+
+            disposition = definition.Disposition;
+
+            moveSpeed = Mathf.Max(
+                0f,
+                definition.SwimSpeed);
+
+            sprintSpeed = Mathf.Max(
+                moveSpeed,
+                definition.SprintSpeed);
+
+            wanderRadius = Mathf.Max(
+                0.1f,
+                definition.WanderRadius);
+
+            perceptionRadius =
+                definition.GetPerceptionRadius(
+                    ecosystem.PerceptionSettings
+                        .CommonPerceptionRadius);
+
+            decisionInterval = Mathf.Max(
+                0.02f,
+                ecosystem.PerceptionSettings
+                    .DecisionInterval);
+
+            int maxHealth =
+                definition.HealthRange.Evaluate(
+                    instanceVariation);
+
+            contactDamage =
+                definition.AttackRange.Evaluate(
+                    instanceVariation);
+
+            actorHealth.Configure(maxHealth);
+        }
+
+        private void ApplyDefinitionScale()
+        {
+            Vector2 minimum =
+                definition.DesignSizeRange.Min;
+
+            Vector2 maximum =
+                definition.DesignSizeRange.Max;
+
+            Vector2 selectedSize =
+                definition.DesignSizeRange.Evaluate(
+                    instanceVariation);
+
+            float referenceWidth =
+                (minimum.x + maximum.x) * 0.5f;
+
+            float referenceHeight =
+                (minimum.y + maximum.y) * 0.5f;
+
+            float scaleSum = 0f;
+            int scaleAxisCount = 0;
+
+            if (referenceWidth > 0.001f)
+            {
+                scaleSum +=
+                    selectedSize.x / referenceWidth;
+
+                scaleAxisCount++;
+            }
+
+            if (referenceHeight > 0.001f)
+            {
+                scaleSum +=
+                    selectedSize.y / referenceHeight;
+
+                scaleAxisCount++;
+            }
+
+            float uniformScale =
+                scaleAxisCount > 0
+                    ? scaleSum / scaleAxisCount
+                    : 1f;
+
+            transform.localScale =
+                Vector3.one *
+                Mathf.Max(0.01f, uniformScale);
         }
 
         private void EvaluatePlayer()
@@ -215,7 +436,17 @@ namespace MimicCell.Creatures
                 case CreatureState.Flee:
                     return -DirectionToPlayer(currentPosition);
 
+                case CreatureState.Idle:
+                    return hasGroupMovementDirection
+                        ? groupMovementDirection
+                        : Vector2.zero;
+
                 case CreatureState.Wander:
+                    if (hasGroupMovementDirection)
+                    {
+                        return groupMovementDirection;
+                    }
+
                     if (Vector2.Distance(currentPosition, homePosition) > wanderRadius)
                     {
                         return (homePosition - currentPosition).normalized;
@@ -239,16 +470,22 @@ namespace MimicCell.Creatures
             return direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.zero;
         }
 
-        private float GetStateSpeedMultiplier()
+        private float GetCurrentSpeed()
         {
             switch (CurrentState)
             {
                 case CreatureState.Chase:
-                    return 1f;
                 case CreatureState.Flee:
-                    return 1.15f;
+                    return sprintSpeed;
+
+                case CreatureState.Idle:
+                    return hasGroupMovementDirection
+                        ? moveSpeed
+                        : 0f;
+
                 case CreatureState.Wander:
-                    return 0.45f;
+                    return moveSpeed;
+
                 default:
                     return 0f;
             }
@@ -288,33 +525,76 @@ namespace MimicCell.Creatures
         {
             Vector2 position = attachedRigidbody.position;
 
-            if (position.x <= movementBoundsMin.x + 0.2f && direction.x < 0f)
+            if (environment != null)
+            {
+                Vector2 normalizedDirection =
+                    direction.sqrMagnitude > 1f
+                        ? direction.normalized
+                        : direction;
+
+                Vector2 probePosition =
+                    position + normalizedDirection * 0.5f;
+
+                if (environment.IsInsidePlayableArea(probePosition))
+                {
+                    return normalizedDirection;
+                }
+
+                Vector2 returnDirection =
+                    homePosition - position;
+
+                return returnDirection.sqrMagnitude > 0.001f
+                    ? returnDirection.normalized
+                    : Vector2.zero;
+            }
+
+            if (position.x <= movementBoundsMin.x + 0.2f &&
+                direction.x < 0f)
             {
                 direction.x = Mathf.Abs(direction.x);
             }
-            else if (position.x >= movementBoundsMax.x - 0.2f && direction.x > 0f)
+            else if (
+                position.x >= movementBoundsMax.x - 0.2f &&
+                direction.x > 0f)
             {
                 direction.x = -Mathf.Abs(direction.x);
             }
 
-            if (position.y <= movementBoundsMin.y + 0.2f && direction.y < 0f)
+            if (position.y <= movementBoundsMin.y + 0.2f &&
+                direction.y < 0f)
             {
                 direction.y = Mathf.Abs(direction.y);
             }
-            else if (position.y >= movementBoundsMax.y - 0.2f && direction.y > 0f)
+            else if (
+                position.y >= movementBoundsMax.y - 0.2f &&
+                direction.y > 0f)
             {
                 direction.y = -Mathf.Abs(direction.y);
             }
 
-            return direction.sqrMagnitude > 1f ? direction.normalized : direction;
+            return direction.sqrMagnitude > 1f
+                ? direction.normalized
+                : direction;
         }
 
         private void ClampPositionToBounds()
         {
+            if (environment != null)
+            {
+                return;
+            }
+
             Vector2 position = attachedRigidbody.position;
+
             Vector2 clampedPosition = new Vector2(
-                Mathf.Clamp(position.x, movementBoundsMin.x, movementBoundsMax.x),
-                Mathf.Clamp(position.y, movementBoundsMin.y, movementBoundsMax.y));
+                Mathf.Clamp(
+                    position.x,
+                    movementBoundsMin.x,
+                    movementBoundsMax.x),
+                Mathf.Clamp(
+                    position.y,
+                    movementBoundsMin.y,
+                    movementBoundsMax.y));
 
             if (position != clampedPosition)
             {
@@ -324,13 +604,29 @@ namespace MimicCell.Creatures
 
         private void UpdateVisualFacing(Vector2 direction)
         {
-            if (visualRoot == null || direction.sqrMagnitude <= 0.001f)
+            if (visualRoot == null ||
+                direction.sqrMagnitude <= 0.001f)
             {
                 return;
             }
 
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            visualRoot.localRotation = Quaternion.Euler(0f, 0f, angle);
+            visualRoot.localRotation =
+                Quaternion.identity;
+
+            if (Mathf.Abs(direction.x) <= 0.01f)
+            {
+                return;
+            }
+
+            Vector3 visualScale =
+                visualRoot.localScale;
+
+            visualScale.x =
+                Mathf.Abs(visualScale.x) *
+                (direction.x >= 0f ? 1f : -1f);
+
+            visualRoot.localScale =
+                visualScale;
         }
 
         private void ResolveVisualRoot()
@@ -353,7 +649,7 @@ namespace MimicCell.Creatures
 
             if (attachedCollider == null)
             {
-                attachedCollider = GetComponent<BoxCollider2D>();
+                attachedCollider = GetComponent<Collider2D>();
             }
 
             if (actorHealth == null)
