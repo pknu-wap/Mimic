@@ -14,19 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
   creatureId: NewCreature
   displayName: "\uC0C8 \uC0DD\uBB3C"
-  prefab: {fileID: 0}
+  prefab: {fileID: 8975145865953331004, guid: a9690157c7054014095edf9cd93a9085, type: 3}
   spawnKind: 0
-  foodTier: 1
+  foodTier: 2
   bodySize: 0
-  allowedHabitats: 0
+  allowedHabitats: -1
   traits: 0
   disposition: 0
   designSizeRange:
     min: {x: 0, y: 0}
     max: {x: 0, y: 0}
   healthRange:
-    min: 0
-    max: 0
+    min: 1
+    max: 1
   attackRange:
     min: 0
     max: 0

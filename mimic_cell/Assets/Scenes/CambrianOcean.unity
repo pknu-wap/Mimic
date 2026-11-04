@@ -551,6 +551,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.TunnelVisionEffect
   blurMaterial: {fileID: 2100000, guid: b3e528529f2696640846ded54576bdfc, type: 2}
+  tunnelVisionDefinition: {fileID: 11400000, guid: 7ea99e1b393cd6e4faceae8339660e0a, type: 2}
 --- !u!114 &1196324034
 MonoBehaviour:
   m_ObjectHideFlags: 0
