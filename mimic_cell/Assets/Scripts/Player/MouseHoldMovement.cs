@@ -1,3 +1,4 @@
+using MimicCell.Gameplay;
 using UnityEngine;
 
 #if ENABLE_INPUT_SYSTEM
@@ -74,7 +75,9 @@ namespace MimicCell.Player
             if (movementButtonHeld)
             {
                 velocity += aimDirection * (moveAcceleration * Time.fixedDeltaTime);
-                velocity = Vector2.ClampMagnitude(velocity, moveSpeed);
+                ExtinctionStatusEffects status = GetComponent<ExtinctionStatusEffects>();
+                velocity = Vector2.ClampMagnitude(velocity,
+                    moveSpeed * (status != null ? status.SpeedMultiplier : 1f));
             }
             else
             {

@@ -1,3 +1,4 @@
+using MimicCell.Gameplay;
 using UnityEngine;
 
 #if ENABLE_INPUT_SYSTEM
@@ -67,7 +68,9 @@ namespace MimicCell.Player
                     ? (Vector2)visualRoot.up
                     : moveInput;
                 velocity += thrustDirection.normalized * (swimAcceleration * Time.fixedDeltaTime);
-                velocity = Vector2.ClampMagnitude(velocity, swimSpeed);
+                ExtinctionStatusEffects status = GetComponent<ExtinctionStatusEffects>();
+                velocity = Vector2.ClampMagnitude(velocity,
+                    swimSpeed * (status != null ? status.SpeedMultiplier : 1f));
             }
             else
             {

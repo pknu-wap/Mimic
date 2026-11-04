@@ -4,12 +4,14 @@ namespace MimicCell.Core
     {
         public const string StartMenu = "StartMenu";
         public const string CambrianOcean = "CambrianOcean";
+        public const string CambrianExtinctionTest = "CambrianExtinctionTest";
         public const string Modern = "Modern";
         public const string SampleScene = "SampleScene";
 
         public static bool IsGameplayScene(string sceneName)
         {
             return sceneName == CambrianOcean ||
+                   sceneName == CambrianExtinctionTest ||
                    sceneName == Modern ||
                    sceneName == SampleScene;
         }

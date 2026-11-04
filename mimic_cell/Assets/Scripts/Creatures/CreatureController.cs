@@ -75,6 +75,13 @@ namespace MimicCell.Creatures
         private float stateTimeRemaining;
         private float decisionTimeRemaining;
         private float contactCooldownRemaining;
+        private bool extinctionFrenzy;
+        private bool extinctionCold;
+        private Vector2 extinctionEscapeDirection;
+        private Vector2 extinctionWanderDirection;
+        private float extinctionWanderTime;
+        private float coldPursuitMemory;
+        private CreatureController coldPrey;
 
         public string SpeciesName
         {
@@ -143,6 +150,17 @@ namespace MimicCell.Creatures
             }
 
             contactCooldownRemaining = Mathf.Max(0f, contactCooldownRemaining - Time.deltaTime);
+            if (extinctionFrenzy)
+            {
+                extinctionWanderTime -= Time.deltaTime;
+                if (extinctionWanderTime <= 0f)
+                {
+                    PickExtinctionDirection();
+                }
+                return;
+            }
+
+            coldPursuitMemory = Mathf.Max(0f, coldPursuitMemory - Time.deltaTime);
             decisionTimeRemaining -= Time.deltaTime;
 
             if (decisionTimeRemaining <= 0f)
@@ -304,6 +322,44 @@ namespace MimicCell.Creatures
             hasGroupMovementDirection = false;
         }
 
+        public void SetExtinctionBehavior(bool frenzy, Vector2 escapeDirection, bool cold)
+        {
+            if (CurrentState == CreatureState.Dead)
+            {
+                extinctionFrenzy = false;
+                extinctionCold = false;
+                return;
+            }
+
+            if (frenzy && !extinctionFrenzy)
+            {
+                PickExtinctionDirection();
+            }
+            else if (!frenzy && extinctionFrenzy)
+            {
+                BeginWanderCycle();
+            }
+
+            extinctionFrenzy = frenzy;
+            extinctionEscapeDirection = escapeDirection;
+            extinctionCold = cold;
+            if (!cold)
+            {
+                coldPrey = null;
+                coldPursuitMemory = 0f;
+            }
+        }
+
+        private void PickExtinctionDirection()
+        {
+            extinctionWanderDirection = UnityEngine.Random.insideUnitCircle.normalized;
+            if (extinctionWanderDirection.sqrMagnitude < 0.001f)
+            {
+                extinctionWanderDirection = Vector2.right;
+            }
+            extinctionWanderTime = UnityEngine.Random.Range(0.45f, 1.35f);
+        }
+
         private void ApplyDefinitionStats()
         {
             speciesName =
@@ -400,23 +456,49 @@ namespace MimicCell.Creatures
                 player = FindFirstObjectByType<PrototypePlayer>();
             }
 
+            float radius = perceptionRadius * (extinctionCold ? 1.3f : 1f);
             bool canSeePlayer = player != null &&
                                 player.Health != null &&
                                 player.Health.IsAlive &&
                                 ((Vector2)player.transform.position - attachedRigidbody.position).sqrMagnitude <=
-                                perceptionRadius * perceptionRadius;
+                                radius * radius;
 
             if (canSeePlayer && disposition == CreatureDisposition.Aggressive)
             {
+                coldPrey = null;
+                if (extinctionCold) coldPursuitMemory = 1.2f;
                 SetState(CreatureState.Chase);
                 return;
             }
 
             if (canSeePlayer && disposition == CreatureDisposition.Timid)
             {
+                coldPrey = null;
+                if (extinctionCold) coldPursuitMemory = 1.2f;
                 SetState(CreatureState.Flee);
                 return;
             }
+
+            if (extinctionCold && disposition == CreatureDisposition.Aggressive &&
+                definition != null && definition.FoodTier >= CreatureFoodTier.Tier2)
+            {
+                CreatureController candidate = FindSmallerSameTierPrey(radius);
+                if (candidate != null)
+                {
+                    coldPrey = candidate;
+                    coldPursuitMemory = 1.2f;
+                    SetState(CreatureState.Chase);
+                    return;
+                }
+            }
+
+            if (extinctionCold && coldPursuitMemory > 0f &&
+                (CurrentState == CreatureState.Chase || CurrentState == CreatureState.Flee))
+            {
+                return;
+            }
+
+            coldPrey = null;
 
             if (CurrentState == CreatureState.Chase || CurrentState == CreatureState.Flee)
             {
@@ -424,8 +506,41 @@ namespace MimicCell.Creatures
             }
         }
 
+        private CreatureController FindSmallerSameTierPrey(float radius)
+        {
+            Collider2D[] nearby = Physics2D.OverlapCircleAll(attachedRigidbody.position, radius);
+            CreatureController closest = null;
+            float closestDistance = radius * radius;
+            foreach (Collider2D candidateCollider in nearby)
+            {
+                CreatureController candidate = candidateCollider.GetComponentInParent<CreatureController>();
+                if (candidate == null || candidate == this || candidate.definition == null ||
+                    candidate.CurrentState == CreatureState.Dead ||
+                    candidate.definition.FoodTier != definition.FoodTier ||
+                    candidate.definition.BodySize >= definition.BodySize)
+                {
+                    continue;
+                }
+
+                float distance = ((Vector2)candidate.transform.position - attachedRigidbody.position).sqrMagnitude;
+                if (distance < closestDistance)
+                {
+                    closest = candidate;
+                    closestDistance = distance;
+                }
+            }
+            return closest;
+        }
+
         private Vector2 GetMovementDirection()
         {
+            if (extinctionFrenzy)
+            {
+                // The hazard influence is deliberately weaker than the random heading.
+                Vector2 direction = extinctionWanderDirection + extinctionEscapeDirection * 0.38f;
+                return direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.zero;
+            }
+
             Vector2 currentPosition = attachedRigidbody.position;
 
             switch (CurrentState)
@@ -461,6 +576,12 @@ namespace MimicCell.Creatures
 
         private Vector2 DirectionToPlayer(Vector2 currentPosition)
         {
+            if (coldPrey != null && coldPrey.CurrentState != CreatureState.Dead)
+            {
+                Vector2 toPrey = (Vector2)coldPrey.transform.position - currentPosition;
+                return toPrey.sqrMagnitude > 0.001f ? toPrey.normalized : Vector2.zero;
+            }
+
             if (player == null)
             {
                 return Vector2.zero;
@@ -472,19 +593,25 @@ namespace MimicCell.Creatures
 
         private float GetCurrentSpeed()
         {
+            ExtinctionStatusEffects status = GetComponent<ExtinctionStatusEffects>();
+            float speedMultiplier = status != null ? status.SpeedMultiplier : 1f;
+            if (extinctionFrenzy)
+            {
+                return sprintSpeed * speedMultiplier;
+            }
             switch (CurrentState)
             {
                 case CreatureState.Chase:
                 case CreatureState.Flee:
-                    return sprintSpeed;
+                    return sprintSpeed * speedMultiplier;
 
                 case CreatureState.Idle:
                     return hasGroupMovementDirection
-                        ? moveSpeed
+                        ? moveSpeed * speedMultiplier
                         : 0f;
 
                 case CreatureState.Wander:
-                    return moveSpeed;
+                    return moveSpeed * speedMultiplier;
 
                 default:
                     return 0f;
@@ -667,6 +794,17 @@ namespace MimicCell.Creatures
                 contactCooldownRemaining > 0f ||
                 contactDamage <= 0)
             {
+                return;
+            }
+
+            if (extinctionCold && coldPrey != null &&
+                other.GetComponentInParent<CreatureController>() == coldPrey)
+            {
+                ActorHealth preyHealth = coldPrey.GetComponent<ActorHealth>();
+                if (preyHealth != null && preyHealth.TakeDamage(contactDamage))
+                {
+                    contactCooldownRemaining = contactCooldown;
+                }
                 return;
             }
 

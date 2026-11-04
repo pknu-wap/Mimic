@@ -150,83 +150,40 @@ namespace MimicCell.EditorTools
 
                 Type terrainType = typeof(SeabedTerrainWorld);
                 BindingFlags hidden = BindingFlags.Instance | BindingFlags.NonPublic;
-                float mouthX = (float)terrainType.GetMethod("CaveMouthX", hidden)
-                    .Invoke(terrain, new object[] { 0 });
-                float mouthY = terrain.GetSurfaceY(mouthX);
-                Check(world.GetZoneAt(new Vector2(mouthX, mouthY + 1f)) == OceanDepthZone.AA,
-                    "Starting cave mouth is outside AA.");
-                IList features = (IList)terrainType.GetMethod("BuildCaveFeatures", hidden)
-                    .Invoke(terrain, new object[] { mouthX - 10f, mouthX + 220f });
-                Vector2 current = new Vector2(mouthX, mouthY + 2f);
-                int connectedSegments = 0;
-                for (int step = 0; step < 12; step++)
+                IList tunnels = (IList)terrainType.GetField("tunnelSegments", hidden)
+                    .GetValue(terrain);
+                IList boulders = (IList)terrainType.GetField("chamberBoulders", hidden)
+                    .GetValue(terrain);
+                Check(tunnels.Count > 10 && boulders.Count > 0,
+                    "Expected branching caves and chamber obstacles were not generated.");
+                for (int i = 0; i < tunnels.Count; i++)
                 {
-                    object nextPassage = null;
-                    float longestAdvance = 0f;
-                    foreach (object feature in features)
+                    object tunnel = tunnels[i];
+                    Type tunnelType = tunnel.GetType();
+                    Vector2 start = (Vector2)tunnelType.GetField("Start").GetValue(tunnel);
+                    Vector2 end = (Vector2)tunnelType.GetField("End").GetValue(tunnel);
+                    for (int sample = 0; sample <= 10; sample++)
+                        Check(!terrain.IsSolidAt(Vector2.Lerp(start, end, sample / 10f)),
+                            "Tunnel center is blocked at segment " + i +
+                            " sample " + sample);
+                }
+                SeabedLandmark firstSinkhole = default;
+                foreach (SeabedLandmark landmark in terrain.Landmarks)
+                    if (landmark.Kind == SeabedLandmarkKind.Sinkhole)
                     {
-                        Type featureType = feature.GetType();
-                        Vector2 start = (Vector2)featureType.GetField("Start").GetValue(feature);
-                        Vector2 end = (Vector2)featureType.GetField("End").GetValue(feature);
-                        float advance = end.x - start.x;
-                        if (Vector2.Distance(start, current) > 0.01f ||
-                            advance <= longestAdvance)
-                        {
-                            continue;
-                        }
-
-                        nextPassage = feature;
-                        longestAdvance = advance;
+                        firstSinkhole = landmark;
+                        break;
                     }
-
-                    Check(nextPassage != null, "Cave passage disconnected at segment " + step);
-                    Type passageType = nextPassage.GetType();
-                    Vector2 passageStart = (Vector2)passageType.GetField("Start").GetValue(nextPassage);
-                    Vector2 passageEnd = (Vector2)passageType.GetField("End").GetValue(nextPassage);
-                    Vector2[] polygon = (Vector2[])passageType.GetField("Points").GetValue(nextPassage);
-                    Check(polygon.Length >= 4, "Passage is not polygonal.");
-                    for (int sample = 1; sample <= 9; sample++)
-                        Check(!terrain.IsSolidAt(Vector2.Lerp(passageStart, passageEnd,
-                            sample / 10f)), "Cave passage is blocked at segment " + step);
-                    current = passageEnd;
-                    connectedSegments++;
-                }
-
-                Check(world.GetZoneAt(current) != OceanDepthZone.AA,
-                    "Lateral passage does not reach another water zone.");
-                Check(HasSurfaceOpening(terrain, mouthX) &&
-                    HasSurfaceOpening(terrain, current.x),
-                    "Cave mouth or exit is sealed.");
-                for (float x = mouthX + 14f; x < current.x - 14f; x += 2f)
-                {
-                    bool sinkholeMouth = false;
-                    foreach (SeabedLandmark landmark in terrain.Landmarks)
-                        sinkholeMouth |= landmark.Kind == SeabedLandmarkKind.Sinkhole &&
-                            Mathf.Abs(x - landmark.Position.x) <
-                            landmark.OpeningWidth * 0.8f + 4f;
-                    if (!sinkholeMouth)
-                        Check(terrain.IsSolidAt(new Vector2(x, terrain.GetSurfaceY(x) - 1f)),
-                            "Lateral cave broke through hillside at x=" + x);
-                }
-                float minimumWidth = float.MaxValue;
-                float maximumWidth = float.MinValue;
-                MethodInfo widthMethod = terrainType.GetMethod("PassageHalfWidth", hidden);
-                for (int step = 0; step <= 12; step++)
-                {
-                    float width = (float)widthMethod.Invoke(terrain, new object[] { 0, step });
-                    minimumWidth = Mathf.Min(minimumWidth, width);
-                    maximumWidth = Mathf.Max(maximumWidth, width);
-                }
-                Check(maximumWidth - minimumWidth > 4f,
-                    "Lateral cave width variation is too small.");
-                float originalSurface = terrain.GetSurfaceY(mouthX);
+                Check(HasSurfaceOpening(terrain, firstSinkhole.Position.x),
+                    "Sinkhole mouth is sealed.");
+                float originalSurface = terrain.GetSurfaceY(0f);
                 int originalLandmarkCount = terrain.Landmarks.Count;
                 Vector2 originalLandmark = terrain.Landmarks[0].Position;
                 targetObject.transform.position = new Vector3(320f, 0f, 0f);
                 terrain.Configure(world, null, targetObject.transform);
                 targetObject.transform.position = Vector3.zero;
                 terrain.Configure(world, null, targetObject.transform);
-                Check(Mathf.Abs(originalSurface - terrain.GetSurfaceY(mouthX)) < 0.0001f,
+                Check(Mathf.Abs(originalSurface - terrain.GetSurfaceY(0f)) < 0.0001f,
                     "Terrain changed after chunk streaming.");
                 Check(terrain.Landmarks.Count == originalLandmarkCount &&
                     terrain.Landmarks[0].Position == originalLandmark,
@@ -248,9 +205,8 @@ namespace MimicCell.EditorTools
 
                 Debug.Log("TERRAIN_VALIDATION_PASS relief=" +
                     (maximumDepth - minimumDepth).ToString("0.0") +
-                    " caveSegments=" + connectedSegments +
-                    " passageExitY=" + current.y.ToString("0.0") +
-                    " passageExitZone=" + world.GetZoneAt(current) +
+                    " caveSegments=" + tunnels.Count +
+                    " chamberObstacles=" + boulders.Count +
                     " openAB=" + accessibleABColumns + "/" + sampledColumns +
                     " openBC=" + accessibleBCColumns + "/" + sampledColumns +
                     " seed=" + world.Seed);

@@ -90,12 +90,19 @@ namespace MimicCell.Core
             {
                 follow.SetBounds(new Vector2(-22f, -10f), new Vector2(22f, 10f));
             }
-            else if (sceneName == MimicSceneNames.CambrianOcean)
+            else if (sceneName == MimicSceneNames.CambrianOcean ||
+                     sceneName == MimicSceneNames.CambrianExtinctionTest)
             {
                 CambrianOceanWorld oceanWorld = EnsureCambrianOceanWorld(root.transform, sceneCamera, player.transform);
                 EnsureSeabedTerrain(root.transform, oceanWorld, sceneCamera, player.transform);
                 oceanWorld.GetCameraBounds(sceneCamera, out Vector2 minBounds, out Vector2 maxBounds);
                 follow.SetBounds(minBounds, maxBounds);
+
+                if (sceneName == MimicSceneNames.CambrianExtinctionTest &&
+                    root.GetComponent<CambrianExtinctionController>() == null)
+                {
+                    root.AddComponent<CambrianExtinctionController>();
+                }
             }
 
             Transform visual = player.transform.Find("Visual");
