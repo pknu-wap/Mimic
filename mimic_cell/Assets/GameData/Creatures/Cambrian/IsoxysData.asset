@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
+  m_Name: IsoxysData
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
+  creatureId: Isoxys
+  displayName: "\uC774\uC18C\uC2DC\uC2A4"
+  prefab: {fileID: 4854711201897119062, guid: 652c27dabfd63af489ba53c04328eb4d, type: 3}
+  playerForm:
+    sprite: {fileID: 21300000, guid: d3e963bae82201b4891dec28ff0a91aa, type: 3}
+    visualScale: {x: 0.7, y: 0.7}
+    colliderSize: {x: 2.4, y: 1.8}
+    colliderOffset: {x: 0, y: 0}
+    flipXToFaceRight: 1
+  spawnKind: 0
+  foodTier: 2
+  bodySize: 1
+  allowedHabitats: -1
+  traits: 61
+  disposition: 2
+  designSizeRange:
+    min: {x: 21, y: 14}
+    max: {x: 27, y: 18}
+  healthRange:
+    min: 40
+    max: 45
+  attackRange:
+    min: 5
+    max: 7
+  reflectionDamageRange:
+    min: 1
+    max: 2
+  swimSpeed: 2.8
+  sprintSpeed: 3.9
+  wanderRadius: 3.5
+  usePerceptionRadiusOverride: 0
+  perceptionRadius: 5
+  spawnWeight: 1
+  maxAlive: 4
+  groupSizeRange:
+    min: 0
+    max: 0
+  maxGroupCount: 0

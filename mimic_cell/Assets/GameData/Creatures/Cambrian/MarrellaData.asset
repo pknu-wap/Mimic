@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
+  m_Name: MarrellaData
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
+  creatureId: Marrella
+  displayName: "\uB9C8\uB810\uB77C"
+  prefab: {fileID: 5841187399606061064, guid: 68f458b4a350ac74e941c3ae07ca09f6, type: 3}
+  playerForm:
+    sprite: {fileID: 21300000, guid: e496f99f5b757b945b8667657de9f808, type: 3}
+    visualScale: {x: 0.3, y: 0.3}
+    colliderSize: {x: 2, y: 1}
+    colliderOffset: {x: 0, y: 0}
+    flipXToFaceRight: 1
+  spawnKind: 0
+  foodTier: 1
+  bodySize: 0
+  allowedHabitats: 24
+  traits: 5
+  disposition: 1
+  designSizeRange:
+    min: {x: 14, y: 14}
+    max: {x: 18, y: 18}
+  healthRange:
+    min: 30
+    max: 35
+  attackRange:
+    min: 0
+    max: 0
+  reflectionDamageRange:
+    min: 2
+    max: 3
+  swimSpeed: 1.5
+  sprintSpeed: 3.5
+  wanderRadius: 3
+  usePerceptionRadiusOverride: 0
+  perceptionRadius: 5
+  spawnWeight: 1
+  maxAlive: 4
+  groupSizeRange:
+    min: 0
+    max: 0
+  maxGroupCount: 0
