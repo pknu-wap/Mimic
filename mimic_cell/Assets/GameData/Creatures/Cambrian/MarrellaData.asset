@@ -15,6 +15,12 @@ MonoBehaviour:
   creatureId: Marrella
   displayName: "\uB9C8\uB810\uB77C"
   prefab: {fileID: 5841187399606061064, guid: 68f458b4a350ac74e941c3ae07ca09f6, type: 3}
+  playerForm:
+    sprite: {fileID: 21300000, guid: e496f99f5b757b945b8667657de9f808, type: 3}
+    visualScale: {x: 0.3, y: 0.3}
+    colliderSize: {x: 2, y: 1}
+    colliderOffset: {x: 0, y: 0}
+    flipXToFaceRight: 1
   spawnKind: 0
   foodTier: 1
   bodySize: 0
