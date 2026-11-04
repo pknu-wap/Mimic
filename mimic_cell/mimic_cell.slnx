@@ -50,7 +50,4 @@
   <Project Path="Unity.CollabProxy.Editor.csproj" />
   <Project Path="Unity.InputSystem.DocCodeSamples.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
-  <Project Path="Unity.VisualScripting.DocCodeExamples.csproj" />
-  <Project Path="Unity.PlasticSCM.Editor.Entities.csproj" />
-  <Project Path="Unity.Collections.Editor.csproj" />
 </Solution>

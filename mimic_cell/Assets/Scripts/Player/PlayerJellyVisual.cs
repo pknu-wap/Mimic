@@ -1270,11 +1270,10 @@ namespace MimicCell.Player
                         {
                             GetEdgeSurface(nearbyEdges[edgeIndex], candidate,
                                 worldNodes[0], out Vector2 surface, out Vector2 normal);
-                            Vector2 tangent = new Vector2(-normal.y, normal.x);
-                            if (Mathf.Abs(Vector2.Dot(candidate - surface, tangent)) <=
-                                length * 2f + radius)
+                            if ((candidate - surface).sqrMagnitude <=
+                                (radius + 0.05f) * (radius + 0.05f))
                             {
-                                PushOutside(ref candidate, surface, normal);
+                                PushOutside(ref candidate, surface, normal, radius);
                             }
                         }
 
@@ -1284,7 +1283,11 @@ namespace MimicCell.Player
                                 worldNodes[0], length + radius,
                                 out Vector2 surface, out Vector2 normal))
                             {
-                                PushOutside(ref candidate, surface, normal);
+                                if ((candidate - surface).sqrMagnitude <=
+                                    (radius + 0.05f) * (radius + 0.05f))
+                                {
+                                    PushOutside(ref candidate, surface, normal, radius);
+                                }
                             }
                         }
                     }
@@ -1302,17 +1305,17 @@ namespace MimicCell.Player
             }
 
             private static void PushOutside(ref Vector2 candidate, Vector2 surface,
-                Vector2 normal)
+                Vector2 normal, float radius)
             {
                 if (normal.sqrMagnitude < 0.5f)
                 {
                     return;
                 }
 
-                float correction = 0.02f - Vector2.Dot(candidate - surface, normal);
+                float correction = radius - Vector2.Dot(candidate - surface, normal);
                 if (correction > 0f)
                 {
-                    candidate += normal * Mathf.Min(correction, 0.05f);
+                    candidate += normal * Mathf.Min(correction, 0.035f);
                 }
             }
 
@@ -1321,6 +1324,8 @@ namespace MimicCell.Player
                 float radius)
             {
                 if (normal.sqrMagnitude < 0.5f ||
+                    (candidate - surface).sqrMagnitude >
+                        (length + radius) * (length + radius) ||
                     Vector2.Dot(candidate - surface, normal) >= radius)
                 {
                     return;
@@ -1400,29 +1405,6 @@ namespace MimicCell.Player
                 float length = worldSegmentLengths[index];
                 RaycastHit2D hit = FindEnvironmentHit(start, direction, length,
                     radius);
-                Vector2 candidate = start + direction * length;
-                Vector2 fromRoot = candidate - worldNodes[0];
-                if (fromRoot.sqrMagnitude > 0.0001f)
-                {
-                    RaycastHit2D edgeHit = FindEnvironmentHit(worldNodes[0],
-                        fromRoot.normalized, fromRoot.magnitude,
-                        radius, true);
-                    if (edgeHit.collider != null)
-                    {
-                        hit = edgeHit;
-                        EdgeCollider2D crossedEdge = (EdgeCollider2D)edgeHit.collider;
-                        if (!nearbyEdges.Contains(crossedEdge))
-                        {
-                            nearbyEdges.Add(crossedEdge);
-                        }
-                    }
-                    else if (hit.collider == null)
-                    {
-                        hit = FindEnvironmentHit(worldNodes[0],
-                            fromRoot.normalized, fromRoot.magnitude,
-                            radius);
-                    }
-                }
 
                 if (hit.collider == null)
                 {
@@ -1432,16 +1414,10 @@ namespace MimicCell.Player
                 Vector2 candidatePosition = start + direction * length;
                 Vector2 surface;
                 Vector2 normal;
-                if (hit.collider is EdgeCollider2D edge)
-                {
-                    GetEdgeSurface(edge, candidatePosition, worldNodes[0],
-                        out surface, out normal);
-                }
-                else
-                {
-                    surface = hit.point;
-                    normal = hit.normal.normalized;
-                }
+                // The cast normal belongs to the edge actually struck. Re-selecting the
+                // nearest edge at the candidate can flip sides at polygon corners.
+                surface = hit.point;
+                normal = hit.normal.normalized;
 
                 if (normal.sqrMagnitude < 0.5f ||
                     Vector2.Dot(candidatePosition - surface, normal) >= radius)
@@ -1470,8 +1446,9 @@ namespace MimicCell.Player
                     Mathf.Sqrt(1f - normalShare * normalShare) +
                     normal * normalShare;
                 float newAngle = Vector2.SignedAngle(Vector2.down, redirected);
-                segmentAngles[index] += Mathf.DeltaAngle(segmentAngles[index], newAngle);
-                segmentAngularSpeeds[index] = 0f;
+                segmentAngles[index] = Mathf.MoveTowardsAngle(
+                    segmentAngles[index], newAngle, 24f);
+                segmentAngularSpeeds[index] *= 0.35f;
                 return redirected;
             }
 
@@ -1493,6 +1470,7 @@ namespace MimicCell.Player
                 surface = position;
                 normal = Vector2.zero;
                 float closestDistance = float.PositiveInfinity;
+                int closestSegment = -1;
                 for (int i = 1; i < points.Length; i++)
                 {
                     Vector2 first = edge.transform.TransformPoint(points[i - 1]);
@@ -1513,6 +1491,7 @@ namespace MimicCell.Player
                     }
 
                     closestDistance = distance;
+                    closestSegment = i;
                     surface = point;
                     normal = new Vector2(-segment.y, segment.x).normalized;
                     if (Vector2.Dot(normal, root - point) < 0f)
@@ -1520,11 +1499,52 @@ namespace MimicCell.Player
                         normal = -normal;
                     }
                 }
+
+                // Blend only the two adjoining edges near a corner. Their nearest
+                // segment can change every frame even while the rope hardly moves.
+                if (closestSegment < 0)
+                {
+                    return;
+                }
+
+                Vector2 blended = Vector2.zero;
+                for (int i = Mathf.Max(1, closestSegment - 1);
+                    i <= Mathf.Min(points.Length - 1, closestSegment + 1); i++)
+                {
+                    Vector2 a = edge.transform.TransformPoint(points[i - 1]);
+                    Vector2 b = edge.transform.TransformPoint(points[i]);
+                    Vector2 along = b - a;
+                    float lengthSquared = along.sqrMagnitude;
+                    if (lengthSquared < 0.000001f)
+                    {
+                        continue;
+                    }
+
+                    Vector2 point = a + along * Mathf.Clamp01(
+                        Vector2.Dot(position - a, along) / lengthSquared);
+                    float distanceSquared = (position - point).sqrMagnitude;
+                    if (distanceSquared > closestDistance + 0.04f)
+                    {
+                        continue;
+                    }
+
+                    Vector2 edgeNormal = new Vector2(-along.y, along.x).normalized;
+                    if (Vector2.Dot(edgeNormal, root - point) < 0f)
+                    {
+                        edgeNormal = -edgeNormal;
+                    }
+
+                    blended += edgeNormal / (0.05f + Mathf.Sqrt(distanceSquared));
+                }
+
+                if (blended.sqrMagnitude > 0.01f)
+                {
+                    normal = blended.normalized;
+                }
             }
 
             private RaycastHit2D FindEnvironmentHit(
-                Vector2 start, Vector2 direction, float distance, float radius,
-                bool edgeOnly = false)
+                Vector2 start, Vector2 direction, float distance, float radius)
             {
                 ContactFilter2D filter = new ContactFilter2D { useTriggers = false };
                 int count = Physics2D.CircleCast(start, radius, direction, filter,
@@ -1535,7 +1555,6 @@ namespace MimicCell.Player
                 {
                     RaycastHit2D hit = environmentHits[i];
                     if (hit.collider == null || hit.collider.isTrigger ||
-                        (edgeOnly && !(hit.collider is EdgeCollider2D)) ||
                         hit.collider.transform.IsChildOf(collisionOwner) ||
                         (!(hit.collider is EdgeCollider2D) &&
                             Vector2.Dot(hit.normal, direction) > -0.025f) ||

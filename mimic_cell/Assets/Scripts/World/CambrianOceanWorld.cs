@@ -13,19 +13,13 @@ namespace MimicCell.World
     {
         public const float DefaultWorldHalfWidth = 1024f;
         public const float DefaultSurfaceY = 10f;
-        public const float DefaultShallowShelfDepth = 64f;
-        public const float DefaultDeepBasinDepth = 170f;
+        public const float DefaultShallowShelfDepth = 300f;
+        public const float DefaultDeepBasinDepth = 440f;
         public const float DefaultChunkWidth = 32f;
 
         private const int ZoneCount = 5;
-        private const int SedimentColorIndex = 5;
-        private const float MinimumAAThickness = 10f;
-        private const float MinimumABThickness = 2f;
-        private const float MaximumABThickness = 6f;
-        private const float MinimumBBThickness = 10f;
-        private const float MinimumBCThickness = 3f;
-        private const float MaximumBCThickness = 7f;
-        private const float MinimumCCThickness = 12f;
+        // Mean shares of the local water column: A / AB / B / BC / C.
+        private static readonly float[] MeanZoneShares = { 0.11f, 0.15f, 0.26f, 0.18f, 0.30f };
 
         private static readonly OceanDepthZone[] Zones =
         {
@@ -45,8 +39,8 @@ namespace MimicCell.World
         [Header("World Size")]
         [SerializeField, Min(128f)] private float worldHalfWidth = DefaultWorldHalfWidth;
         [SerializeField] private float surfaceY = DefaultSurfaceY;
-        [SerializeField, Min(40f)] private float shallowShelfDepth = DefaultShallowShelfDepth;
-        [SerializeField, Min(80f)] private float deepBasinDepth = DefaultDeepBasinDepth;
+        [SerializeField, Min(260f)] private float shallowShelfDepth = DefaultShallowShelfDepth;
+        [SerializeField, Min(320f)] private float deepBasinDepth = DefaultDeepBasinDepth;
 
         [Header("Chunk Streaming")]
         [SerializeField, Min(8f)] private float chunkWidth = DefaultChunkWidth;
@@ -62,7 +56,6 @@ namespace MimicCell.World
         [SerializeField] private Color bbColor = new Color(0.05f, 0.29f, 0.49f, 0.96f);
         [SerializeField] private Color bcColor = new Color(0.025f, 0.19f, 0.35f, 0.98f);
         [SerializeField] private Color ccColor = new Color(0.012f, 0.07f, 0.17f, 1f);
-        [SerializeField] private Color sedimentColor = new Color(0.12f, 0.13f, 0.12f, 1f);
 
         private readonly Dictionary<int, OceanChunkData> chunkData = new Dictionary<int, OceanChunkData>();
         private readonly Dictionary<int, OceanChunkView> chunkViews = new Dictionary<int, OceanChunkView>();
@@ -78,6 +71,7 @@ namespace MimicCell.World
         private float worldMaxX;
         private float worldMinY;
         private float nextStreamingUpdate;
+        private SeabedTerrainWorld terrainWorld;
 
         public int Seed
         {
@@ -118,6 +112,14 @@ namespace MimicCell.World
         public float SurfaceY
         {
             get { return surfaceY; }
+        }
+
+        public float ChunkWidth { get { return chunkWidth; } }
+        public int ActiveChunkRadius { get { return activeChunkRadius; } }
+
+        public void RegisterTerrain(SeabedTerrainWorld terrain)
+        {
+            terrainWorld = terrain;
         }
 
         public int LoadedChunkCount
@@ -206,8 +208,8 @@ namespace MimicCell.World
         private void OnValidate()
         {
             worldHalfWidth = Mathf.Max(128f, worldHalfWidth);
-            shallowShelfDepth = Mathf.Max(40f, shallowShelfDepth);
-            deepBasinDepth = Mathf.Max(shallowShelfDepth + 24f, deepBasinDepth);
+            shallowShelfDepth = Mathf.Max(260f, shallowShelfDepth);
+            deepBasinDepth = Mathf.Max(shallowShelfDepth + 80f, deepBasinDepth);
             chunkWidth = Mathf.Max(8f, chunkWidth);
             samplesPerChunk = Mathf.Clamp(samplesPerChunk, 4, 32);
             activeChunkRadius = Mathf.Clamp(activeChunkRadius, 1, 6);
@@ -263,7 +265,7 @@ namespace MimicCell.World
 
         public float GetSeabedY(float worldX)
         {
-            return GetColumnProfile(worldX).SeabedY;
+            return terrainWorld != null ? terrainWorld.GetSurfaceY(worldX) : GetColumnProfile(worldX).SeabedY;
         }
 
         public bool IsInsidePlayableArea(
@@ -283,10 +285,8 @@ namespace MimicCell.World
             bool isBelowSurface =
                 worldPosition.y <= profile.SurfaceY;
 
-            bool isAboveSeabed =
-                worldPosition.y >= profile.SeabedY;
-
-            return isBelowSurface && isAboveSeabed;
+            return isBelowSurface && worldPosition.y >= worldMinY &&
+                (terrainWorld == null || !terrainWorld.IsSolidAt(worldPosition));
         }
 
         public int GetStableChunkSeed(float worldX)
@@ -359,7 +359,7 @@ namespace MimicCell.World
             worldMinX = -worldHalfWidth;
             chunkCount = Mathf.CeilToInt((worldHalfWidth * 2f) / chunkWidth);
             worldMaxX = worldMinX + (chunkCount * chunkWidth);
-            worldMinY = surfaceY - deepBasinDepth - 16f;
+            worldMinY = surfaceY - deepBasinDepth - 80f;
 
             oceanMaterial = CreateOceanMaterial();
             BuildWorldData();
@@ -413,70 +413,17 @@ namespace MimicCell.World
             float waterDepth = Mathf.Lerp(shallowShelfDepth, deepBasinDepth, basinWeight) + regionalRelief + localRelief;
             waterDepth = Mathf.Clamp(waterDepth, shallowShelfDepth, deepBasinDepth);
 
-            float layerNoiseA = FractalNoise(worldX * 0.011f, resolvedSeed ^ 0x3a91d45, 2);
-            float abNoise = FractalNoise(worldX * 0.021f, resolvedSeed ^ 0x51c77b9, 3);
-            float bcNoise = FractalNoise(worldX * 0.027f, resolvedSeed ^ 0x2f846d1, 3);
-            float transitionContrast = (FractalNoise(worldX * 0.014f, resolvedSeed ^ 0x6b204f3, 3) * 2f) - 1f;
-            float separationNoise = FractalNoise(worldX * 0.009f, resolvedSeed ^ 0x14d83a7, 3);
-            float depthRatio = Mathf.InverseLerp(shallowShelfDepth, deepBasinDepth, waterDepth);
-
-            float maximumSafeAAThickness = waterDepth
-                - MinimumABThickness
-                - MinimumBBThickness
-                - MinimumBCThickness
-                - MinimumCCThickness;
-            float aaThickness = Mathf.Clamp(
-                Mathf.Lerp(12f, 18f, layerNoiseA),
-                MinimumAAThickness,
-                Mathf.Max(MinimumAAThickness, maximumSafeAAThickness));
-
-            float desiredABThickness = Mathf.Clamp(
-                Mathf.Lerp(MinimumABThickness, MaximumABThickness, abNoise)
-                + (transitionContrast * 1.25f),
-                MinimumABThickness,
-                MaximumABThickness);
-            float desiredBCThickness = Mathf.Clamp(
-                Mathf.Lerp(MinimumBCThickness, MaximumBCThickness, bcNoise)
-                - (transitionContrast * 1.5f),
-                MinimumBCThickness,
-                MaximumBCThickness);
-
-            // Transition bands vary visibly, but their hard maxima stay below every primary zone minimum.
-            float freeDepth = Mathf.Max(
-                0f,
-                waterDepth
-                - aaThickness
-                - MinimumABThickness
-                - MinimumBBThickness
-                - MinimumBCThickness
-                - MinimumCCThickness);
-            float transitionExtraBudget = freeDepth * Mathf.Lerp(0.42f, 0.24f, depthRatio);
-            float desiredTransitionExtra =
-                (desiredABThickness - MinimumABThickness) + (desiredBCThickness - MinimumBCThickness);
-            float transitionScale = desiredTransitionExtra > 0f
-                ? Mathf.Min(1f, transitionExtraBudget / desiredTransitionExtra)
-                : 0f;
-
-            float abThickness = MinimumABThickness
-                + ((desiredABThickness - MinimumABThickness) * transitionScale);
-            float bcThickness = MinimumBCThickness
-                + ((desiredBCThickness - MinimumBCThickness) * transitionScale);
-
-            float distributableDepth = Mathf.Max(
-                0f,
-                waterDepth
-                - aaThickness
-                - abThickness
-                - MinimumBBThickness
-                - bcThickness
-                - MinimumCCThickness);
-            float separationShape = Mathf.SmoothStep(
-                0f,
-                1f,
-                Mathf.InverseLerp(0.22f, 0.78f, separationNoise));
-            float bbShare = Mathf.Lerp(0.16f, 0.84f, separationShape);
-            float bbThickness = MinimumBBThickness + (distributableDepth * bbShare);
-            float ccThickness = MinimumCCThickness + (distributableDepth * (1f - bbShare));
+            float aaShare = GetZoneShare(worldX, 0);
+            float abShare = GetZoneShare(worldX, 1);
+            float bbShare = GetZoneShare(worldX, 2);
+            float bcShare = GetZoneShare(worldX, 3);
+            float ccShare = GetZoneShare(worldX, 4);
+            float shareTotal = aaShare + abShare + bbShare + bcShare + ccShare;
+            float aaThickness = waterDepth * aaShare / shareTotal;
+            float abThickness = waterDepth * abShare / shareTotal;
+            float bbThickness = waterDepth * bbShare / shareTotal;
+            float bcThickness = waterDepth * bcShare / shareTotal;
+            float ccThickness = waterDepth * ccShare / shareTotal;
 
             float aaBottomY = surfaceY - aaThickness;
             float abBottomY = aaBottomY - abThickness;
@@ -491,6 +438,15 @@ namespace MimicCell.World
                 bbBottomY,
                 bcBottomY,
                 seabedY);
+        }
+
+        private float GetZoneShare(float worldX, int zone)
+        {
+            // Slow, seed-dependent shifts retain the requested proportions on average.
+            float variation = (FractalNoise(worldX * (0.005f + zone * 0.001f),
+                resolvedSeed ^ (0x3a91d45 + zone * 7919), 3) - 0.5f) *
+                (zone == 1 || zone == 3 ? 0.55f : 0.30f);
+            return MeanZoneShares[zone] * (1f + variation);
         }
 
         private void ResolveStreamingTarget()
@@ -575,15 +531,6 @@ namespace MimicCell.World
             meshRenderer.lightProbeUsage = LightProbeUsage.Off;
             meshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
 
-            EdgeCollider2D seabedCollider = chunkObject.AddComponent<EdgeCollider2D>();
-            Vector2[] colliderPoints = new Vector2[data.Profiles.Length];
-            float sampleStep = chunkWidth / samplesPerChunk;
-            for (int sample = 0; sample < data.Profiles.Length; sample++)
-            {
-                colliderPoints[sample] = new Vector2(sample * sampleStep, data.Profiles[sample].SeabedY);
-            }
-
-            seabedCollider.points = colliderPoints;
             chunkObject.SetActive(false);
 
             OceanChunkView view = new OceanChunkView(chunkObject, mesh);
@@ -594,10 +541,10 @@ namespace MimicCell.World
         private Mesh BuildChunkMesh(OceanChunkData data)
         {
             int segmentCount = data.Profiles.Length - 1;
-            List<Vector3> vertices = new List<Vector3>(segmentCount * (ZoneCount + 1) * 4);
-            List<int> triangles = new List<int>(segmentCount * (ZoneCount + 1) * 6);
-            List<Color> colors = new List<Color>(segmentCount * (ZoneCount + 1) * 4);
-            List<Vector2> uvs = new List<Vector2>(segmentCount * (ZoneCount + 1) * 4);
+            List<Vector3> vertices = new List<Vector3>(segmentCount * ZoneCount * 4);
+            List<int> triangles = new List<int>(segmentCount * ZoneCount * 6);
+            List<Color> colors = new List<Color>(segmentCount * ZoneCount * 4);
+            List<Vector2> uvs = new List<Vector2>(segmentCount * ZoneCount * 4);
             float sampleStep = chunkWidth / samplesPerChunk;
 
             for (int segment = 0; segment < segmentCount; segment++)
@@ -619,23 +566,10 @@ namespace MimicCell.World
                         x1,
                         left.GetTop(zone),
                         right.GetTop(zone),
-                        left.GetBottom(zone),
-                        right.GetBottom(zone),
+                        zone == OceanDepthZone.CC ? worldMinY : left.GetBottom(zone),
+                        zone == OceanDepthZone.CC ? worldMinY : right.GetBottom(zone),
                         GetBandColor(zoneIndex));
                 }
-
-                AddQuad(
-                    vertices,
-                    triangles,
-                    colors,
-                    uvs,
-                    x0,
-                    x1,
-                    left.SeabedY,
-                    right.SeabedY,
-                    worldMinY,
-                    worldMinY,
-                    GetBandColor(SedimentColorIndex));
             }
 
             Mesh mesh = new Mesh
@@ -714,6 +648,13 @@ namespace MimicCell.World
                     new Vector2(worldMaxX, surfaceY),
                     new Vector2(worldMaxX, worldMinY)
                 });
+            CreateBoundary(
+                "World Floor",
+                new[]
+                {
+                    new Vector2(worldMinX, worldMinY),
+                    new Vector2(worldMaxX, worldMinY)
+                });
         }
 
         private void CreateBoundary(string boundaryName, Vector2[] points)
@@ -762,7 +703,7 @@ namespace MimicCell.World
                 case 4:
                     return ccColor;
                 default:
-                    return sedimentColor;
+                    return ccColor;
             }
         }
 

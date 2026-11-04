@@ -526,7 +526,7 @@ namespace MimicCell.EditorTools
             if (useCambrianWorldBounds)
             {
                 float horizontalMargin = size * (16f / 9f);
-                float worldMinY = CambrianOceanWorld.DefaultSurfaceY - CambrianOceanWorld.DefaultDeepBasinDepth - 16f;
+                float worldMinY = CambrianOceanWorld.DefaultSurfaceY - CambrianOceanWorld.DefaultDeepBasinDepth - 80f;
                 follow.SetBounds(
                     new Vector2(-CambrianOceanWorld.DefaultWorldHalfWidth + horizontalMargin, worldMinY + size),
                     new Vector2(CambrianOceanWorld.DefaultWorldHalfWidth - horizontalMargin, CambrianOceanWorld.DefaultSurfaceY - size));
@@ -581,6 +581,10 @@ namespace MimicCell.EditorTools
             GameObject worldObject = new GameObject("Cambrian Ocean World");
             worldObject.transform.SetParent(root, false);
             worldObject.AddComponent<CambrianOceanWorld>();
+
+            GameObject terrainObject = new GameObject("Seabed Terrain");
+            terrainObject.transform.SetParent(root, false);
+            terrainObject.AddComponent<SeabedTerrainWorld>();
         }
 
         private static void CreateModernBackdrop(Transform root)

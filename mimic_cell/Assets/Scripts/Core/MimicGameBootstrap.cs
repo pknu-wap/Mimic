@@ -91,11 +91,19 @@ namespace MimicCell.Core
             {
                 follow.SetBounds(new Vector2(-22f, -10f), new Vector2(22f, 10f));
             }
-            else if (sceneName == MimicSceneNames.CambrianOcean)
+            else if (sceneName == MimicSceneNames.CambrianOcean ||
+                     sceneName == MimicSceneNames.CambrianExtinctionTest)
             {
                 CambrianOceanWorld oceanWorld = EnsureCambrianOceanWorld(root.transform, sceneCamera, player.transform);
+                EnsureSeabedTerrain(root.transform, oceanWorld, sceneCamera, player.transform);
                 oceanWorld.GetCameraBounds(sceneCamera, out Vector2 minBounds, out Vector2 maxBounds);
                 follow.SetBounds(minBounds, maxBounds);
+
+                if (sceneName == MimicSceneNames.CambrianExtinctionTest &&
+                    root.GetComponent<CambrianExtinctionController>() == null)
+                {
+                    root.AddComponent<CambrianExtinctionController>();
+                }
             }
 
             Transform visual = player.transform.Find("Visual");
@@ -311,6 +319,22 @@ PrototypePlayer player = playerObject.AddComponent<PrototypePlayer>();
             oceanWorld.gameObject.SetActive(true);
             oceanWorld.Configure(sceneCamera, player);
             return oceanWorld;
+        }
+
+        private static void EnsureSeabedTerrain(
+            Transform root, CambrianOceanWorld oceanWorld, Camera sceneCamera, Transform player)
+        {
+            SeabedTerrainWorld terrain = root.GetComponentInChildren<SeabedTerrainWorld>(true);
+            if (terrain == null)
+            {
+                GameObject terrainObject = new GameObject("Seabed Terrain");
+                terrainObject.transform.SetParent(root, false);
+                terrain = terrainObject.AddComponent<SeabedTerrainWorld>();
+            }
+
+            terrain.gameObject.SetActive(true);
+            terrain.Configure(oceanWorld, sceneCamera, player);
+            oceanWorld.RegisterTerrain(terrain);
         }
 
         private static void EnsureModernBackdrop(Transform root)

@@ -52,6 +52,12 @@ namespace MimicCell.Creatures
         private System.Random random;
         private float spawnTimer;
         private bool initialized;
+        private float extinctionSpawnRateMultiplier = 1f;
+
+        public void SetExtinctionSpawnRateMultiplier(float multiplier)
+        {
+            extinctionSpawnRateMultiplier = Mathf.Max(0f, multiplier);
+        }
 
         private void Start()
         {
@@ -87,7 +93,7 @@ namespace MimicCell.Creatures
             CleanupActiveGroups();
             UpdateDespawnTimers();
 
-            spawnTimer -= Time.deltaTime;
+            spawnTimer -= Time.deltaTime * extinctionSpawnRateMultiplier;
 
             if (spawnTimer > 0f)
             {
