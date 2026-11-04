@@ -52,25 +52,45 @@ private void Update()
             statusController = GetComponent<StatusEffectController>();
         }
 
-        if (statusController != null && panicDefinition != null)
-        {
-            statusController.ApplyEffect(panicDefinition);
-            TryEscape((Vector2)transform.position + Vector2.right * 3f);
-        }
-    }
+        
+if (statusController != null && panicDefinition != null)
+{
+    statusController.ApplyEffect(panicDefinition);
+    Debug.Log("패닉 상태이상 적용 시도!");
+    
+Debug.Log("패닉 활성화 여부: " +
+    statusController.HasEffect(panicDefinition));
+
+    DetectPredators();
+}
+else
+{
+    Debug.LogWarning("PanicEffect: Controller 또는 PanicDefinition이 없습니다.");
+}
+
     if (statusController == null)
 {
     statusController = GetComponent<StatusEffectController>();
 }
 
-if (panicDefinition != null &&
-    statusController != null &&
-    statusController.HasEffect(panicDefinition))
-{
-    DetectPredators();
-}
-}
-private void DetectPredators()
+
+        }
+
+        if (statusController == null)
+        {
+            statusController = GetComponent<StatusEffectController>();
+        }
+
+        if (panicDefinition != null &&
+            statusController != null &&
+            statusController.HasEffect(panicDefinition))
+        {
+            DetectPredators();
+        }
+    }
+
+    private void DetectPredators()
+
 {
     Camera gameCamera = Camera.main;
 
@@ -183,3 +203,4 @@ private void DetectPredators()
         }
     }
 }
+

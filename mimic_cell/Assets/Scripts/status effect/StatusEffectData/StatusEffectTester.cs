@@ -49,10 +49,17 @@ if (Keyboard.current != null &&
 {
     Debug.Log("T키 입력 감지!");
 
-    if (controller == null)
-    {
-        Debug.LogWarning("StatusEffectController를 찾지 못했습니다.");
-    }
+   
+if (controller == null)
+{
+    controller = GetComponent<StatusEffectController>();
+}
+
+if (controller == null)
+{
+    Debug.LogWarning("StatusEffectController를 찾지 못했습니다.");
+}
+
     else if (dopamineRelease == null)
     {
         Debug.LogWarning("DopamineRelease 데이터가 연결되지 않았습니다.");

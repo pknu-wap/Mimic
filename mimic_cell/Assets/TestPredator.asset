@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
+  m_Name: TestPredator
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
+  creatureId: NewCreature
+  displayName: "\uC0C8 \uC0DD\uBB3C"
+  prefab: {fileID: 0}
+  spawnKind: 0
+  foodTier: 1
+  bodySize: 0
+  allowedHabitats: 0
+  traits: 0
+  disposition: 0
+  designSizeRange:
+    min: {x: 0, y: 0}
+    max: {x: 0, y: 0}
+  healthRange:
+    min: 0
+    max: 0
+  attackRange:
+    min: 0
+    max: 0
+  reflectionDamageRange:
+    min: 0
+    max: 0
+  swimSpeed: 1
+  sprintSpeed: 1
+  wanderRadius: 4
+  usePerceptionRadiusOverride: 0
+  perceptionRadius: 5
+  spawnWeight: 1
+  maxAlive: 4
+  groupSizeRange:
+    min: 0
+    max: 0
+  maxGroupCount: 0

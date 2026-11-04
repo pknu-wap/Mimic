@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.StatusEffectDefinition
   effectId: 
   displayName: 
-  category: 0
+  category: 1
   targetType: 0
-  durationType: 0
+  durationType: 1
   duration: 3
   swimSpeedMultiplier: 1

@@ -18,4 +18,4 @@ MonoBehaviour:
   targetType: 0
   durationType: 0
   duration: 3
-  swimSpeedMultiplier: 0.25
+  swimSpeedMultiplier: 1.25
