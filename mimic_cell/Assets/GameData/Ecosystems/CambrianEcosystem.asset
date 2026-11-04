@@ -17,6 +17,7 @@ MonoBehaviour:
   creatures:
   - {fileID: 11400000, guid: 98f6b35a84ead0e479b05795f93dbec8, type: 2}
   - {fileID: 11400000, guid: 8143815d75cf5e146829c4d1af1dfaed, type: 2}
+  - {fileID: 11400000, guid: d33dacbd47e7a694eb0e973c6a6407e6, type: 2}
   spawnSettings:
     firstSpawnDelay: 2
     spawnInterval: 4
