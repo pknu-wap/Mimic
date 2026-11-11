@@ -1,22 +1,16 @@
-using MimicCell.CameraSystem;
 using MimicCell.Creatures;
 using MimicCell.Gameplay;
 using MimicCell.Player;
 using MimicCell.Prototype;
-using MimicCell.World;
+using MimicCell.StatusEffects;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
 
 namespace MimicCell.EditorTools
 {
     public static class MimicPrototypeSceneBuilder
     {
-        private const string RuntimeRootName = "[Mimic Runtime]";
-        private const string CambrianScenePath = "Assets/Scenes/CambrianOcean.unity";
-        private const string ModernScenePath = "Assets/Scenes/Modern.unity";
         private const string PrototypePrefabFolder = "Assets/Prefabs/Prototype";
         private const string PlayerPrefabPath = PrototypePrefabFolder + "/PlayerPrototype.prefab";
         private const string PlayerSpritePath = "Assets/Sprites/Player/플레이어 (초기 버전).psd";
@@ -27,7 +21,6 @@ namespace MimicCell.EditorTools
         private sealed class CreatureSpec
         {
             public string Name;
-            public Vector2 Position;
             public Vector2Int PixelSize;
             public Color FillColor;
             public CreatureDisposition Disposition;
@@ -48,7 +41,6 @@ namespace MimicCell.EditorTools
             new CreatureSpec
             {
                 Name = "Pikaia",
-                Position = new Vector2(-4.5f, 2f),
                 PixelSize = new Vector2Int(24, 8),
                 FillColor = new Color(0.77f, 0.86f, 0.64f, 0.86f),
                 Disposition = CreatureDisposition.Timid,
@@ -61,7 +53,6 @@ namespace MimicCell.EditorTools
             new CreatureSpec
             {
                 Name = "Myllokunmingia",
-                Position = new Vector2(3.8f, 1.2f),
                 PixelSize = new Vector2Int(20, 10),
                 FillColor = new Color(0.58f, 0.78f, 0.94f, 0.86f),
                 Disposition = CreatureDisposition.Timid,
@@ -74,7 +65,6 @@ namespace MimicCell.EditorTools
             new CreatureSpec
             {
                 Name = "Isoxys",
-                Position = new Vector2(-2.6f, -1.6f),
                 PixelSize = new Vector2Int(24, 16),
                 FillColor = new Color(0.91f, 0.62f, 0.48f, 0.86f),
                 Disposition = CreatureDisposition.Passive,
@@ -87,7 +77,6 @@ namespace MimicCell.EditorTools
             new CreatureSpec
             {
                 Name = "Marrella",
-                Position = new Vector2(2.4f, -3.1f),
                 PixelSize = new Vector2Int(16, 16),
                 FillColor = new Color(0.83f, 0.74f, 0.94f, 0.86f),
                 Disposition = CreatureDisposition.Timid,
@@ -100,7 +89,6 @@ namespace MimicCell.EditorTools
             new CreatureSpec
             {
                 Name = "Anomalocaris",
-                Position = new Vector2(6.2f, -0.5f),
                 PixelSize = new Vector2Int(64, 32),
                 FillColor = new Color(0.92f, 0.37f, 0.28f, 0.84f),
                 Disposition = CreatureDisposition.Aggressive,
@@ -206,9 +194,10 @@ namespace MimicCell.EditorTools
                 movement.Configure(null, visual.transform, null);
                 movement.SetMovementMode(PlayerMovementMode.WasdSwim);
 
-                player.AddComponent<ActorHealth>();
-                PrototypePlayer prototypePlayer = player.AddComponent<PrototypePlayer>();
-                prototypePlayer.Configure(20);
+                player.AddComponent<ActorHealth>().Configure(20);
+                player.AddComponent<StatusEffectController>();
+                player.AddComponent<PrototypePlayer>();
+                player.AddComponent<PlayerAttack>();
 
                 return PrefabUtility.SaveAsPrefabAsset(player, PlayerPrefabPath);
             }
@@ -235,11 +224,15 @@ namespace MimicCell.EditorTools
             SortingGroup sortingGroup = visual.AddComponent<SortingGroup>();
             sortingGroup.sortingOrder = 10;
 
+            Transform aimPivot = new GameObject("Tentacle Aim").transform;
+            aimPivot.SetParent(visual.transform, false);
+            aimPivot.gameObject.AddComponent<PlayerTentacleAim>();
+
             Vector2 bodyLowerLeft = new Vector2(282f, 495f);
             Vector2 bodyCenter = bodyLowerLeft + (bodySprite.rect.size * 0.5f);
 
             GameObject bodyRoot = new GameObject("Body Jelly");
-            bodyRoot.transform.SetParent(visual.transform, false);
+            bodyRoot.transform.SetParent(aimPivot, false);
             SpriteRenderer bodyRenderer = CreatePlayerLayer(
                 bodyRoot.transform,
                 "Layer 7 - Body",
@@ -256,19 +249,19 @@ namespace MimicCell.EditorTools
             SpriteRenderer[] legs =
             {
                 CreatePlayerLayer(
-                    visual.transform,
+                    aimPivot,
                     "Layer 1 - Leg",
                     legOneSprite,
                     CalculatePlayerLayerOffset(legOneSprite, new Vector2(339f, 83f), bodyCenter),
                     1),
                 CreatePlayerLayer(
-                    visual.transform,
+                    aimPivot,
                     "Layer 3 - Leg",
                     legThreeSprite,
                     CalculatePlayerLayerOffset(legThreeSprite, new Vector2(174f, 71f), bodyCenter),
                     3),
                 CreatePlayerLayer(
-                    visual.transform,
+                    aimPivot,
                     "Layer 5 - Leg",
                     legFiveSprite,
                     CalculatePlayerLayerOffset(legFiveSprite, new Vector2(391f, 83f), bodyCenter),
@@ -276,7 +269,7 @@ namespace MimicCell.EditorTools
             };
 
             SpriteRenderer extractionTentacle = CreatePlayerLayer(
-                visual.transform,
+                aimPivot,
                 "Layer 9 - Extraction Tentacle",
                 extractionSprite,
                 CalculatePlayerLayerOffset(extractionSprite, new Vector2(376f, 146f), bodyCenter),
@@ -284,7 +277,7 @@ namespace MimicCell.EditorTools
 
             PlayerJellyVisual jellyVisual = parent.gameObject.AddComponent<PlayerJellyVisual>();
             jellyVisual.Configure(
-                visual.transform,
+                aimPivot,
                 bodyRoot.transform,
                 bodyRenderer,
                 coreRenderer.transform,
@@ -379,185 +372,6 @@ namespace MimicCell.EditorTools
             }
         }
 
-        private static void BuildGameplayScene(
-            string scenePath,
-            GameObject playerPrefab,
-            Material aimMaterial,
-            bool includeCambrianCreatures)
-        {
-            Scene scene = SceneManager.GetSceneByPath(scenePath);
-            bool wasAlreadyLoaded = scene.IsValid() && scene.isLoaded;
-
-            if (!wasAlreadyLoaded)
-            {
-                scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
-            }
-
-            try
-            {
-                RemoveGeneratedRoot(scene);
-
-                GameObject runtimeRoot = new GameObject(RuntimeRootName);
-                SceneManager.MoveGameObjectToScene(runtimeRoot, scene);
-                runtimeRoot.AddComponent<PrototypeGameSession>();
-
-                if (includeCambrianCreatures)
-                {
-                    CreateCambrianBackdrop(runtimeRoot.transform);
-                }
-                else
-                {
-                    CreateModernBackdrop(runtimeRoot.transform);
-                }
-
-                GameObject player = PrefabUtility.InstantiatePrefab(playerPrefab, scene) as GameObject;
-                player.transform.SetParent(runtimeRoot.transform, false);
-                player.transform.position = Vector3.zero;
-
-                Camera sceneCamera = FindSceneCamera(scene);
-                ConfigureCamera(
-                    sceneCamera,
-                    player.transform,
-                    includeCambrianCreatures
-                        ? new Color(0.02f, 0.12f, 0.24f, 1f)
-                        : new Color(0.53f, 0.74f, 0.82f, 1f),
-                    includeCambrianCreatures ? 13f : 7.5f,
-                    includeCambrianCreatures);
-
-                LineRenderer aimLine = CreateAimLine(player.transform, aimMaterial);
-                PlayerMovementController movement = player.GetComponent<PlayerMovementController>();
-                movement.Configure(sceneCamera, player.transform.Find("Visual"), aimLine);
-
-                if (includeCambrianCreatures)
-                {
-                    PlaceCambrianCreatures(scene, runtimeRoot.transform);
-                }
-                else
-                {
-                    CreateModernMarkers(runtimeRoot.transform);
-                }
-
-                EditorSceneManager.MarkSceneDirty(scene);
-                EditorSceneManager.SaveScene(scene);
-
-                if (SceneManager.GetActiveScene() == scene)
-                {
-                    Selection.activeGameObject = player;
-                }
-            }
-            finally
-            {
-                if (!wasAlreadyLoaded && scene.IsValid() && scene.isLoaded)
-                {
-                    EditorSceneManager.CloseScene(scene, true);
-                }
-            }
-        }
-
-        private static void RemoveGeneratedRoot(Scene scene)
-        {
-            GameObject[] roots = scene.GetRootGameObjects();
-            for (int i = 0; i < roots.Length; i++)
-            {
-                if (roots[i].name == RuntimeRootName)
-                {
-                    Object.DestroyImmediate(roots[i]);
-                }
-            }
-        }
-
-        private static void PlaceCambrianCreatures(Scene scene, Transform root)
-        {
-            Transform group = new GameObject("Cambrian Creature Placeholders").transform;
-            group.SetParent(root, false);
-
-            for (int i = 0; i < CambrianCreatures.Length; i++)
-            {
-                CreatureSpec spec = CambrianCreatures[i];
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(spec.PrefabPath);
-                GameObject creature = PrefabUtility.InstantiatePrefab(prefab, scene) as GameObject;
-                creature.transform.SetParent(group, false);
-                creature.transform.position = spec.Position;
-            }
-        }
-
-        private static Camera FindSceneCamera(Scene scene)
-        {
-            GameObject[] roots = scene.GetRootGameObjects();
-            for (int i = 0; i < roots.Length; i++)
-            {
-                Camera camera = roots[i].GetComponentInChildren<Camera>(true);
-                if (camera != null)
-                {
-                    return camera;
-                }
-            }
-
-            GameObject cameraObject = new GameObject("Main Camera");
-            SceneManager.MoveGameObjectToScene(cameraObject, scene);
-            TrySetTag(cameraObject, "MainCamera");
-            cameraObject.AddComponent<AudioListener>();
-            return cameraObject.AddComponent<Camera>();
-        }
-
-        private static void ConfigureCamera(
-            Camera sceneCamera,
-            Transform target,
-            Color background,
-            float size,
-            bool useCambrianWorldBounds)
-        {
-            sceneCamera.orthographic = true;
-            sceneCamera.orthographicSize = size;
-            sceneCamera.clearFlags = CameraClearFlags.SolidColor;
-            sceneCamera.backgroundColor = background;
-            sceneCamera.transform.position = new Vector3(0f, 0f, -10f);
-
-            CameraFollow2D follow = sceneCamera.GetComponent<CameraFollow2D>();
-            if (follow == null)
-            {
-                follow = sceneCamera.gameObject.AddComponent<CameraFollow2D>();
-            }
-
-            follow.SetTarget(target);
-            follow.SetOffset(new Vector3(0f, 0f, -10f));
-            follow.SetDeadZone(new Vector2(1.8f, 1.1f));
-
-            if (useCambrianWorldBounds)
-            {
-                float horizontalMargin = size * (16f / 9f);
-                float worldMinY = CambrianOceanWorld.DefaultSurfaceY - CambrianOceanWorld.DefaultDeepBasinDepth - 80f;
-                follow.SetBounds(
-                    new Vector2(-CambrianOceanWorld.DefaultWorldHalfWidth + horizontalMargin, worldMinY + size),
-                    new Vector2(CambrianOceanWorld.DefaultWorldHalfWidth - horizontalMargin, CambrianOceanWorld.DefaultSurfaceY - size));
-            }
-            else
-            {
-                follow.SetBounds(new Vector2(-22f, -10f), new Vector2(22f, 10f));
-            }
-
-            EditorUtility.SetDirty(sceneCamera);
-            EditorUtility.SetDirty(follow);
-        }
-
-        private static LineRenderer CreateAimLine(Transform player, Material material)
-        {
-            GameObject lineObject = new GameObject("Aim Line");
-            lineObject.transform.SetParent(player, false);
-
-            LineRenderer line = lineObject.AddComponent<LineRenderer>();
-            line.useWorldSpace = true;
-            line.positionCount = 2;
-            line.startWidth = 0.035f;
-            line.endWidth = 0.01f;
-            line.startColor = new Color(0.72f, 1f, 1f, 0.75f);
-            line.endColor = new Color(0.72f, 1f, 1f, 0.05f);
-            line.sortingOrder = 30;
-            line.sharedMaterial = material;
-            line.enabled = false;
-            return line;
-        }
-
         private static GameObject CreateVisual(
             Transform parent,
             Vector2Int pixelSize,
@@ -574,57 +388,6 @@ namespace MimicCell.EditorTools
             PlaceholderSprite placeholder = visual.AddComponent<PlaceholderSprite>();
             placeholder.Apply(pixelSize, fillColor, outlineColor, PixelsPerUnit);
             return visual;
-        }
-
-        private static void CreateCambrianBackdrop(Transform root)
-        {
-            GameObject worldObject = new GameObject("Cambrian Ocean World");
-            worldObject.transform.SetParent(root, false);
-            worldObject.AddComponent<CambrianOceanWorld>();
-
-            GameObject terrainObject = new GameObject("Seabed Terrain");
-            terrainObject.transform.SetParent(root, false);
-            terrainObject.AddComponent<SeabedTerrainWorld>();
-        }
-
-        private static void CreateModernBackdrop(Transform root)
-        {
-            Transform backdrop = new GameObject("Modern Prototype Backdrop").transform;
-            backdrop.SetParent(root, false);
-            CreateBlock(backdrop, "Sky Band", new Vector2(0f, 3.5f), new Vector2(44f, 9f), new Color(0.38f, 0.62f, 0.76f, 0.34f), -100);
-            CreateBlock(backdrop, "Ground Band", new Vector2(0f, -4.8f), new Vector2(44f, 1.6f), new Color(0.18f, 0.30f, 0.20f, 0.72f), -98);
-        }
-
-        private static void CreateModernMarkers(Transform root)
-        {
-            Transform markers = new GameObject("Modern Movement Placeholders").transform;
-            markers.SetParent(root, false);
-            CreateBlock(markers, "Future Air Movement Area", new Vector2(-5f, 3f), new Vector2(5f, 2f), new Color(0.76f, 0.89f, 1f, 0.22f), -80);
-            CreateBlock(markers, "Future Land Movement Area", new Vector2(4f, -3.2f), new Vector2(6f, 1.2f), new Color(0.42f, 0.66f, 0.42f, 0.32f), -80);
-        }
-
-        private static void CreateBlock(
-            Transform parent,
-            string objectName,
-            Vector2 position,
-            Vector2 scale,
-            Color fillColor,
-            int sortingOrder)
-        {
-            GameObject block = new GameObject(objectName);
-            block.transform.SetParent(parent, false);
-            block.transform.position = position;
-            block.transform.localScale = new Vector3(scale.x, scale.y, 1f);
-
-            SpriteRenderer renderer = block.AddComponent<SpriteRenderer>();
-            renderer.sortingOrder = sortingOrder;
-
-            PlaceholderSprite placeholder = block.AddComponent<PlaceholderSprite>();
-            placeholder.Apply(
-                new Vector2Int(16, 16),
-                fillColor,
-                new Color(1f, 1f, 1f, 0f),
-                PixelsPerUnit);
         }
 
         private static void TrySetTag(GameObject target, string tagName)

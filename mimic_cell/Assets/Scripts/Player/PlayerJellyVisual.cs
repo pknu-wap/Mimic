@@ -65,6 +65,7 @@ namespace MimicCell.Player
         private readonly List<TentacleSpriteMesh> tentacles = new List<TentacleSpriteMesh>();
 
         private SoftBodySpriteMesh bodyMesh;
+        private TentacleSpriteMesh extractionTentacle;
         private Vector3 baseBodyPosition;
         private Vector3 baseBodyScale;
         private Vector3 baseCorePosition;
@@ -96,6 +97,12 @@ namespace MimicCell.Player
             extractionTentacleRenderer = newExtractionTentacleRenderer;
             targetRigidbody = GetComponent<Rigidbody2D>();
             initialized = false;
+        }
+
+        public bool TryGetExtractionAttachmentDirection(out Vector2 direction)
+        {
+            direction = extractionTentacle != null ? extractionTentacle.AttachmentDirection : Vector2.zero;
+            return direction.sqrMagnitude > 0.0001f;
         }
 
         public void ApplyImpact(Vector2 worldPoint, float normalizedStrength)
@@ -291,6 +298,7 @@ namespace MimicCell.Player
             }
 
             tentacles.Clear();
+            extractionTentacle = null;
         }
 
         private void InitializeIfNeeded()
@@ -322,7 +330,7 @@ namespace MimicCell.Player
             AddTentacles(legRenderers, 0f);
             if (extractionTentacleRenderer != null && extractionTentacleRenderer.sprite != null)
             {
-                tentacles.Add(new TentacleSpriteMesh(
+                extractionTentacle = new TentacleSpriteMesh(
                     extractionTentacleRenderer,
                     bodyRenderer,
                     transform,
@@ -330,7 +338,8 @@ namespace MimicCell.Player
                     rootRigidFraction,
                     rootAnchorInset,
                     2.55f,
-                    true));
+                    true);
+                tentacles.Add(extractionTentacle);
             }
 
             initialized = bodyMesh.IsValid;
@@ -983,6 +992,9 @@ namespace MimicCell.Player
             private float initialBodyAngle;
             private float bodyAngle;
             private readonly float totalWorldLength;
+
+            public Vector2 AttachmentDirection =>
+                bodyAnchorTransform.TransformVector(bodyAnchorLocal - bodyCenterLocal);
 
             public TentacleSpriteMesh(
                 SpriteRenderer source,

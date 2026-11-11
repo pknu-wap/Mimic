@@ -607,6 +607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41409b64e4a34759afc310aac8932c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Gameplay.PrototypeGameSession
+  player: {fileID: 1877712880}
   respawnDelay: 1.25
 --- !u!4 &1662799709
 Transform:
@@ -1142,6 +1143,17 @@ Transform:
   - {fileID: 1920394630}
   m_Father: {fileID: 1662799709}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1877712880 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7508835435472099057, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+  m_PrefabInstance: {fileID: 1877712874}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df70b6cae4a451590cb17b7e91b3b31, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PrototypePlayer
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

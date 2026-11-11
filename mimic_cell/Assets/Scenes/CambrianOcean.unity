@@ -791,6 +791,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2055101682}
   - component: {fileID: 2055101681}
+  - component: {fileID: 2055101684}
   m_Layer: 0
   m_Name: '[Mimic Runtime]'
   m_TagString: Untagged
@@ -810,6 +811,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41409b64e4a34759afc310aac8932c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Gameplay.PrototypeGameSession
+  player: {fileID: 1196324040}
   respawnDelay: 1.25
 --- !u!4 &2055101682
 Transform:
@@ -829,6 +831,32 @@ Transform:
   - {fileID: 1196324024}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2055101684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055101680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae00e8e3380c48499bda2a36e43e0316, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.CambrianOceanBootstrap
+  ocean: {fileID: 1175212828}
+  terrain: {fileID: 1452000003}
+  cameraFollow: {fileID: 519420033}
+--- !u!114 &1196324040 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7508835435472099057, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+  m_PrefabInstance: {fileID: 1196324023}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df70b6cae4a451590cb17b7e91b3b31, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PrototypePlayer
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
