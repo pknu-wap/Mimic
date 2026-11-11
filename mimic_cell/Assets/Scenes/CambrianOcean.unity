@@ -427,7 +427,6 @@ MonoBehaviour:
   bbColor: {r: 0.05, g: 0.29, b: 0.49, a: 0.96}
   bcColor: {r: 0.025, g: 0.19, b: 0.35, a: 0.98}
   ccColor: {r: 0.012, g: 0.07, b: 0.17, a: 1}
-  sedimentColor: {r: 0.12, g: 0.13, b: 0.12, a: 1}
 --- !u!114 &1175212829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,6 +531,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1196324034}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324047}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324046}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324048}
   m_SourcePrefab: {fileID: 100100000, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
 --- !u!4 &1196324024 stripped
 Transform:
@@ -582,6 +590,100 @@ MonoBehaviour:
   dashDuration: 2
   cooldown: 3
   randomAngle: 30
+--- !u!114 &1196324046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163678592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdec51b2ec404e44cb444263f4a8a843, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.BerserkEffect
+  berserkDefinition: {fileID: 11400000, guid: c0dd5fe92fad8a348a2f4646d64eaa1b, type: 2}
+  detectionRadius: 5
+  dashSpeed: 7
+  stoppingDistance: 1.2
+--- !u!114 &1196324047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163678592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 860835450e2cfc741a8c361eb38c7dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.StatusEffectController
+  ownerType: 0
+--- !u!114 &1196324048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163678592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 208e97a47409ecc459ada80408baced7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PressureMaladaptationEffect
+  oceanWorld: {fileID: 1175212828}
+  cameraFollow: {fileID: 519420033}
+  useTestHabitat: 1
+  testAllowedHabitats: 1
+--- !u!1 &1452000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1452000002}
+  - component: {fileID: 1452000003}
+  m_Layer: 0
+  m_Name: Seabed Terrain
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1452000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2055101682}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1452000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5de4f326039047349d880d9e1818246b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.SeabedTerrainWorld
+  terrainTexture: {fileID: 2800000, guid: 4b5e4d903add4a00af1237e6c0c725e1, type: 3}
+  textureWorldSize: 4
+  backWallTexture: {fileID: 0}
+  cellSize: 1.5
+  streamingInterval: 0.2
 --- !u!1 &1918069291
 GameObject:
   m_ObjectHideFlags: 0
