@@ -20,6 +20,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9b1dad70da20fd14da8ab11ba97c5bdd, type: 2}
   - {fileID: 11400000, guid: c1483d1d102b8b84dafd86fa43c2c643, type: 2}
   - {fileID: 11400000, guid: a4f7d7e42c45fcb4881863cf16961b9a, type: 2}
+  - {fileID: 11400000, guid: 4dfc1a01796967240a9ab273c73d9c03, type: 2}
+  - {fileID: 11400000, guid: a487bde7b8fe1e44c89be4ff1d36e43e, type: 2}
+  - {fileID: 11400000, guid: 96357d3a8b4a65c44be50ed57b33bf70, type: 2}
+  - {fileID: 11400000, guid: 58ada217901325642ada598f389e371f, type: 2}
+  - {fileID: 11400000, guid: 7b17282320db20e4fa46db46d420c849, type: 2}
+  - {fileID: 11400000, guid: c90e50377dd4f034b841802263c984c3, type: 2}
+  - {fileID: 11400000, guid: b6e709b197a43684c989ffa3d8413565, type: 2}
+  - {fileID: 11400000, guid: da2e9d91ab4c6bb4b87f2f118b7570f6, type: 2}
   spawnSettings:
     firstSpawnDelay: 2
     spawnInterval: 4

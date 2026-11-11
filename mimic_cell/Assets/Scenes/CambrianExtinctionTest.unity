@@ -226,7 +226,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 26.16
+  orthographic size: 7.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -720,6 +720,12 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.SeabedTerrainWorld
   terrainTexture: {fileID: 2800000, guid: 4b5e4d903add4a00af1237e6c0c725e1, type: 3}
+  terrainTileShader: {fileID: 4800000, guid: c1cc6762d164421884756c9b4804e37d, type: 3}
+  terrainTiles:
+  - {fileID: 2800000, guid: 3205d9142b9338049a06403c77840622, type: 3}
+  - {fileID: 2800000, guid: 5ba03f5ebb72867488abbd313759eed0, type: 3}
+  - {fileID: 2800000, guid: 6229e64a178ac604c9e454c3f64d027b, type: 3}
+  - {fileID: 2800000, guid: 1d77a2108e312d0488fc2bd29c0b3c62, type: 3}
   textureWorldSize: 4
   cellSize: 1.5
   streamingInterval: 0.2
@@ -734,6 +740,7 @@ GameObject:
   - component: {fileID: 2055101682}
   - component: {fileID: 2055101681}
   - component: {fileID: 2055101683}
+  - component: {fileID: 2055101684}
   m_Layer: 0
   m_Name: '[Mimic Runtime]'
   m_TagString: Untagged
@@ -753,6 +760,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41409b64e4a34759afc310aac8932c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Gameplay.PrototypeGameSession
+  player: {fileID: 1196324040}
   respawnDelay: 1.25
 --- !u!114 &2055101683
 MonoBehaviour:
@@ -784,6 +792,32 @@ Transform:
   - {fileID: 1196324024}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2055101684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055101680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae00e8e3380c48499bda2a36e43e0316, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.CambrianOceanBootstrap
+  ocean: {fileID: 1175212828}
+  terrain: {fileID: 1452000003}
+  cameraFollow: {fileID: 519420033}
+--- !u!114 &1196324040 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7508835435472099057, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+  m_PrefabInstance: {fileID: 1196324023}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df70b6cae4a451590cb17b7e91b3b31, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PrototypePlayer
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

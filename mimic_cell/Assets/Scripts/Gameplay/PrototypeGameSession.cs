@@ -14,39 +14,25 @@ namespace MimicCell.Gameplay
     [DisallowMultipleComponent]
     public sealed class PrototypeGameSession : MonoBehaviour
     {
+        [SerializeField] private PrototypePlayer player;
         [SerializeField, Min(0f)] private float respawnDelay = 1.25f;
 
-        private PrototypePlayer player;
         private Vector3 playerSpawnPosition;
-        private Coroutine respawnRoutine;
 
         public PrototypeSessionState State { get; private set; } = PrototypeSessionState.Playing;
 
         public event Action<PrototypeSessionState> StateChanged;
 
-        public void Configure(PrototypePlayer newPlayer, Vector3 spawnPosition)
+        private void Awake()
         {
-            if (player != null)
+            if (player == null)
             {
-                player.Defeated -= HandlePlayerDefeated;
+                Debug.LogError("Assign the scene player to the game session.", this);
+                return;
             }
 
-            if (respawnRoutine != null)
-            {
-                StopCoroutine(respawnRoutine);
-                respawnRoutine = null;
-            }
-
-            player = newPlayer;
-            playerSpawnPosition = spawnPosition;
-
-            if (player != null)
-            {
-                player.Defeated += HandlePlayerDefeated;
-                player.SetControlsEnabled(true);
-            }
-
-            SetState(PrototypeSessionState.Playing);
+            playerSpawnPosition = player.transform.position;
+            player.Defeated += HandlePlayerDefeated;
         }
 
         private void OnDestroy()
@@ -66,7 +52,7 @@ namespace MimicCell.Gameplay
 
             defeatedPlayer.SetControlsEnabled(false);
             SetState(PrototypeSessionState.PlayerDefeated);
-            respawnRoutine = StartCoroutine(RespawnPlayer());
+            StartCoroutine(RespawnPlayer());
         }
 
         private IEnumerator RespawnPlayer()
@@ -78,7 +64,6 @@ namespace MimicCell.Gameplay
                 player.ResetAt(playerSpawnPosition);
             }
 
-            respawnRoutine = null;
             SetState(PrototypeSessionState.Playing);
         }
 
