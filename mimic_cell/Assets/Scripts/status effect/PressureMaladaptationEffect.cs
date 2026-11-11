@@ -3,6 +3,7 @@ using MimicCell.Gameplay;
 using MimicCell.Player;
 using MimicCell.World;
 using UnityEngine;
+using MimicCell.CameraSystem;
 
 namespace MimicCell.StatusEffects
 {
@@ -13,6 +14,7 @@ namespace MimicCell.StatusEffects
         private const double DamageFraction = 0.10;
 
         [SerializeField] private CambrianOceanWorld oceanWorld;
+        [SerializeField] private CameraFollow2D cameraFollow;
 
         [Header("Test Only")]
         [SerializeField] private bool useTestHabitat;
@@ -72,6 +74,8 @@ namespace MimicCell.StatusEffects
 
                 if (health.TakeDamage(damage))
                 {
+                      cameraFollow?.PlayPressureShake();
+
                     Debug.Log(
                         $"수압 부적응 [{current}] 피해 {damage}. " +
                         $"체력 {health.CurrentHealth}/{health.MaxHealth}",
