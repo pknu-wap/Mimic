@@ -14,8 +14,20 @@ namespace MimicCell.World
         private const float SurfaceFeatureWidth = 240f;
         private const float UpperRidgeSpacing = 380f;
 
-        [Header("Temporary Art")]
+        private static readonly int[] TileTextureIds =
+        {
+            Shader.PropertyToID("_Tile0"),
+            Shader.PropertyToID("_Tile1"),
+            Shader.PropertyToID("_Tile2"),
+            Shader.PropertyToID("_Tile3")
+        };
+        private static readonly int TileSeedId = Shader.PropertyToID("_TileSeed");
+
+        [Header("Terrain Art")]
         [SerializeField] private Texture2D terrainTexture;
+        [SerializeField] private Shader terrainTileShader;
+        [Tooltip("Assign four textures to vary the terrain tile by tile.")]
+        [SerializeField] private Texture2D[] terrainTiles = Array.Empty<Texture2D>();
         [SerializeField, Min(0.5f)] private float textureWorldSize = 4f;
         [SerializeField] private Texture2D backWallTexture;
 
@@ -1004,55 +1016,57 @@ namespace MimicCell.World
                 terrainTexture = Resources.Load<Texture2D>(PlaceholderTexturePath);
             }
 
-            Shader shader = Shader.Find("Sprites/Default");
-            if (shader == null)
-            {
-                shader = Shader.Find("Universal Render Pipeline/Unlit");
-            }
+            return CreateTerrainMaterial("Seabed Terrain", terrainTexture, Color.white, true);
+        }
 
+        private Material CreateBackWallMaterial()
+        {
+            Texture2D texture = backWallTexture != null ? backWallTexture : terrainTexture;
+            return CreateTerrainMaterial("Cave Back Wall", texture,
+                new Color(0.66f, 0.73f, 0.76f, 1f), backWallTexture == null);
+        }
+
+        private Material CreateTerrainMaterial(string materialName, Texture2D fallbackTexture, Color tint, bool useTerrainTiles)
+        {
+            bool useVariants = useTerrainTiles && terrainTileShader != null && terrainTileShader.isSupported &&
+                terrainTiles != null && terrainTiles.Length == TileTextureIds.Length;
+            Shader shader = useVariants
+                ? terrainTileShader
+                : Shader.Find("Sprites/Default") ?? Shader.Find("Universal Render Pipeline/Unlit");
             if (shader == null)
             {
                 Debug.LogError("No shader found for seabed terrain.", this);
                 return null;
             }
 
-            if (terrainTexture != null)
-            {
-                terrainTexture.wrapMode = TextureWrapMode.Repeat;
-            }
-
             Material material = new Material(shader)
             {
-                name = "Seabed Terrain Temporary Material",
-                color = Color.white,
-                mainTexture = terrainTexture != null ? terrainTexture : Texture2D.whiteTexture,
+                name = materialName,
+                color = tint,
                 hideFlags = HideFlags.DontSave
             };
+
+            if (useVariants)
+            {
+                // Use only seed bits that fit exactly in the shader's float property.
+                material.SetFloat(TileSeedId, resolvedSeed & 0x00ffffff);
+                for (int i = 0; i < TileTextureIds.Length; i++)
+                {
+                    Texture2D tile = terrainTiles[i] != null ? terrainTiles[i] : fallbackTexture;
+                    material.SetTexture(TileTextureIds[i], tile != null ? tile : Texture2D.whiteTexture);
+                }
+            }
+            else
+            {
+                if (fallbackTexture != null)
+                {
+                    fallbackTexture.wrapMode = TextureWrapMode.Repeat;
+                }
+
+                material.mainTexture = fallbackTexture != null ? fallbackTexture : Texture2D.whiteTexture;
+            }
+
             return material;
-        }
-
-        private Material CreateBackWallMaterial()
-        {
-            Shader shader = Shader.Find("Sprites/Default") ??
-                Shader.Find("Universal Render Pipeline/Unlit");
-            if (shader == null)
-            {
-                return null;
-            }
-
-            Texture2D texture = backWallTexture != null ? backWallTexture : terrainTexture;
-            if (texture != null)
-            {
-                texture.wrapMode = TextureWrapMode.Repeat;
-            }
-
-            return new Material(shader)
-            {
-                name = "Cave Back Wall Temporary Material",
-                mainTexture = texture != null ? texture : Texture2D.whiteTexture,
-                color = new Color(0.66f, 0.73f, 0.76f, 1f),
-                hideFlags = HideFlags.DontSave
-            };
         }
 
         private void ClearChunks()

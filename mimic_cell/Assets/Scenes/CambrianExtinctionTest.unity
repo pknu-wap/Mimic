@@ -720,6 +720,12 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.SeabedTerrainWorld
   terrainTexture: {fileID: 2800000, guid: 4b5e4d903add4a00af1237e6c0c725e1, type: 3}
+  terrainTileShader: {fileID: 4800000, guid: c1cc6762d164421884756c9b4804e37d, type: 3}
+  terrainTiles:
+  - {fileID: 2800000, guid: 3205d9142b9338049a06403c77840622, type: 3}
+  - {fileID: 2800000, guid: 5ba03f5ebb72867488abbd313759eed0, type: 3}
+  - {fileID: 2800000, guid: 6229e64a178ac604c9e454c3f64d027b, type: 3}
+  - {fileID: 2800000, guid: 1d77a2108e312d0488fc2bd29c0b3c62, type: 3}
   textureWorldSize: 4
   cellSize: 1.5
   streamingInterval: 0.2
