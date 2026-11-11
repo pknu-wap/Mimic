@@ -14,7 +14,8 @@ namespace MimicCell.StatusEffects
     {
         [SerializeField]
 private Material blurMaterial;
-private readonly Dictionary<CreatureController, TierOneLightPulse> preyLights = new();[SerializeField]
+
+[SerializeField]
 private StatusEffectDefinition tunnelVisionDefinition;
 
 private StatusEffectController statusController;
@@ -97,67 +98,36 @@ foreach (CreatureController creature in creatures)
     if (creature.Definition == null)
         continue;
 
-    Material effectMaterial;
-
-    switch (creature.Definition.FoodTier)
-    {
-        case CreatureFoodTier.Tier1:
-            ShowPreyLight(creature);
-continue;
-        case CreatureFoodTier.Tier3:
-            effectMaterial = blurMaterial;
-            break;
-        default:
-            continue;
-    }
-
-    if (effectMaterial == null)
+    if (creature.Definition.FoodTier != CreatureFoodTier.Tier3)
         continue;
 
-    foreach (SpriteRenderer renderer in
-             creature.GetComponentsInChildren<SpriteRenderer>())
-    {
-        if (!originalMaterials.ContainsKey(renderer))
-        {
-            originalMaterials.Add(renderer, renderer.sharedMaterial);
-        }
+    SpriteRenderer[] renderers =
+        creature.GetComponentsInChildren<SpriteRenderer>();
 
-        renderer.sharedMaterial = effectMaterial;
-    }
-}
-
-}
-
-  private void ShowPreyLight(CreatureController creature)
+   
+foreach (SpriteRenderer renderer in renderers)
 {
-    if (preyLights.TryGetValue(creature, out TierOneLightPulse existing) &&
-        existing != null)
+    if (renderer == null || blurMaterial == null)
+        continue;
+
+    // 원래 Material을 한 번만 저장
+    if (!originalMaterials.ContainsKey(renderer))
     {
-        return;
+        originalMaterials.Add(renderer, renderer.sharedMaterial);
     }
 
-    SpriteRenderer body = creature.GetComponentInChildren<SpriteRenderer>();
-    if (body == null || body.sprite == null)
-        return;
-
-    var lightObject = new GameObject("Tier 1 Prey Light");
-    lightObject.transform.SetParent(creature.transform, false);
-
-    var pulse = lightObject.AddComponent<TierOneLightPulse>();
-    pulse.Initialize(body, Random.Range(0f, 0.35f));
-    preyLights[creature] = pulse;
+    // 블러 적용
+    renderer.sharedMaterial = blurMaterial;
 }
 
-private void ClearPreyLights()
-{
-    foreach (TierOneLightPulse pulse in preyLights.Values)
-    {
-        if (pulse != null)
-            Destroy(pulse.gameObject);
-    }
 
-    preyLights.Clear();
-} 
+    Debug.Log(
+        $"{creature.name}: Tier3 블러 적용 완료");
+}
+
+}
+
+   
 
 private void RestoreMaterials()
 {
@@ -170,7 +140,6 @@ private void RestoreMaterials()
     }
 
     originalMaterials.Clear();
-    ClearPreyLights();
 }
 
     }
