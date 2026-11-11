@@ -179,7 +179,7 @@ namespace MimicCell.World
         private void Start()
         {
             ResolveStreamingTarget();
-            RefreshStreaming(true);
+            RefreshStreaming(false);
         }
 
         private void Update()

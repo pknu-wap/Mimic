@@ -30,7 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 54910889850090819}
+  m_Father: {fileID: 6310024010803169380}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1067667902512533719
 SpriteRenderer:
@@ -212,13 +212,60 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 6310024010803169380}
+  m_Father: {fileID: 5270640567023923783}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6310024010803169379
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6310024010803169380}
+  - component: {fileID: 6310024010803169381}
+  m_Layer: 0
+  m_Name: Tentacle Aim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6310024010803169380
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6310024010803169379}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
   - {fileID: 443478555875500913}
   - {fileID: 3700055706403466707}
   - {fileID: 2858970063871305406}
   - {fileID: 4089249121876393094}
   - {fileID: 1319961253938493012}
-  m_Father: {fileID: 5270640567023923783}
+  m_Father: {fileID: 54910889850090819}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6310024010803169381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6310024010803169379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db2c595ea7704e72a513f05592c480b6, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleAim
+  aimHoldSeconds: 0.25
+  returnSpeed: 720
 --- !u!210 &2782922287327151865
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -353,7 +400,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 54910889850090819}
+  m_Father: {fileID: 6310024010803169380}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7820882185777394718
 SpriteRenderer:
@@ -445,7 +492,7 @@ Transform:
   m_Children:
   - {fileID: 1244134293048297790}
   - {fileID: 2728273293877189270}
-  m_Father: {fileID: 54910889850090819}
+  m_Father: {fileID: 6310024010803169380}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7775672073312203066
 GameObject:
@@ -555,6 +602,8 @@ GameObject:
   - component: {fileID: 1734810983278790563}
   - component: {fileID: 2097008861271464530}
   - component: {fileID: 7508835435472099057}
+  - component: {fileID: 6310024010803169382}
+  - component: {fileID: 9003527612338714761}
   - component: {fileID: -1720600722151849923}
   - component: {fileID: -7109796891368331952}
   m_Layer: 0
@@ -656,7 +705,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b363486ffed14107b6ff284fe69ed17b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerJellyVisual
-  visualRoot: {fileID: 54910889850090819}
+  visualRoot: {fileID: 6310024010803169380}
   bodyRoot: {fileID: 443478555875500913}
   bodyRenderer: {fileID: 1163149879768469176}
   coreRoot: {fileID: 2728273293877189270}
@@ -784,7 +833,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5df70b6cae4a451590cb17b7e91b3b31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PrototypePlayer
-  maxHealth: 20
+--- !u!114 &6310024010803169382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17ccca83d25c4e53a41999d0c22be346, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerAttack
+--- !u!114 &9003527612338714761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 860835450e2cfc741a8c361eb38c7dce, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.StatusEffectController
+  ownerType: 0
 --- !u!114 &-1720600722151849923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -877,7 +950,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 54910889850090819}
+  m_Father: {fileID: 6310024010803169380}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1110715004870587559
 SpriteRenderer:
@@ -968,7 +1041,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 54910889850090819}
+  m_Father: {fileID: 6310024010803169380}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &171653813474192436
 SpriteRenderer:

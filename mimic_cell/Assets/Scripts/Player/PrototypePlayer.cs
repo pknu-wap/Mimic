@@ -10,8 +10,6 @@ namespace MimicCell.Player
     [RequireComponent(typeof(PlayerMovementController))]
     public sealed class PrototypePlayer : MonoBehaviour
     {
-        [SerializeField, Min(1)] private int maxHealth = 20;
-
         private Rigidbody2D attachedRigidbody;
         private ActorHealth actorHealth;
         private PlayerMovementController movementController;
@@ -35,13 +33,6 @@ namespace MimicCell.Player
             {
                 actorHealth.Died -= HandleDied;
             }
-        }
-
-        public void Configure(int newMaxHealth)
-        {
-            ResolveComponents();
-            maxHealth = Mathf.Max(1, newMaxHealth);
-            actorHealth.Configure(maxHealth);
         }
 
         public bool TakeDamage(int amount)
