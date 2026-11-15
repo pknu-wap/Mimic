@@ -30,11 +30,12 @@ namespace MimicCell.Player
         private Rigidbody2D attachedRigidbody;
         private StatusEffectController statusEffectController;
         private Vector2 moveInput;
+        private AnoxiaEffect anoxiaEffect;
         private float headingAngle;
         private float headingVelocity;
         private bool isForcedMoving;
-private Vector2 forcedMoveDirection;
-private float forcedMoveSpeed;
+        private Vector2 forcedMoveDirection;
+        private float forcedMoveSpeed;
 
         private void Awake()
         {
@@ -67,13 +68,13 @@ private float forcedMoveSpeed;
         private void FixedUpdate()
         {
             if (isForcedMoving)
-{
-    attachedRigidbody.linearVelocity =
-        forcedMoveDirection * forcedMoveSpeed;
-    return;
-}
+            {
+                attachedRigidbody.linearVelocity =
+                    forcedMoveDirection * forcedMoveSpeed;
+                return;
+            }
             Vector2 velocity = attachedRigidbody.linearVelocity;
-            
+
 
             if (moveInput.sqrMagnitude > 0.001f)
             {
@@ -81,22 +82,22 @@ private float forcedMoveSpeed;
                     ? (Vector2)visualRoot.up
                     : moveInput;
                 velocity += thrustDirection.normalized * (swimAcceleration * Time.fixedDeltaTime);
-               if (statusEffectController == null)
-{
-    statusEffectController = GetComponent<StatusEffectController>();
-}
+                if (statusEffectController == null)
+                {
+                    statusEffectController = GetComponent<StatusEffectController>();
+                }
 
-float speedMultiplier = statusEffectController != null
-    ? statusEffectController.GetSwimSpeedMultiplier()
-    : 1f;
+                float speedMultiplier = statusEffectController != null
+                    ? statusEffectController.GetSwimSpeedMultiplier()
+                    : 1f;
 
-float finalSwimSpeed = swimSpeed * speedMultiplier;
-if (Mathf.Abs(speedMultiplier - 1f) > 0.001f)
-{
-    Debug.Log("도파민 적용 중! 최대 이동속도: " + finalSwimSpeed);
-}
+                float finalSwimSpeed = swimSpeed * speedMultiplier;
+                if (Mathf.Abs(speedMultiplier - 1f) > 0.001f)
+                {
+                    Debug.Log(" 상태이상 적용 후 최대 유영 속도:: " + finalSwimSpeed);
+                }
 
-velocity = Vector2.ClampMagnitude(velocity, finalSwimSpeed);
+                velocity = Vector2.ClampMagnitude(velocity, finalSwimSpeed);
             }
             else
             {
@@ -109,24 +110,24 @@ velocity = Vector2.ClampMagnitude(velocity, finalSwimSpeed);
             attachedRigidbody.linearVelocity = velocity;
         }
 
-public void StartForcedMovement(Vector2 direction, float speed)
-{
-    if (direction.sqrMagnitude <= 0.001f)
-    {
-        return;
-    }
+        public void StartForcedMovement(Vector2 direction, float speed)
+        {
+            if (direction.sqrMagnitude <= 0.001f)
+            {
+                return;
+            }
 
-    forcedMoveDirection = direction.normalized;
-    forcedMoveSpeed = Mathf.Max(0f, speed);
-    isForcedMoving = true;
-}
+            forcedMoveDirection = direction.normalized;
+            forcedMoveSpeed = Mathf.Max(0f, speed);
+            isForcedMoving = true;
+        }
 
-public void StopForcedMovement()
-{
-    isForcedMoving = false;
-    moveInput = Vector2.zero;
-    StopMovement();
-}
+        public void StopForcedMovement()
+        {
+            isForcedMoving = false;
+            moveInput = Vector2.zero;
+            StopMovement();
+        }
 
         public void Configure(Transform newVisualRoot)
         {
@@ -178,8 +179,16 @@ public void StopForcedMovement()
             }
         }
 
-        private static Vector2 ReadKeyboardMove()
+        private  Vector2 ReadKeyboardMove()
         {
+            if (anoxiaEffect == null)
+    anoxiaEffect = GetComponent<AnoxiaEffect>();
+
+if (anoxiaEffect != null &&
+    anoxiaEffect.TryReadMovement(out Vector2 anoxiaMove))
+{
+    return anoxiaMove;
+}
             Vector2 move = Vector2.zero;
 
 #if ENABLE_INPUT_SYSTEM

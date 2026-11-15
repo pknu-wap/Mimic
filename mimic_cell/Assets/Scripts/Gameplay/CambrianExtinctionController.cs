@@ -266,8 +266,7 @@ namespace MimicCell.Gameplay
                     float front = phaseTime < 3f
                         ? Mathf.Lerp(column.SurfaceY, column.AABottomY, phaseTime / 3f) - 0.5f
                         : TurbidityFront(column);
-                    DrawBand(index * width, width + 1f, column.SurfaceY, front,
-                        new Color(0.25f, 0.20f, 0.14f, 0.48f));
+DrawBand(index * width, width, front, ocean.WorldMinY,                        new Color(0.25f, 0.20f, 0.14f, 0.48f));
                 }
                 else if (phase == ExtinctionPhase.Anoxia)
                 {
