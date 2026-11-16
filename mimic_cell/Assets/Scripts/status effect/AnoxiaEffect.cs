@@ -11,7 +11,7 @@ namespace MimicCell.StatusEffects
     public sealed class AnoxiaEffect : MonoBehaviour
     {
         [SerializeField] private bool enableTestKey;
-
+[SerializeField] private GameObject anoxiaBubbleAnimation;
        private const float LingerDuration = 2f;
 
 private ActorHealth health;
@@ -50,8 +50,7 @@ private long damageRemainder;
 
     nextDamageAt = now + 1f;
     damageRemainder = 0;
-    ShuffleDirections();
-}
+SetReversedDirections();}
 
 private void Update()
 {
@@ -129,32 +128,32 @@ private void Update()
             return true;
         }
 
-        private void ShuffleDirections()
-        {
-            do
-            {
-                directions[0] = Vector2.up;
-                directions[1] = Vector2.left;
-                directions[2] = Vector2.down;
-                directions[3] = Vector2.right;
+        private void SetReversedDirections()
+{
+    directions[0] = Vector2.down;  // W
+    directions[1] = Vector2.right; // A
+    directions[2] = Vector2.up;    // S
+    directions[3] = Vector2.left;  // D
+}
 
-                for (int i = directions.Length - 1; i > 0; i--)
-                {
-                    int j = Random.Range(0, i + 1);
-                    (directions[i], directions[j]) =
-                        (directions[j], directions[i]);
-                }
-            }
-            while (directions[0] == Vector2.up &&
-                   directions[1] == Vector2.left &&
-                   directions[2] == Vector2.down &&
-                   directions[3] == Vector2.right);
-        }
+     private void LateUpdate()
+{
+    if (anoxiaBubbleAnimation == null)
+        return;
 
-      private void OnDisable()
+    bool showBubbles = exposed && health != null && health.IsAlive;
+
+    if (anoxiaBubbleAnimation.activeSelf != showBubbles)
+        anoxiaBubbleAnimation.SetActive(showBubbles);
+}
+
+private void OnDisable()
 {
     insideAnoxia = false;
     exposed = false;
+
+    if (anoxiaBubbleAnimation != null)
+        anoxiaBubbleAnimation.SetActive(false);
 }
 
         private static bool WasTestKeyPressed()

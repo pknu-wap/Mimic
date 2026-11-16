@@ -576,6 +576,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.AnoxiaEffect
   enableTestKey: 0
+  anoxiaBubbleAnimation: {fileID: 0}
 --- !u!114 &1196324054
 MonoBehaviour:
   m_ObjectHideFlags: 0
