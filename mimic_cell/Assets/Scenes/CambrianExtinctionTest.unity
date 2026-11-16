@@ -531,6 +531,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1196324054}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324058}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324057}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324056}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324055}
   m_SourcePrefab: {fileID: 100100000, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
 --- !u!4 &1196324024 stripped
 Transform:
@@ -593,6 +605,69 @@ MonoBehaviour:
   enableTestKey: 0
   showScreenEffect: 1
   damagePercentPerSecond: 10
+--- !u!114 &1196324055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368441824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f320169601cc2e419dbaf70b55852eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.TunnelVisionEffect
+  blurMaterial: {fileID: 2100000, guid: b3e528529f2696640846ded54576bdfc, type: 2}
+  tunnelVisionDefinition: {fileID: 11400000, guid: 7ea99e1b393cd6e4faceae8339660e0a, type: 2}
+--- !u!114 &1196324056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368441824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 208e97a47409ecc459ada80408baced7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PressureMaladaptationEffect
+  oceanWorld: {fileID: 1175212828}
+  cameraFollow: {fileID: 519420033}
+  useTestHabitat: 0
+  testAllowedHabitats: 1
+--- !u!114 &1196324057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368441824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2a5614de9882204ab0c0c2dd3c1f307, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PanicEffect
+  panicDefinition: {fileID: 11400000, guid: 5351c5c526f3cc148ae4da7cc314c478, type: 2}
+  dashSpeed: 7
+  dashDuration: 2
+  cooldown: 3
+  randomAngle: 30
+--- !u!114 &1196324058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368441824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdec51b2ec404e44cb444263f4a8a843, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.BerserkEffect
+  berserkDefinition: {fileID: 11400000, guid: c0dd5fe92fad8a348a2f4646d64eaa1b, type: 2}
+  detectionRadius: 5
+  dashSpeed: 7
+  stoppingDistance: 1.2
 --- !u!1 &1452000001
 GameObject:
   m_ObjectHideFlags: 0

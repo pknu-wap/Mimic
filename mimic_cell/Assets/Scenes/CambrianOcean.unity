@@ -539,13 +539,7 @@ PrefabInstance:
       addedObject: {fileID: 1196324048}
     - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1196324049}
-    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1196324061}
-    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1196324062}
   m_SourcePrefab: {fileID: 100100000, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
 --- !u!4 &1196324024 stripped
 Transform:
@@ -639,19 +633,6 @@ MonoBehaviour:
   cameraFollow: {fileID: 519420033}
   useTestHabitat: 1
   testAllowedHabitats: 1
---- !u!114 &1196324049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1163678592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caffff4772dc389428ccf958a1c60ae1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.AnoxiaEffect
-  enableTestKey: 1
 --- !u!114 &1196324061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -668,21 +649,6 @@ MonoBehaviour:
   enableTestKey: 1
   showScreenEffect: 1
   damagePercentPerSecond: 10
---- !u!114 &1196324062
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1163678592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 529f5c2eedafeb443a12fdd054757fe2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.FreezingEffect
-  freezingDefinition: {fileID: 11400000, guid: f3bc4f2094b475749a08434fddbd98c3, type: 2}
-  enableTestKey: 1
-  frozenTint: {r: 0.07871127, g: 0.3904017, b: 0.6226415, a: 1}
 --- !u!1 &1452000001
 GameObject:
   m_ObjectHideFlags: 0
