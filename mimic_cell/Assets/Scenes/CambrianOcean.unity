@@ -170,7 +170,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -360,6 +360,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &897217714
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 897217716}
+  - component: {fileID: 897217715}
+  m_Layer: 0
+  m_Name: Dopamine Visual Volume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &897217715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897217714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 10
+  blendDistance: 0
+  weight: 0
+  sharedProfile: {fileID: 11400000, guid: 9c4d59b6b8bdf9c4db3314e7976f63ea, type: 2}
+--- !u!4 &897217716
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897217714}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.15583, y: 0.89131, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1163678592 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
@@ -540,6 +589,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1196324061}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324062}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324074}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324075}
   m_SourcePrefab: {fileID: 100100000, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
 --- !u!4 &1196324024 stripped
 Transform:
@@ -649,6 +707,50 @@ MonoBehaviour:
   enableTestKey: 1
   showScreenEffect: 1
   damagePercentPerSecond: 10
+--- !u!114 &1196324062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163678592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f66ca4513aefc42987cfac41134276, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.DopamineVisualEffect
+  dopamineDefinition: {fileID: 11400000, guid: 5b61560198cae734184348c31f65cc5a, type: 2}
+  dopamineVolume: {fileID: 897217715}
+--- !u!114 &1196324074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163678592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94ce73119bd785b44b7452f32b9fab4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.AssimilationShakeEffect
+  cameraFollow: {fileID: 519420033}
+  tunnelVision: {fileID: 11400000, guid: 7ea99e1b393cd6e4faceae8339660e0a, type: 2}
+  berserk: {fileID: 11400000, guid: c0dd5fe92fad8a348a2f4646d64eaa1b, type: 2}
+  panic: {fileID: 11400000, guid: 5351c5c526f3cc148ae4da7cc314c478, type: 2}
+  beatInterval: 0.85
+--- !u!114 &1196324075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163678592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c1faab1eb36df54c9018b8abdff0f9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PlayerDamageShakeEffect
+  cameraFollow: {fileID: 519420033}
 --- !u!1 &1452000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -927,3 +1029,4 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 2055101682}
+  - {fileID: 897217716}

@@ -26,6 +26,7 @@ namespace MimicCell.Gameplay
 
         public event Action<ActorHealth> HealthChanged;
         public event Action<ActorHealth> Died;
+        public event Action<ActorHealth> DamageTaken;
 
         private void Awake()
         {
@@ -58,6 +59,7 @@ namespace MimicCell.Gameplay
             int previousHealth = currentHealth;
             currentHealth = Mathf.Max(0, currentHealth - amount);
             HealthChanged?.Invoke(this);
+            DamageTaken?.Invoke(this);
 
             if (previousHealth > 0 && currentHealth == 0)
             {
