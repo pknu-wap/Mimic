@@ -16,8 +16,8 @@ namespace MimicCell.CameraSystem
         [SerializeField] private Vector2 maxBounds = new Vector2(20f, 8f);
 
         private Vector3 dampVelocity;
-        private const float ShakeDuration = 0.15f;
-private const float ShakeStrength = 0.12f;
+        private const float ShakeDuration = 0.25f;
+private const float ShakeStrength = 0.1f;
 
 private float shakeRemaining;
 private Vector3 shakeOffset;
@@ -68,13 +68,20 @@ private Vector3 shakeOffset;
             }
 
             transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref dampVelocity, smoothTime);
-         if (shakeRemaining > 0f)
-    {
-        float strength = ShakeStrength * (shakeRemaining / ShakeDuration);
-        shakeOffset = (Vector3)(Random.insideUnitCircle * strength);
-        transform.position += shakeOffset;
-        shakeRemaining = Mathf.Max(0f, shakeRemaining - Time.deltaTime);
-    }
+        if (shakeRemaining > 0f)
+{
+    float progress = 1f - shakeRemaining / ShakeDuration;
+    float fade = Mathf.Sin(progress * Mathf.PI);
+    float swing = Mathf.Sin(progress * Mathf.PI * 4f);
+
+    shakeOffset = new Vector3(
+        swing * fade * ShakeStrength,
+        swing * fade * ShakeStrength * 0.3f,
+        0f);
+
+    transform.position += shakeOffset;
+    shakeRemaining = Mathf.Max(0f, shakeRemaining - Time.deltaTime);
+}
 }
 public void PlayPressureShake()
 {
