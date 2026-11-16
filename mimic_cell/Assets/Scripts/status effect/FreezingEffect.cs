@@ -29,19 +29,27 @@ namespace MimicCell.StatusEffects
         private StatusEffectController statusController;
         private bool touchingIce;
         private bool frozen;
-        private float startedAt;
-        private int damageTicks;
+       private float releaseAt;
+private float nextDamageAt;
         private long damageRemainder;
 
         // 대멸종에서 빙하 수역의 안팎을 알려줄 때 사용한다.
         public void SetIceContact(bool touching)
-        {
-            bool justEntered = touching && !touchingIce;
-            touchingIce = touching;
+{
+    if (touchingIce == touching)
+        return;
 
-            if (justEntered)
-                StartFreezing();
-        }
+    touchingIce = touching;
+
+    if (touchingIce)
+    {
+        StartFreezing();
+    }
+    else if (frozen)
+    {
+        releaseAt = Time.time + DurationSeconds;
+    }
+}
 
         private void StartFreezing()
         {
@@ -58,11 +66,12 @@ namespace MimicCell.StatusEffects
             if (!statusController.HasEffect(freezingDefinition))
                 return;
 
-            frozen = true;
-            startedAt = Time.time;
-            damageTicks = 0;
-            damageRemainder = 0;
-        }
+               frozen = true;
+    nextDamageAt = Time.time + 1f;
+    releaseAt = Time.time + DurationSeconds;
+    damageRemainder = 0;
+}
+        
 
         private void Update()
         {
@@ -79,29 +88,29 @@ namespace MimicCell.StatusEffects
                 return;
             }
 
-            float elapsed = Time.time - startedAt;
+              float now = Time.time;
+    float damageUntil = touchingIce ? now : Mathf.Min(now, releaseAt);
 
-            while (frozen && health.IsAlive && damageTicks < DurationSeconds &&
-                   elapsed >= damageTicks + 1f)
-            {
-                damageTicks++;
+    while (frozen && health.IsAlive && nextDamageAt <= damageUntil)
+    {
+        nextDamageAt += 1f;
 
-                long scaledDamage =
-                    (long)health.MaxHealth * DamagePercent + damageRemainder;
-                int damage = (int)(scaledDamage / 100);
-                damageRemainder = scaledDamage % 100;
+        long scaledDamage =
+            (long)health.MaxHealth * DamagePercent + damageRemainder;
+        int damage = (int)(scaledDamage / 100);
+        damageRemainder = scaledDamage % 100;
 
-                if (health.TakeDamage(damage))
-                {
-                    Debug.Log(
-                        $"빙결 피해 {damage} · 체력 " +
-                        $"{health.CurrentHealth}/{health.MaxHealth}", this);
-                }
-            }
-
-            if (!health.IsAlive || elapsed >= DurationSeconds)
-                EndFreezing();
+        if (damage > 0 && health.TakeDamage(damage))
+        {
+            Debug.Log(
+                $"빙결 피해 {damage} · 체력 " +
+                $"{health.CurrentHealth}/{health.MaxHealth}", this);
         }
+    }
+
+    if (!health.IsAlive || (!touchingIce && now >= releaseAt))
+        EndFreezing();
+}
 
         private void LateUpdate()
         {

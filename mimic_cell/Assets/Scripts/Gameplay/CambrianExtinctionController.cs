@@ -2,6 +2,7 @@ using MimicCell.Creatures;
 using MimicCell.Player;
 using MimicCell.World;
 using UnityEngine;
+using MimicCell.StatusEffects;
 
 namespace MimicCell.Gameplay
 {
@@ -151,20 +152,49 @@ namespace MimicCell.Gameplay
         }
 
         private void ApplyHazard(GameObject actor)
+{
+    bool hasHazard = TryGetHazard(
+        actor.transform.position, out ExtinctionStatus status);
+
+    if (player != null && actor == player.gameObject)
+    {
+        bool handledByPlayerEffect = false;
+
+        if (actor.TryGetComponent<AnoxiaEffect>(out var anoxia) &&
+            anoxia.isActiveAndEnabled)
         {
-            if (!TryGetHazard(actor.transform.position, out ExtinctionStatus status))
-            {
-                return;
-            }
-
-            ExtinctionStatusEffects effects = actor.GetComponent<ExtinctionStatusEffects>();
-            if (effects == null)
-            {
-                effects = actor.AddComponent<ExtinctionStatusEffects>();
-            }
-
-            effects.Apply(status, 2.5f);
+            bool insideAnoxia = hasHazard && status == ExtinctionStatus.Anoxia;
+            anoxia.SetExposure(insideAnoxia);
+            handledByPlayerEffect |= insideAnoxia;
         }
+
+        if (actor.TryGetComponent<FreezingEffect>(out var freezing) &&
+            freezing.isActiveAndEnabled)
+        {
+            bool touchingIce = hasHazard && status == ExtinctionStatus.Freezing;
+            freezing.SetIceContact(touchingIce);
+            handledByPlayerEffect |= touchingIce;
+        }
+if (actor.TryGetComponent<MudCoatingEffect>(out var mud) &&
+    mud.isActiveAndEnabled)
+{
+    bool insideMud = hasHazard && status == ExtinctionStatus.MudCoating;
+    mud.SetCovered(insideMud);
+    handledByPlayerEffect |= insideMud;
+}
+        if (handledByPlayerEffect)
+            return;
+    }
+
+    if (!hasHazard)
+        return;
+
+    ExtinctionStatusEffects effects = actor.GetComponent<ExtinctionStatusEffects>();
+    if (effects == null)
+        effects = actor.AddComponent<ExtinctionStatusEffects>();
+
+    effects.Apply(status, 2.5f);
+}
 
         public bool TryGetHazard(Vector2 position, out ExtinctionStatus status)
         {

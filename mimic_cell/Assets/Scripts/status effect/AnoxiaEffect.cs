@@ -12,64 +12,83 @@ namespace MimicCell.StatusEffects
     {
         [SerializeField] private bool enableTestKey;
 
-        private ActorHealth health;
-        private bool exposed;
-        private float enteredAt;
-        private int damageTicks;
-        private int damageRemainder;
+       private const float LingerDuration = 2f;
 
+private ActorHealth health;
+private bool insideAnoxia;
+private bool exposed;
+private float releaseAt;
+private float nextDamageAt;
+private long damageRemainder;
         // 순서대로 W, A, S, D가 가리키는 방향.
         private readonly Vector2[] directions = new Vector2[4];
 
-        public void SetExposure(bool value)
+       public void SetExposure(bool inside)
+{
+    if (!isActiveAndEnabled || insideAnoxia == inside)
+        return;
+
+    insideAnoxia = inside;
+    float now = Time.time;
+
+    if (!insideAnoxia)
+    {
+        if (exposed)
+            releaseAt = now + LingerDuration;
+
+        return;
+    }
+
+    if (exposed && now < releaseAt)
+        return;
+
+    health = GetComponent<ActorHealth>();
+    exposed = health != null && health.IsAlive;
+
+    if (!exposed)
+        return;
+
+    nextDamageAt = now + 1f;
+    damageRemainder = 0;
+    ShuffleDirections();
+}
+
+private void Update()
+{
+    if (enableTestKey && WasTestKeyPressed())
+        SetExposure(!insideAnoxia);
+
+    if (!exposed)
+        return;
+
+    if (health == null || !health.IsAlive)
+    {
+        exposed = false;
+        return;
+    }
+
+    float now = Time.time;
+    float damageUntil = insideAnoxia ? now : Mathf.Min(now, releaseAt);
+
+    while (health.IsAlive && nextDamageAt <= damageUntil)
+    {
+        nextDamageAt += 1f;
+
+        long scaledDamage = (long)health.MaxHealth + damageRemainder;
+        int damage = (int)(scaledDamage / 10);
+        damageRemainder = scaledDamage % 10;
+
+        if (damage > 0 && health.TakeDamage(damage))
         {
-            if (exposed == value)
-                return;
-
-            if (value)
-            {
-                health = GetComponent<ActorHealth>();
-                if (health == null || !health.IsAlive)
-                    return;
-
-                enteredAt = Time.time;
-                damageTicks = 0;
-                damageRemainder = 0;
-                ShuffleDirections();
-            }
-
-            exposed = value;
+            Debug.Log(
+                $"무산소화 피해 {damage} · 체력 " +
+                $"{health.CurrentHealth}/{health.MaxHealth}", this);
         }
+    }
 
-        private void Update()
-        {
-            if (enableTestKey && WasTestKeyPressed())
-                SetExposure(!exposed);
-
-            if (!exposed || health == null || !health.IsAlive)
-                return;
-
-            float elapsed = Time.time - enteredAt;
-
-            while (exposed && damageTicks < 2 &&
-                   elapsed >= damageTicks + 1f && health.IsAlive)
-            {
-                damageTicks++;
-
-                // 정수 체력에 맞춰 소수 피해를 다음 틱에 반영한다.
-                int scaledDamage = health.MaxHealth + damageRemainder;
-                int damage = scaledDamage / 10;
-                damageRemainder = scaledDamage % 10;
-
-                if (health.TakeDamage(damage))
-                {
-                    Debug.Log(
-                        $"무산소화 피해 {damage} · 체력 " +
-                        $"{health.CurrentHealth}/{health.MaxHealth}",
-                        this);
-                }
-            }
-        }
+    if (!health.IsAlive || (!insideAnoxia && now >= releaseAt))
+        exposed = false;
+}
 
         public bool TryReadMovement(out Vector2 move)
         {
@@ -132,10 +151,11 @@ namespace MimicCell.StatusEffects
                    directions[3] == Vector2.right);
         }
 
-        private void OnDisable()
-        {
-            SetExposure(false);
-        }
+      private void OnDisable()
+{
+    insideAnoxia = false;
+    exposed = false;
+}
 
         private static bool WasTestKeyPressed()
         {

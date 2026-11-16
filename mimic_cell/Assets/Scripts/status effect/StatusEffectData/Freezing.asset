@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e71336241a9bb8347abd669e23956baf, type: 3}
   m_Name: Freezing
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.StatusEffectDefinition
-  effectId: 
-  displayName: 
-  category: 0
-  targetType: 0
-  durationType: 0
+  effectId: freezing
+  displayName: "\uBE59\uACB0"
+  category: 1
+  targetType: 2
+  durationType: 1
   duration: 3
-  swimSpeedMultiplier: 1
+  swimSpeedMultiplier: 0.6

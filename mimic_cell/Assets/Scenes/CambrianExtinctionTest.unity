@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &368441824 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+  m_PrefabInstance: {fileID: 1196324023}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,7 +427,6 @@ MonoBehaviour:
   bbColor: {r: 0.05, g: 0.29, b: 0.49, a: 0.96}
   bcColor: {r: 0.025, g: 0.19, b: 0.35, a: 0.98}
   ccColor: {r: 0.012, g: 0.07, b: 0.17, a: 1}
-  sedimentColor: {r: 0.12, g: 0.13, b: 0.12, a: 1}
 --- !u!114 &1175212829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -517,13 +521,132 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5270640567023923783, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1918069292}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324041}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324053}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324054}
   m_SourcePrefab: {fileID: 100100000, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
 --- !u!4 &1196324024 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5270640567023923783, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
   m_PrefabInstance: {fileID: 1196324023}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1196324040 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7508835435472099057, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+  m_PrefabInstance: {fileID: 1196324023}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368441824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df70b6cae4a451590cb17b7e91b3b31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PrototypePlayer
+--- !u!114 &1196324041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368441824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 529f5c2eedafeb443a12fdd054757fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.FreezingEffect
+  freezingDefinition: {fileID: 11400000, guid: f3bc4f2094b475749a08434fddbd98c3, type: 2}
+  enableTestKey: 0
+  frozenTint: {r: 0.65, g: 0.85, b: 1, a: 1}
+--- !u!114 &1196324053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368441824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caffff4772dc389428ccf958a1c60ae1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.AnoxiaEffect
+  enableTestKey: 0
+--- !u!114 &1196324054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368441824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2222897173f6784693f44e10e366642, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.MudCoatingEffect
+  mudCoatingDefinition: {fileID: 11400000, guid: 954c832a54ebdd243882c54f59711951, type: 2}
+  enableTestKey: 0
+  showScreenEffect: 1
+  damagePercentPerSecond: 10
+--- !u!1 &1452000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1452000002}
+  - component: {fileID: 1452000003}
+  m_Layer: 0
+  m_Name: Seabed Terrain
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1452000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2055101682}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1452000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5de4f326039047349d880d9e1818246b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.SeabedTerrainWorld
+  terrainTexture: {fileID: 2800000, guid: 4b5e4d903add4a00af1237e6c0c725e1, type: 3}
+  terrainTileShader: {fileID: 4800000, guid: c1cc6762d164421884756c9b4804e37d, type: 3}
+  terrainTiles:
+  - {fileID: 2800000, guid: 3205d9142b9338049a06403c77840622, type: 3}
+  - {fileID: 2800000, guid: 5ba03f5ebb72867488abbd313759eed0, type: 3}
+  - {fileID: 2800000, guid: 6229e64a178ac604c9e454c3f64d027b, type: 3}
+  - {fileID: 2800000, guid: 1d77a2108e312d0488fc2bd29c0b3c62, type: 3}
+  textureWorldSize: 4
+  backWallTexture: {fileID: 0}
+  cellSize: 1.5
+  streamingInterval: 0.2
 --- !u!1 &1918069291
 GameObject:
   m_ObjectHideFlags: 0
@@ -675,60 +798,6 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!1 &1452000001
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1452000002}
-  - component: {fileID: 1452000003}
-  m_Layer: 0
-  m_Name: Seabed Terrain
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1452000002
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1452000001}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2055101682}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1452000003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1452000001}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5de4f326039047349d880d9e1818246b, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.SeabedTerrainWorld
-  terrainTexture: {fileID: 2800000, guid: 4b5e4d903add4a00af1237e6c0c725e1, type: 3}
-  terrainTileShader: {fileID: 4800000, guid: c1cc6762d164421884756c9b4804e37d, type: 3}
-  terrainTiles:
-  - {fileID: 2800000, guid: 3205d9142b9338049a06403c77840622, type: 3}
-  - {fileID: 2800000, guid: 5ba03f5ebb72867488abbd313759eed0, type: 3}
-  - {fileID: 2800000, guid: 6229e64a178ac604c9e454c3f64d027b, type: 3}
-  - {fileID: 2800000, guid: 1d77a2108e312d0488fc2bd29c0b3c62, type: 3}
-  textureWorldSize: 4
-  cellSize: 1.5
-  streamingInterval: 0.2
 --- !u!1 &2055101680
 GameObject:
   m_ObjectHideFlags: 0
@@ -762,18 +831,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Gameplay.PrototypeGameSession
   player: {fileID: 1196324040}
   respawnDelay: 1.25
---- !u!114 &2055101683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2055101680}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 580db90988564c4781cb907686bc7d69, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Gameplay.CambrianExtinctionController
 --- !u!4 &2055101682
 Transform:
   m_ObjectHideFlags: 0
@@ -792,6 +849,18 @@ Transform:
   - {fileID: 1196324024}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2055101683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055101680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 580db90988564c4781cb907686bc7d69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Gameplay.CambrianExtinctionController
 --- !u!114 &2055101684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -802,22 +871,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae00e8e3380c48499bda2a36e43e0316, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.CambrianOceanBootstrap
   ocean: {fileID: 1175212828}
   terrain: {fileID: 1452000003}
   cameraFollow: {fileID: 519420033}
---- !u!114 &1196324040 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7508835435472099057, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
-  m_PrefabInstance: {fileID: 1196324023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5df70b6cae4a451590cb17b7e91b3b31, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PrototypePlayer
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
