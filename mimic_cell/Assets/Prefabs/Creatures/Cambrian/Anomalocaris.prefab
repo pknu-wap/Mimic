@@ -8,6 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 434553515257665297, guid: 19edea4901420da438cfb23088d159bb, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 434553515257665297, guid: 19edea4901420da438cfb23088d159bb, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.3
+      objectReference: {fileID: 0}
     - target: {fileID: 5100830523769901341, guid: 19edea4901420da438cfb23088d159bb, type: 3}
       propertyPath: m_Name
       value: Anomalocaris
@@ -74,11 +82,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8079473695124305364, guid: 19edea4901420da438cfb23088d159bb, type: 3}
       propertyPath: m_Size.x
-      value: 6.4
+      value: 21.12
       objectReference: {fileID: 0}
     - target: {fileID: 8079473695124305364, guid: 19edea4901420da438cfb23088d159bb, type: 3}
       propertyPath: m_Size.y
-      value: 2.4
+      value: 7.92
       objectReference: {fileID: 0}
     - target: {fileID: 8079473695124305364, guid: 19edea4901420da438cfb23088d159bb, type: 3}
       propertyPath: m_Enabled
