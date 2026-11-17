@@ -238,6 +238,13 @@ if (actor.TryGetComponent<MudCoatingEffect>(out var mud) &&
             {
                 status = ExtinctionStatus.MudCoating;
             }
+            else if (phase == ExtinctionPhase.Anoxia &&
+         phaseTime >= 5f &&
+         position.y >= column.SeabedY &&
+         position.y <= AnoxiaFront(column))
+{
+    status = ExtinctionStatus.Anoxia;
+}
             else if (phase == ExtinctionPhase.Cold && phaseTime >= 5f)
 {
     OceanDepthZone zone = column.GetZone(position.y);
