@@ -12,6 +12,13 @@ namespace MimicCell.StatusEffects
         private const float DamageInterval = 1f;
         private const double DamageFraction = 0.10;
 
+        private const float DistortionBuildUpSeconds = 5f;
+private const float DistortionRecoverySeconds = 0.6f;
+private static readonly int PressureStrengthId =
+    Shader.PropertyToID("_MimicCellPressureScreenStrength");
+
+private float distortionStrength;
+
         [SerializeField] private CambrianOceanWorld oceanWorld;
 
         [Header("Test Only")]
@@ -55,10 +62,14 @@ namespace MimicCell.StatusEffects
                 current == CreatureHabitatMask.None ||
                 (allowed & current) != CreatureHabitatMask.None)
             {
+                UpdateDistortion(false); // 수압이 맞는 곳에서는 서서히 복구
+    
                 elapsed = 0f;
                 damageRemainder = 0;
                 return;
             }
+            UpdateDistortion(true); // 수압이 맞지 않는 곳에서는 점점 강해짐
+
 
             elapsed += Time.deltaTime;
 
@@ -81,10 +92,23 @@ namespace MimicCell.StatusEffects
             }
         }
 
-        private void OnDisable()
-        {
-            elapsed = 0f;
-            damageRemainder = 0;
-        }
+        private void UpdateDistortion(bool exposed)
+{
+    float target = exposed ? 1f : 0f;
+    float seconds = exposed ? DistortionBuildUpSeconds : DistortionRecoverySeconds;
+
+    distortionStrength = Mathf.MoveTowards(
+        distortionStrength, target, Time.deltaTime / seconds);
+
+    Shader.SetGlobalFloat(PressureStrengthId, distortionStrength);
+}
+
+private void OnDisable()
+{
+    elapsed = 0f;
+    damageRemainder = 0;
+    distortionStrength = 0f;
+    Shader.SetGlobalFloat(PressureStrengthId, 0f);
+}
     }
 }

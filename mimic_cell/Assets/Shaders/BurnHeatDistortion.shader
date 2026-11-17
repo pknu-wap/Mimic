@@ -18,6 +18,7 @@ Shader "MimicCell/Burn Heat Distortion"
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
 
             float _MimicCellBurnScreenStrength;
+            float _MimicCellPressureScreenStrength;
 
             half4 ReadScreen(float2 uv)
             {
@@ -29,11 +30,16 @@ Shader "MimicCell/Burn Heat Distortion"
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
                 float2 uv = input.texcoord;
-                float strength = saturate(_MimicCellBurnScreenStrength);
 
-                if (strength <= 0.001)
-                    return ReadScreen(uv);
+float pressure = saturate(_MimicCellPressureScreenStrength);
+float2 centered = uv - 0.5;
+float edgeDistance = saturate(max(abs(centered.x), abs(centered.y)) * 2.0);
+float squeeze = edgeDistance * edgeDistance * (1.0 - edgeDistance);
+uv += centered * squeeze * (0.4 * pressure);
 
+float strength = saturate(_MimicCellBurnScreenStrength);
+if (strength <= 0.001)
+    return ReadScreen(uv);
                 float2 fromCenter = abs(uv - 0.5) * 2.0;
                 float edge = smoothstep(0.25, 1.0, max(fromCenter.x, fromCenter.y));
                 float time = _Time.y;
