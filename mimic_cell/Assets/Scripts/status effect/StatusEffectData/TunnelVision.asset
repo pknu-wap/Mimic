@@ -16,6 +16,6 @@ MonoBehaviour:
   displayName: 
   category: 1
   targetType: 0
-  durationType: 1
+  durationType: 0
   duration: 3
   swimSpeedMultiplier: 1
