@@ -18,6 +18,8 @@ namespace MimicCell.StatusEffects
         private ActorHealth health;
         private StatusEffectController statusController;
         private bool covered;
+        private const float VisionRecoveryDuration = 0.8f;
+private float vignetteWeight;
         private float damageTimer;
         private long damageRemainder;
         private Texture2D vignette;
@@ -95,23 +97,36 @@ namespace MimicCell.StatusEffects
                 SetCovered(false);
         }
 
-        private void OnGUI()
-        {
-            if (!covered || !showScreenEffect ||
-                Event.current.type != EventType.Repaint ||
-                Screen.width <= 0 || Screen.height <= 0)
-            {
-                return;
-            }
+        private void LateUpdate()
+{
+    vignetteWeight = covered
+        ? 1f
+        : Mathf.MoveTowards(
+            vignetteWeight, 0f, Time.deltaTime / VisionRecoveryDuration);
+}
 
-            float aspect = (float)Screen.width / Screen.height;
-            if (vignette == null || Mathf.Abs(vignetteAspect - aspect) > 0.01f)
-                CreateVignette(aspect);
+private void OnGUI()
+{
+    if (vignetteWeight <= 0f || !showScreenEffect ||
+        Event.current.type != EventType.Repaint ||
+        Screen.width <= 0 || Screen.height <= 0)
+    {
+        return;
+    }
 
-            GUI.DrawTexture(
-                new Rect(0f, 0f, Screen.width, Screen.height),
-                vignette, ScaleMode.StretchToFill, true);
-        }
+    float aspect = (float)Screen.width / Screen.height;
+    if (vignette == null || Mathf.Abs(vignetteAspect - aspect) > 0.01f)
+        CreateVignette(aspect);
+
+    Color previousColor = GUI.color;
+    GUI.color = new Color(1f, 1f, 1f, vignetteWeight);
+
+    GUI.DrawTexture(
+        new Rect(0f, 0f, Screen.width, Screen.height),
+        vignette, ScaleMode.StretchToFill, true);
+
+    GUI.color = previousColor;
+}
 
         private void CreateVignette(float aspect)
         {
@@ -119,8 +134,8 @@ namespace MimicCell.StatusEffects
                 Destroy(vignette);
 
             const int size = 256;
-            const float clearRadius = 0.22f;
-            const float darkRadius = 0.49f;
+            const float clearRadius = 0.19f;
+            const float darkRadius = 0.21f;
 
             vignetteAspect = aspect;
             vignette = new Texture2D(size, size, TextureFormat.RGBA32, false)
@@ -155,6 +170,7 @@ namespace MimicCell.StatusEffects
         private void OnDisable()
         {
             SetCovered(false);
+            vignetteWeight = 0f;
         }
 
         private void OnDestroy()
