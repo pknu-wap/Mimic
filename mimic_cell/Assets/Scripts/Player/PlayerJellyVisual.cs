@@ -18,54 +18,53 @@ namespace MimicCell.Player
         [SerializeField] private SpriteRenderer extractionTentacleRenderer;
         [SerializeField] private Rigidbody2D targetRigidbody;
 
-        [Header("Fluid Pudding Body")]
-        [SerializeField, Range(5, 20)] private int bodyMeshColumns = 16;
-        [SerializeField, Range(5, 24)] private int bodyMeshRows = 18;
-        [SerializeField, Min(0f)] private float idlePulseAmplitude = 0.014f;
-        [SerializeField, Min(0f)] private float idlePulseFrequency = 0.46f;
-        [SerializeField, Min(0f)] private float shapeSpring = 14f;
-        [SerializeField, Min(0f)] private float shapeDamping = 3.4f;
-        [SerializeField, Min(0f)] private float surfaceSpring = 27f;
-        [SerializeField, Min(0f)] private float surfaceDamping = 5.3f;
-        [SerializeField, Min(0f)] private float surfaceCohesion = 22f;
-        [SerializeField, Min(0.1f)] private float referenceSpeed = 3f;
-        [SerializeField, Range(0f, 0.5f)] private float pressureStretch = 0.16f;
-        [SerializeField, Range(0f, 0.65f)] private float pressureTaper = 0.3f;
-        [SerializeField, Range(0f, 0.4f)] private float frontCompression = 0.13f;
-        [SerializeField, Range(0f, 0.5f)] private float rearElongation = 0.19f;
-        [SerializeField, Range(0f, 0.25f)] private float bodyWaveAmplitude = 0.045f;
-        [SerializeField, Min(0f)] private float bodyWaveFrequency = 0.92f;
-        [SerializeField, Min(0f)] private float bodyWaveCycles = 1.45f;
-        [SerializeField, Range(0f, 0.2f)] private float accelerationInertia = 0.055f;
-        [SerializeField, Range(0.1f, 1.5f)] private float maximumBodyOffset = 0.78f;
+        private const int BodyMeshColumns = 16;
+        private const int BodyMeshRows = 18;
+        private const float IdlePulseAmplitude = 0.014f;
+        private const float IdlePulseFrequency = 0.46f;
+        private const float ShapeSpring = 14f;
+        private const float ShapeDamping = 3.4f;
+        private const float SurfaceSpring = 27f;
+        private const float SurfaceDamping = 5.3f;
+        private const float SurfaceCohesion = 22f;
+        private const float ReferenceSpeed = 3f;
+        private const float PressureStretch = 0.16f;
+        private const float PressureTaper = 0.3f;
+        private const float FrontCompression = 0.13f;
+        private const float RearElongation = 0.19f;
+        private const float BodyWaveAmplitude = 0.045f;
+        private const float BodyWaveFrequency = 0.92f;
+        private const float BodyWaveCycles = 1.45f;
+        private const float AccelerationInertia = 0.055f;
+        private const float MaximumBodyOffset = 0.78f;
 
-        [Header("Contact Shape")]
-        [SerializeField, Range(0f, 0.85f)] private float impactCompression = 0.48f;
-        [SerializeField, Range(0f, 0.75f)] private float displacedFluidBulge = 0.34f;
-        [SerializeField, Range(0.25f, 1.5f)] private float contactInfluence = 0.82f;
-        [SerializeField, Min(0.1f)] private float fullImpactSpeed = 3.5f;
-        [SerializeField, Min(0f)] private float impactKick = 2.8f;
-        [SerializeField, Min(0f)] private float impactSpring = 22f;
-        [SerializeField, Min(0f)] private float impactDamping = 3.4f;
-        [SerializeField, Range(0f, 1f)] private float collisionStayCompression = 0.32f;
-        [SerializeField, Min(0f)] private float contactRecoverySpeed = 2.4f;
+        private const float ImpactCompression = 0.48f;
+        private const float DisplacedFluidBulge = 0.34f;
+        private const float ContactInfluence = 0.82f;
+        private const float FullImpactSpeed = 3.5f;
+        private const float ImpactKick = 2.8f;
+        private const float ImpactSpring = 22f;
+        private const float ImpactDamping = 3.4f;
+        private const float CollisionStayCompression = 0.32f;
+        private const float ContactRecoverySpeed = 2.4f;
 
-        [Header("Rope Appendages")]
-        [SerializeField, Range(8, 40)] private int tentacleRows = 28;
-        [SerializeField, Min(0f)] private float tentacleWaveForce = 2.4f;
-        [SerializeField, Min(0f)] private float tentacleWaveFrequency = 0.42f;
-        [SerializeField, Min(0f)] private float waterFlowDrag = 2f;
-        [SerializeField, Min(0f)] private float wakeGatherForce = 2.4f;
-        [SerializeField, Range(0f, 0.7f)] private float idleWaveScale = 0.55f;
-        [Tooltip("Inner fraction that follows the body without rope motion.")]
-        [SerializeField, Range(0.03f, 0.45f)] private float rootRigidFraction = 0.07f;
-        [Tooltip("Distance in body-local units that hides each rope root inside the body sprite.")]
-        [SerializeField, Range(0f, 0.3f)] private float rootAnchorInset = 0.02f;
+        private const int TentacleRows = 28;
+        private const int ExtractionTentacleRows = 48;
+        private const float TentacleWaveForce = 2.4f;
+        private const float TentacleWaveFrequency = 0.42f;
+        private const float WaterFlowDrag = 2f;
+        private const float WakeGatherForce = 2.4f;
+        private const float IdleWaveScale = 0.55f;
+        private const float RootRigidFraction = 0.07f;
+        private const float RootAnchorInset = 0.02f;
 
         private readonly List<TentacleSpriteMesh> tentacles = new List<TentacleSpriteMesh>();
 
         private SoftBodySpriteMesh bodyMesh;
         private TentacleSpriteMesh extractionTentacle;
+        private Vector2 extractionTip;
+        private float extractionReach;
+        private float extractionCurl;
         private Vector3 baseBodyPosition;
         private Vector3 baseBodyScale;
         private Vector3 baseCorePosition;
@@ -105,6 +104,13 @@ namespace MimicCell.Player
             return direction.sqrMagnitude > 0.0001f;
         }
 
+        public void SetExtractionPose(Vector2 tip, float reach, float curl)
+        {
+            extractionTip = tip;
+            extractionReach = reach;
+            extractionCurl = curl;
+        }
+
         public void ApplyImpact(Vector2 worldPoint, float normalizedStrength)
         {
             InitializeIfNeeded();
@@ -135,34 +141,6 @@ namespace MimicCell.Player
             ResetMotionState();
         }
 
-        private void OnValidate()
-        {
-            bodyMeshColumns = Mathf.Clamp(bodyMeshColumns, 5, 20);
-            bodyMeshRows = Mathf.Clamp(bodyMeshRows, 5, 24);
-            idlePulseAmplitude = Mathf.Max(0f, idlePulseAmplitude);
-            idlePulseFrequency = Mathf.Max(0f, idlePulseFrequency);
-            shapeSpring = Mathf.Max(0f, shapeSpring);
-            shapeDamping = Mathf.Max(0f, shapeDamping);
-            surfaceSpring = Mathf.Max(0f, surfaceSpring);
-            surfaceDamping = Mathf.Max(0f, surfaceDamping);
-            surfaceCohesion = Mathf.Max(0f, surfaceCohesion);
-            referenceSpeed = Mathf.Max(0.1f, referenceSpeed);
-            bodyWaveFrequency = Mathf.Max(0f, bodyWaveFrequency);
-            bodyWaveCycles = Mathf.Max(0f, bodyWaveCycles);
-            fullImpactSpeed = Mathf.Max(0.1f, fullImpactSpeed);
-            impactKick = Mathf.Max(0f, impactKick);
-            impactSpring = Mathf.Max(0f, impactSpring);
-            impactDamping = Mathf.Max(0f, impactDamping);
-            contactRecoverySpeed = Mathf.Max(0f, contactRecoverySpeed);
-            tentacleRows = Mathf.Clamp(tentacleRows, 8, 40);
-            tentacleWaveForce = Mathf.Max(0f, tentacleWaveForce);
-            tentacleWaveFrequency = Mathf.Max(0f, tentacleWaveFrequency);
-            waterFlowDrag = Mathf.Max(0f, waterFlowDrag);
-            wakeGatherForce = Mathf.Max(0f, wakeGatherForce);
-            rootRigidFraction = Mathf.Clamp(rootRigidFraction, 0.03f, 0.45f);
-            rootAnchorInset = Mathf.Clamp(rootAnchorInset, 0f, 0.3f);
-        }
-
         private void LateUpdate()
         {
             InitializeIfNeeded();
@@ -184,39 +162,19 @@ namespace MimicCell.Player
                 18f);
             previousLocalVelocity = localVelocity;
 
-            Vector2 pressureTarget = Vector2.ClampMagnitude(localVelocity / referenceSpeed, 1f);
-            StepSpring(ref pressureShape, ref pressureShapeVelocity, pressureTarget, shapeSpring, shapeDamping, deltaTime);
+            Vector2 pressureTarget = Vector2.ClampMagnitude(localVelocity / ReferenceSpeed, 1f);
+            StepSpring(ref pressureShape, ref pressureShapeVelocity, pressureTarget, ShapeSpring, ShapeDamping, deltaTime);
 
-            StepSpring(ref impactAmount, ref impactVelocity, sustainedImpact, impactSpring, impactDamping, deltaTime);
+            StepSpring(ref impactAmount, ref impactVelocity, sustainedImpact, ImpactSpring, ImpactDamping, deltaTime);
             impactAmount = Mathf.Clamp(impactAmount, -0.5f, 1.25f);
-            sustainedImpact = Mathf.MoveTowards(sustainedImpact, 0f, deltaTime * contactRecoverySpeed);
+            sustainedImpact = Mathf.MoveTowards(sustainedImpact, 0f, deltaTime * ContactRecoverySpeed);
 
-            float pulse = Mathf.Sin(visualTime * idlePulseFrequency * Mathf.PI * 2f) * idlePulseAmplitude;
-            BodySimulationSettings bodySettings = new BodySimulationSettings
-            {
-                SurfaceSpring = surfaceSpring,
-                SurfaceDamping = surfaceDamping,
-                SurfaceCohesion = surfaceCohesion,
-                PressureStretch = pressureStretch,
-                PressureTaper = pressureTaper,
-                FrontCompression = frontCompression,
-                RearElongation = rearElongation,
-                WaveAmplitude = bodyWaveAmplitude,
-                WaveFrequency = bodyWaveFrequency,
-                WaveCycles = bodyWaveCycles,
-                AccelerationInertia = accelerationInertia,
-                MaximumOffset = maximumBodyOffset,
-                ImpactCompression = impactCompression,
-                DisplacedFluidBulge = displacedFluidBulge,
-                ContactInfluence = contactInfluence,
-                ContactRecoverySpeed = contactRecoverySpeed
-            };
+            float pulse = Mathf.Sin(visualTime * IdlePulseFrequency * Mathf.PI * 2f) * IdlePulseAmplitude;
             bodyMesh.Simulate(
                 pressureShape,
                 localAcceleration,
                 visualTime,
                 pulse,
-                bodySettings,
                 deltaTime);
 
             UpdateBodyTransforms(pulse);
@@ -231,18 +189,20 @@ namespace MimicCell.Player
                     localVelocity,
                     visualAngleDelta,
                     visualTime,
-                    waterFlowDrag,
-                    wakeGatherForce,
-                    idleWaveScale,
-                    tentacleWaveForce,
-                    tentacleWaveFrequency,
-                    referenceSpeed,
                     deltaTime);
             }
 
             for (int i = 0; i < tentacles.Count; i++)
             {
-                tentacles[i].FinishSimulation();
+                TentacleSpriteMesh tentacle = tentacles[i];
+                if (tentacle == extractionTentacle && extractionReach > 0f)
+                {
+                    tentacle.DrawStrike(extractionTip, extractionReach, extractionCurl);
+                }
+                else
+                {
+                    tentacle.FinishSimulation();
+                }
             }
         }
 
@@ -253,7 +213,7 @@ namespace MimicCell.Player
                 return;
             }
 
-            float strength = Mathf.Max(0.2f, Mathf.Clamp01(collision.relativeVelocity.magnitude / fullImpactSpeed));
+            float strength = Mathf.Max(0.2f, Mathf.Clamp01(collision.relativeVelocity.magnitude / FullImpactSpeed));
             RegisterCollision(collision, strength, true);
         }
 
@@ -264,7 +224,7 @@ namespace MimicCell.Player
                 return;
             }
 
-            RegisterCollision(collision, collisionStayCompression, false);
+            RegisterCollision(collision, CollisionStayCompression, false);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -326,7 +286,7 @@ namespace MimicCell.Player
                 baseCoreScale = coreRoot.localScale;
             }
 
-            bodyMesh = new SoftBodySpriteMesh(bodyRenderer, bodyMeshColumns, bodyMeshRows);
+            bodyMesh = new SoftBodySpriteMesh(bodyRenderer);
             AddTentacles(legRenderers, 0f);
             if (extractionTentacleRenderer != null && extractionTentacleRenderer.sprite != null)
             {
@@ -334,9 +294,7 @@ namespace MimicCell.Player
                     extractionTentacleRenderer,
                     bodyRenderer,
                     transform,
-                    Mathf.Max(48, tentacleRows),
-                    rootRigidFraction,
-                    rootAnchorInset,
+                    ExtractionTentacleRows,
                     2.55f,
                     true);
                 tentacles.Add(extractionTentacle);
@@ -361,9 +319,7 @@ namespace MimicCell.Player
                         renderers[i],
                         bodyRenderer,
                         transform,
-                        tentacleRows,
-                        rootRigidFraction,
-                        rootAnchorInset,
+                        TentacleRows,
                         phaseOffset + i * 0.85f));
                 }
             }
@@ -450,7 +406,7 @@ namespace MimicCell.Player
                 Mathf.Clamp01(strength),
                 addImpulse,
                 wideContact,
-                impactKick,
+                ImpactKick,
                 sustained);
         }
 
@@ -466,7 +422,7 @@ namespace MimicCell.Player
             sustainedImpact = Mathf.Max(sustainedImpact, Mathf.Clamp01(strength));
             if (addKick)
             {
-                impactVelocity += Mathf.Clamp01(strength) * impactKick;
+                impactVelocity += Mathf.Clamp01(strength) * ImpactKick;
             }
         }
 
@@ -537,26 +493,6 @@ namespace MimicCell.Player
             value += velocity * deltaTime;
         }
 
-        private struct BodySimulationSettings
-        {
-            public float SurfaceSpring;
-            public float SurfaceDamping;
-            public float SurfaceCohesion;
-            public float PressureStretch;
-            public float PressureTaper;
-            public float FrontCompression;
-            public float RearElongation;
-            public float WaveAmplitude;
-            public float WaveFrequency;
-            public float WaveCycles;
-            public float AccelerationInertia;
-            public float MaximumOffset;
-            public float ImpactCompression;
-            public float DisplacedFluidBulge;
-            public float ContactInfluence;
-            public float ContactRecoverySpeed;
-        }
-
         private sealed class SoftBodySpriteMesh : IDisposable
         {
             private const int MaximumContacts = 12;
@@ -571,15 +507,11 @@ namespace MimicCell.Player
             private readonly List<ContactSample> contacts = new List<ContactSample>(MaximumContacts);
             private readonly Vector2 center;
             private readonly Vector2 extents;
-            private readonly int columns;
-            private readonly int rows;
             private readonly float minimumExtent;
 
-            public SoftBodySpriteMesh(SpriteRenderer source, int meshColumns, int meshRows)
+            public SoftBodySpriteMesh(SpriteRenderer source)
             {
-                columns = Mathf.Max(1, meshColumns);
-                rows = Mathf.Max(1, meshRows);
-                grid = new SpriteGridMesh(source, columns, rows, "Fluid Pudding Mesh");
+                grid = new SpriteGridMesh(source, BodyMeshColumns, BodyMeshRows, "Fluid Pudding Mesh");
                 int vertexCount = grid.IsValid ? grid.BaseVertices.Length : 0;
                 positions = new Vector2[vertexCount];
                 velocities = new Vector2[vertexCount];
@@ -649,7 +581,6 @@ namespace MimicCell.Player
                 Vector2 localAcceleration,
                 float time,
                 float pulse,
-                BodySimulationSettings settings,
                 float deltaTime)
             {
                 if (!grid.IsValid)
@@ -657,17 +588,17 @@ namespace MimicCell.Player
                     return;
                 }
 
-                BuildTargets(pressureVector, localAcceleration, time, pulse, settings);
+                BuildTargets(pressureVector, localAcceleration, time, pulse);
 
                 const int substeps = 2;
                 float stepTime = deltaTime / substeps;
                 for (int step = 0; step < substeps; step++)
                 {
-                    BuildForces(settings);
+                    BuildForces();
                     for (int i = 0; i < positions.Length; i++)
                     {
                         velocities[i] += forces[i] * stepTime;
-                        velocities[i] *= 1f / (1f + settings.SurfaceDamping * stepTime);
+                        velocities[i] *= 1f / (1f + SurfaceDamping * stepTime);
                         velocities[i] = Vector2.ClampMagnitude(velocities[i], 4.5f);
                         positions[i] += velocities[i] * stepTime;
                         if (contactPins[i] > 0f)
@@ -678,7 +609,7 @@ namespace MimicCell.Player
 
                         Vector2 basePosition = grid.BaseVertices[i];
                         Vector2 displacement = positions[i] - basePosition;
-                        float maximumOffset = minimumExtent * settings.MaximumOffset;
+                        float maximumOffset = minimumExtent * MaximumBodyOffset;
                         if (displacement.sqrMagnitude > maximumOffset * maximumOffset)
                         {
                             positions[i] = basePosition + displacement.normalized * maximumOffset;
@@ -693,7 +624,7 @@ namespace MimicCell.Player
                 }
 
                 grid.ApplyVertices(renderedVertices);
-                DecayContacts(settings.ContactRecoverySpeed, deltaTime);
+                DecayContacts(deltaTime);
             }
 
             public void Dispose()
@@ -705,8 +636,7 @@ namespace MimicCell.Player
                 Vector2 pressureVector,
                 Vector2 localAcceleration,
                 float time,
-                float pulse,
-                BodySimulationSettings settings)
+                float pulse)
             {
                 float pressure = Mathf.Clamp01(pressureVector.magnitude);
                 Vector2 direction = pressure > 0.0001f ? pressureVector / pressure : Vector2.up;
@@ -723,10 +653,10 @@ namespace MimicCell.Player
 
                     float front = Mathf.Max(0f, normalizedAlong);
                     float rear = Mathf.Max(0f, -normalizedAlong);
-                    along *= 1f + pressure * settings.PressureStretch;
-                    along *= 1f - pressure * settings.FrontCompression * front * front;
-                    along *= 1f + pressure * settings.RearElongation * rear * rear;
-                    perpendicular *= 1f - pressure * settings.PressureTaper * rear * rear;
+                    along *= 1f + pressure * PressureStretch;
+                    along *= 1f - pressure * FrontCompression * front * front;
+                    along *= 1f + pressure * RearElongation * rear * rear;
+                    perpendicular *= 1f - pressure * PressureTaper * rear * rear;
 
                     Vector2 result = center + direction * along + perpendicular;
                     Vector2 normalizedRadius = new Vector2(
@@ -735,35 +665,35 @@ namespace MimicCell.Player
                     float radialLength = normalizedRadius.magnitude;
                     Vector2 radialDirection = radialLength > 0.001f ? normalizedRadius / radialLength : Vector2.zero;
                     float surfaceWeight = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.18f, 1f, radialLength));
-                    float contactPin = GetContactPin(basePosition, settings.ContactInfluence);
+                    float contactPin = GetContactPin(basePosition);
                     contactPins[i] = contactPin;
 
                     float wavePhase =
-                        time * settings.WaveFrequency * Mathf.PI * 2f -
-                        normalizedAlong * settings.WaveCycles * Mathf.PI * 2f +
+                        time * BodyWaveFrequency * Mathf.PI * 2f -
+                        normalizedAlong * BodyWaveCycles * Mathf.PI * 2f +
                         Mathf.Atan2(normalizedRadius.y, normalizedRadius.x) * 0.22f;
                     float resistance = 0.16f + pressure * 0.84f;
-                    float wave = Mathf.Sin(wavePhase) * settings.WaveAmplitude * minimumExtent * resistance * surfaceWeight;
+                    float wave = Mathf.Sin(wavePhase) * BodyWaveAmplitude * minimumExtent * resistance * surfaceWeight;
                     result += radialDirection * wave * (1f - contactPin);
-                    result -= normalizedAcceleration * (settings.AccelerationInertia * minimumExtent * surfaceWeight * (1f - contactPin));
+                    result -= normalizedAcceleration * (AccelerationInertia * minimumExtent * surfaceWeight * (1f - contactPin));
 
                     result -= center;
                     result.x *= 1f + pulse * (1f - contactPin);
                     result.y *= 1f - pulse * 0.72f * (1f - contactPin);
                     result += center;
-                    ApplyContactFields(ref result, radialDirection, settings);
+                    ApplyContactFields(ref result, radialDirection);
 
                     Vector2 targetOffset = result - basePosition;
-                    float maximumTargetOffset = minimumExtent * settings.MaximumOffset;
+                    float maximumTargetOffset = minimumExtent * MaximumBodyOffset;
                     targets[i] = targetOffset.sqrMagnitude > maximumTargetOffset * maximumTargetOffset
                         ? basePosition + targetOffset.normalized * maximumTargetOffset
                         : result;
                 }
             }
 
-            private float GetContactPin(Vector2 position, float influence)
+            private float GetContactPin(Vector2 position)
             {
-                float radius = minimumExtent * influence;
+                float radius = minimumExtent * ContactInfluence;
                 float pin = 0f;
                 for (int i = 0; i < contacts.Count; i++)
                 {
@@ -783,10 +713,9 @@ namespace MimicCell.Player
 
             private void ApplyContactFields(
                 ref Vector2 position,
-                Vector2 radialDirection,
-                BodySimulationSettings settings)
+                Vector2 radialDirection)
             {
-                float radius = minimumExtent * settings.ContactInfluence;
+                float radius = minimumExtent * ContactInfluence;
                 for (int i = 0; i < contacts.Count; i++)
                 {
                     ContactSample contact = contacts[i];
@@ -813,22 +742,22 @@ namespace MimicCell.Player
 
                     float dent = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(normalizedDistance));
                     dent *= dent;
-                    float depth = minimumExtent * settings.ImpactCompression * contact.Strength;
+                    float depth = minimumExtent * ImpactCompression * contact.Strength;
                     position += contact.Inward * (depth * dent);
 
                     float ringDistance = (normalizedDistance - 0.82f) / 0.23f;
                     float ring = Mathf.Exp(-(ringDistance * ringDistance));
                     Vector2 tangent = new Vector2(-contact.Inward.y, contact.Inward.x);
                     float side = Mathf.Sign(Vector2.Dot(position - contact.Point, tangent));
-                    position += radialDirection * (depth * settings.DisplacedFluidBulge * ring);
-                    position += tangent * (side * depth * settings.DisplacedFluidBulge * ring * 0.28f);
+                    position += radialDirection * (depth * DisplacedFluidBulge * ring);
+                    position += tangent * (side * depth * DisplacedFluidBulge * ring * 0.28f);
                 }
             }
 
-            private void BuildForces(BodySimulationSettings settings)
+            private void BuildForces()
             {
-                int vertexColumns = columns + 1;
-                int vertexRows = rows + 1;
+                const int vertexColumns = BodyMeshColumns + 1;
+                const int vertexRows = BodyMeshRows + 1;
                 for (int row = 0; row < vertexRows; row++)
                 {
                     for (int column = 0; column < vertexColumns; column++)
@@ -844,9 +773,9 @@ namespace MimicCell.Player
                         AddNeighborOffset(column, row + 1, vertexColumns, vertexRows, ref neighborOffset, ref neighborCount);
 
                         Vector2 cohesion = neighborCount > 0
-                            ? ((neighborOffset / neighborCount) - offset) * settings.SurfaceCohesion
+                            ? ((neighborOffset / neighborCount) - offset) * SurfaceCohesion
                             : Vector2.zero;
-                        forces[index] = (targets[index] - positions[index]) * settings.SurfaceSpring + cohesion;
+                        forces[index] = (targets[index] - positions[index]) * SurfaceSpring + cohesion;
                     }
                 }
             }
@@ -928,13 +857,13 @@ namespace MimicCell.Player
                 }
             }
 
-            private void DecayContacts(float recoverySpeed, float deltaTime)
+            private void DecayContacts(float deltaTime)
             {
                 for (int i = contacts.Count - 1; i >= 0; i--)
                 {
                     if (!contacts[i].Sustained || Time.time - contacts[i].LastRefreshTime > 0.12f)
                     {
-                        contacts[i].Strength = Mathf.MoveTowards(contacts[i].Strength, 0f, recoverySpeed * deltaTime);
+                        contacts[i].Strength = Mathf.MoveTowards(contacts[i].Strength, 0f, ContactRecoverySpeed * deltaTime);
                     }
                     if (contacts[i].Strength <= 0.001f)
                     {
@@ -971,17 +900,16 @@ namespace MimicCell.Player
             private readonly float[] segmentAngularSpeeds;
             private readonly RaycastHit2D[] environmentHits = new RaycastHit2D[12];
             private readonly Collider2D[] nearbyColliders = new Collider2D[64];
-            private readonly List<EdgeCollider2D> nearbyEdges = new List<EdgeCollider2D>(8);
+            private readonly List<Vector2[]> nearbyEdges = new List<Vector2[]>(8);
             private readonly List<BoxCollider2D> nearbyBoxes = new List<BoxCollider2D>(8);
-            private readonly Dictionary<EdgeCollider2D, Vector2[]> edgePoints =
-                new Dictionary<EdgeCollider2D, Vector2[]>();
+            private readonly Dictionary<EdgeCollider2D, EdgeSurface> edgeSurfaces =
+                new Dictionary<EdgeCollider2D, EdgeSurface>();
             private readonly LineRenderer line;
             private readonly Material lineMaterial;
             private readonly Transform bodyAnchorTransform;
             private readonly Transform collisionOwner;
             private readonly Vector2 bodyAnchorLocal;
             private readonly Vector2 bodyCenterLocal;
-            private readonly float rootRigidFraction;
             private readonly int rows;
             private readonly float phase;
             private readonly float top;
@@ -1001,13 +929,10 @@ namespace MimicCell.Player
                 SpriteRenderer body,
                 Transform owner,
                 int meshRows,
-                float rigidFraction,
-                float anchorInset,
                 float wavePhase,
                 bool useLine = false)
             {
-                rows = Mathf.Max(2, meshRows);
-                rootRigidFraction = Mathf.Clamp(rigidFraction, 0.03f, 0.45f);
+                rows = meshRows;
                 phase = wavePhase;
                 grid = new SpriteGridMesh(source, 1, rows, "Rope Physics Mesh", !useLine);
                 if (useLine && grid.IsValid)
@@ -1079,7 +1004,7 @@ namespace MimicCell.Player
                 if (bodyAnchorTransform != null)
                 {
                     Vector2 rawAnchor = bodyAnchorTransform.InverseTransformPoint(rootWorld);
-                    bodyAnchorLocal = Vector2.MoveTowards(rawAnchor, bodyCenterLocal, Mathf.Max(0f, anchorInset));
+                    bodyAnchorLocal = Vector2.MoveTowards(rawAnchor, bodyCenterLocal, RootAnchorInset);
                 }
                 else
                 {
@@ -1126,12 +1051,6 @@ namespace MimicCell.Player
                 Vector2 localVelocity,
                 float visualAngleDelta,
                 float time,
-                float flowDrag,
-                float gatherForce,
-                float stationaryWaveScale,
-                float waveForce,
-                float waveFrequency,
-                float referenceSpeed,
                 float deltaTime)
             {
                 if (!grid.IsValid)
@@ -1142,17 +1061,16 @@ namespace MimicCell.Player
                 UpdateRootAnchor();
                 Transform source = grid.SourceTransform;
                 bodyAngle += visualAngleDelta;
-                float speedRatio = Mathf.Clamp01(localVelocity.magnitude /
-                    Mathf.Max(0.1f, referenceSpeed));
+                float speedRatio = Mathf.Clamp01(localVelocity.magnitude / ReferenceSpeed);
                 Vector2 worldVelocity = source.TransformDirection(localVelocity);
                 float flowAngle = worldVelocity.sqrMagnitude > 0.0001f
                     ? Vector2.SignedAngle(Vector2.down, -worldVelocity.normalized)
                     : 0f;
-                int pinnedCount = Mathf.Clamp(Mathf.RoundToInt(rows * rootRigidFraction),
+                int pinnedCount = Mathf.Clamp(Mathf.RoundToInt(rows * RootRigidFraction),
                     1, rows - 2);
                 worldNodes[0] = source.TransformPoint(GetAnchoredRestNode(0));
                 nodes[0] = source.InverseTransformPoint(worldNodes[0]);
-                CollectNearbySurfaces();
+                bool canHitEnvironment = CollectNearbySurfaces();
 
                 for (int i = 1; i <= rows; i++)
                 {
@@ -1184,13 +1102,13 @@ namespace MimicCell.Player
                             float flowError = Mathf.Clamp(
                                 Mathf.DeltaAngle(desiredAngle, flowAngle), -90f, 90f);
                             desiredAngle += flowError * speedRatio * t * t *
-                                Mathf.Clamp01(flowDrag * gatherForce * 0.1f);
+                                Mathf.Clamp01(WaterFlowDrag * WakeGatherForce * 0.1f);
                         }
 
-                        float wave = Mathf.Sin(time * waveFrequency * Mathf.PI * 2f -
+                        float wave = Mathf.Sin(time * TentacleWaveFrequency * Mathf.PI * 2f -
                             t * Mathf.PI * 2.2f + phase);
-                        desiredAngle += wave * waveForce * 2.3f * t * t *
-                            Mathf.Lerp(stationaryWaveScale, 1f, speedRatio);
+                        desiredAngle += wave * TentacleWaveForce * 2.3f * t * t *
+                            Mathf.Lerp(IdleWaveScale, 1f, speedRatio);
                         float responseTime = Mathf.Lerp(0.045f, 0.13f,
                             Mathf.Pow(t, 1.3f));
                         segmentAngles[i] = Mathf.SmoothDamp(
@@ -1211,35 +1129,60 @@ namespace MimicCell.Player
                     float radians = segmentAngles[i] * Mathf.Deg2Rad;
                     Vector2 direction = new Vector2(Mathf.Sin(radians),
                         -Mathf.Cos(radians));
-                    direction = ResolveWorldCollision(i, direction);
+                    if (canHitEnvironment)
+                    {
+                        direction = ResolveWorldCollision(i, direction);
+                    }
                     worldNodes[i] = worldNodes[i - 1] +
                         direction * worldSegmentLengths[i];
                     nodes[i] = source.InverseTransformPoint(worldNodes[i]);
                 }
 
-                KeepChainOutsideSurfaces(pinnedCount, source);
+                if (canHitEnvironment)
+                {
+                    KeepChainOutsideSurfaces(pinnedCount, source);
+                }
             }
 
-            private void CollectNearbySurfaces()
+            private bool CollectNearbySurfaces()
             {
                 nearbyEdges.Clear();
                 nearbyBoxes.Clear();
                 ContactFilter2D filter = new ContactFilter2D { useTriggers = false };
                 int count = Physics2D.OverlapCircle(worldNodes[0],
                     totalWorldLength + 0.3f, filter, nearbyColliders);
+                // Every segment cast fits inside this circle. A full buffer may omit a collider.
+                bool canHitEnvironment = count == nearbyColliders.Length;
                 for (int i = 0; i < count; i++)
                 {
-                    if (nearbyColliders[i] is EdgeCollider2D edge &&
-                        !edge.transform.IsChildOf(collisionOwner))
+                    Collider2D collider = nearbyColliders[i];
+                    if (collider == null || collider.transform.IsChildOf(collisionOwner))
                     {
-                        nearbyEdges.Add(edge);
+                        continue;
                     }
-                    else if (nearbyColliders[i] is BoxCollider2D box &&
-                        !box.transform.IsChildOf(collisionOwner))
+
+                    canHitEnvironment = true;
+                    if (collider is EdgeCollider2D edge)
+                    {
+                        if (!edgeSurfaces.TryGetValue(edge, out EdgeSurface surface))
+                        {
+                            if (edgeSurfaces.Count >= nearbyColliders.Length)
+                            {
+                                edgeSurfaces.Clear();
+                            }
+                            surface = new EdgeSurface(edge);
+                            edgeSurfaces.Add(edge, surface);
+                        }
+                        surface.UpdateTransform(edge.transform.localToWorldMatrix);
+                        nearbyEdges.Add(surface.WorldPoints);
+                    }
+                    else if (collider is BoxCollider2D box)
                     {
                         nearbyBoxes.Add(box);
                     }
                 }
+
+                return canHitEnvironment;
             }
 
             private void KeepChainOutsideSurfaces(int pinnedCount, Transform source)
@@ -1464,29 +1407,18 @@ namespace MimicCell.Player
                 return redirected;
             }
 
-            private void GetEdgeSurface(
-                EdgeCollider2D edge, Vector2 position, Vector2 root,
+            private static void GetEdgeSurface(
+                Vector2[] points, Vector2 position, Vector2 root,
                 out Vector2 surface, out Vector2 normal)
             {
-                if (!edgePoints.TryGetValue(edge, out Vector2[] points))
-                {
-                    points = edge.points;
-                    if (edgePoints.Count > 48)
-                    {
-                        edgePoints.Clear();
-                    }
-
-                    edgePoints.Add(edge, points);
-                }
-
                 surface = position;
                 normal = Vector2.zero;
                 float closestDistance = float.PositiveInfinity;
                 int closestSegment = -1;
                 for (int i = 1; i < points.Length; i++)
                 {
-                    Vector2 first = edge.transform.TransformPoint(points[i - 1]);
-                    Vector2 second = edge.transform.TransformPoint(points[i]);
+                    Vector2 first = points[i - 1];
+                    Vector2 second = points[i];
                     Vector2 segment = second - first;
                     float lengthSquared = segment.sqrMagnitude;
                     if (lengthSquared < 0.000001f)
@@ -1523,8 +1455,8 @@ namespace MimicCell.Player
                 for (int i = Mathf.Max(1, closestSegment - 1);
                     i <= Mathf.Min(points.Length - 1, closestSegment + 1); i++)
                 {
-                    Vector2 a = edge.transform.TransformPoint(points[i - 1]);
-                    Vector2 b = edge.transform.TransformPoint(points[i]);
+                    Vector2 a = points[i - 1];
+                    Vector2 b = points[i];
                     Vector2 along = b - a;
                     float lengthSquared = along.sqrMagnitude;
                     if (lengthSquared < 0.000001f)
@@ -1555,6 +1487,36 @@ namespace MimicCell.Player
                 }
             }
 
+            private class EdgeSurface
+            {
+                private readonly Vector2[] localPoints;
+                private Matrix4x4 localToWorld;
+                private bool initialized;
+
+                public Vector2[] WorldPoints { get; }
+
+                public EdgeSurface(EdgeCollider2D edge)
+                {
+                    localPoints = edge.points;
+                    WorldPoints = new Vector2[localPoints.Length];
+                }
+
+                public void UpdateTransform(Matrix4x4 matrix)
+                {
+                    if (initialized && localToWorld.Equals(matrix))
+                    {
+                        return;
+                    }
+
+                    initialized = true;
+                    localToWorld = matrix;
+                    for (int i = 0; i < localPoints.Length; i++)
+                    {
+                        WorldPoints[i] = matrix.MultiplyPoint3x4(localPoints[i]);
+                    }
+                }
+            }
+
             private RaycastHit2D FindEnvironmentHit(
                 Vector2 start, Vector2 direction, float distance, float radius)
             {
@@ -1580,6 +1542,26 @@ namespace MimicCell.Player
                 }
 
                 return nearest;
+            }
+
+            public void DrawStrike(Vector2 worldTip, float reach, float curl)
+            {
+                if (line == null)
+                {
+                    FinishSimulation();
+                    return;
+                }
+
+                Vector2 root = nodes[0];
+                Vector2 tip = grid.SourceTransform.InverseTransformPoint(worldTip);
+                Vector2 span = tip - root;
+                Vector2 bow = Vector2.Perpendicular(span) * curl;
+                for (int i = 0; i <= rows; i++)
+                {
+                    float t = i / (float)rows;
+                    Vector2 stretched = root + span * t + bow * (4f * t * (1f - t));
+                    line.SetPosition(i, Vector2.LerpUnclamped(nodes[i], stretched, reach));
+                }
             }
 
             public void FinishSimulation()
@@ -1735,6 +1717,7 @@ namespace MimicCell.Player
                     renderedNormals[row] = normal;
                 }
 
+                bool hasNearbySurfaces = nearbyEdges.Count > 0 || nearbyBoxes.Count > 0;
                 for (int i = 0; i < grid.BaseVertices.Length; i++)
                 {
                     Vector3 baseVertex = grid.BaseVertices[i];
@@ -1743,7 +1726,7 @@ namespace MimicCell.Player
                     Vector2 normal = SampleNormal(t);
                     float across = baseVertex.x - SampleRestNode(t).x;
                     Vector2 position = center + normal * across;
-                    if (t > rootRigidFraction)
+                    if (hasNearbySurfaces && t > RootRigidFraction)
                     {
                         position = KeepRenderedVertexOutside(position);
                     }
