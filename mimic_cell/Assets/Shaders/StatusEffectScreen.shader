@@ -19,12 +19,24 @@ Shader "MimicCell/Burn Heat Distortion"
 
             float _MimicCellBurnScreenStrength;
             float _MimicCellPressureScreenStrength;
+            float _MimicCellAssimilation;
 
             half4 ReadScreen(float2 uv)
             {
                 return SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, uv);
             }
+half4 ApplyAssimilationDarkening(half4 color, float2 screenUV)
+{
+float amount = smoothstep(0.60, 1.0, _MimicCellAssimilation);    
+float2 fromCenter = (screenUV - 0.5) * 2.0;
+    float edge = smoothstep(0.25, 1.2, length(fromCenter));
 
+    float edgeDarkness = edge * amount * 0.55;
+float fullDarkness = smoothstep(0.0, 1.0, amount);
+
+color.rgb *= (1.0 - edgeDarkness) * (1.0 - fullDarkness);
+    return color;
+}
             half4 Frag(Varyings input) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
@@ -39,7 +51,7 @@ uv += centered * squeeze * (0.4 * pressure);
 
 float strength = saturate(_MimicCellBurnScreenStrength);
 if (strength <= 0.001)
-    return ReadScreen(uv);
+    return ApplyAssimilationDarkening(ReadScreen(uv), input.texcoord);
                 float2 fromCenter = abs(uv - 0.5) * 2.0;
                 float edge = smoothstep(0.25, 1.0, max(fromCenter.x, fromCenter.y));
                 float time = _Time.y;
@@ -68,8 +80,7 @@ if (strength <= 0.001)
                     color.rgb, half3(1.0, 0.78, 0.65),
                     strength * (0.04 + 0.08 * edge));
 
-                return color;
-            }
+return ApplyAssimilationDarkening(color, input.texcoord);            }
             ENDHLSL
         }
     }
