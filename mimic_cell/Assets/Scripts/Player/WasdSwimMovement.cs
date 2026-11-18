@@ -1,4 +1,7 @@
+using MimicCell.Creatures;
+using MimicCell.Gameplay;
 using UnityEngine;
+using MimicCell.StatusEffects;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -8,12 +11,13 @@ namespace MimicCell.Player
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(ActorHealth))]
     public sealed class WasdSwimMovement : MonoBehaviour
     {
         [Header("WASD Swim")]
-        [SerializeField, Min(0f)] private float swimSpeed = 3f;
+        [SerializeField, Min(0f)] private float swimSpeed = 4f;
         [Tooltip("Acceleration applied as thrust while movement input is held.")]
-        [SerializeField, Min(0f)] private float swimAcceleration = 6f;
+        [SerializeField, Min(0f)] private float swimAcceleration = 7.2f;
         [Tooltip("Speed lost per second after releasing movement input. Lower values create a longer glide.")]
         [SerializeField, Min(0f)] private float swimDeceleration = 2f;
 
@@ -26,15 +30,57 @@ namespace MimicCell.Player
         [SerializeField] private Transform visualRoot;
 
         private Rigidbody2D attachedRigidbody;
+        private StatusEffectController statusEffectController;
         private Vector2 moveInput;
+        private AnoxiaEffect anoxiaEffect;
         private float headingAngle;
         private float headingVelocity;
+        private bool isForcedMoving;
+        private Vector2 forcedMoveDirection;
+        private float forcedMoveSpeed;
+        private float baseSwimSpeed;
+        private ActorHealth actorHealth;
+        private PrototypePlayer player;
+        private PlayerCreatureFormController formController;
+        private float sprintingSpeedBoostEndTime;
 
         private void Awake()
         {
             attachedRigidbody = GetComponent<Rigidbody2D>();
+            
+            statusEffectController = GetComponent<StatusEffectController>();
+            
+            actorHealth = GetComponent<ActorHealth>();
+
+            player = GetComponent<PrototypePlayer>();
+
+            formController = GetComponent<PlayerCreatureFormController>();
+
+            actorHealth.Damaged += HandleDamaged;
+
+            actorHealth.Died += HandleDied;
+
+            formController.FormChanged += HandleFormChanged;
+
+            baseSwimSpeed = swimSpeed;
+
             ConfigureRigidbody();
             ResolveVisualRoot();
+        }
+
+        private void OnDestroy()
+        {
+            if (actorHealth != null)
+            {
+                actorHealth.Damaged -= HandleDamaged;
+
+                actorHealth.Died -= HandleDied;
+            }
+
+            if (formController != null)
+            {
+                formController.FormChanged -= HandleFormChanged;
+            }
         }
 
         private void OnEnable()
@@ -59,7 +105,14 @@ namespace MimicCell.Player
 
         private void FixedUpdate()
         {
+            if (isForcedMoving)
+            {
+                attachedRigidbody.linearVelocity =
+                    forcedMoveDirection * forcedMoveSpeed;
+                return;
+            }
             Vector2 velocity = attachedRigidbody.linearVelocity;
+
 
             if (moveInput.sqrMagnitude > 0.001f)
             {
@@ -67,23 +120,112 @@ namespace MimicCell.Player
                     ? (Vector2)visualRoot.up
                     : moveInput;
                 velocity += thrustDirection.normalized * (swimAcceleration * Time.fixedDeltaTime);
-                velocity = Vector2.ClampMagnitude(velocity, swimSpeed);
+                if (statusEffectController == null)
+                {
+                    statusEffectController = GetComponent<StatusEffectController>();
+                }
+
+                float speedMultiplier = statusEffectController != null
+                    ? statusEffectController.GetSwimSpeedMultiplier()
+                    : 1f;
+
+                float traitSpeedMultiplier = GetSprintingSpeedMultiplier();
+
+                float finalSwimSpeed = swimSpeed * speedMultiplier * traitSpeedMultiplier;
+
+                if (Mathf.Abs(speedMultiplier - 1f) > 0.001f)
+                {
+                    Debug.Log("도파민 적용 중! 최대 이동속도: " + finalSwimSpeed);
+                }
+
+                velocity = Vector2.ClampMagnitude(velocity, finalSwimSpeed);
             }
             else
             {
-                velocity = Vector2.MoveTowards(
-                    velocity,
-                    Vector2.zero,
-                    swimDeceleration * Time.fixedDeltaTime);
+                velocity = Vector2.MoveTowards(velocity, Vector2.zero, swimDeceleration * Time.fixedDeltaTime);
             }
 
             attachedRigidbody.linearVelocity = velocity;
+        }
+
+        public void StartForcedMovement(Vector2 direction, float speed)
+        {
+            if (direction.sqrMagnitude <= 0.001f)
+            {
+                return;
+            }
+
+            forcedMoveDirection = direction.normalized;
+            forcedMoveSpeed = Mathf.Max(0f, speed);
+            isForcedMoving = true;
+        }
+
+        public void StopForcedMovement()
+        {
+            isForcedMoving = false;
+            moveInput = Vector2.zero;
+            StopMovement();
+        }
+
+        public void SetRuntimeSpeed(float speed)
+        {
+            swimSpeed = Mathf.Max(0f, speed);
+        }
+
+        public void RestoreBaseSpeed()
+        {
+            swimSpeed = baseSwimSpeed;
         }
 
         public void Configure(Transform newVisualRoot)
         {
             visualRoot = newVisualRoot;
             ResolveVisualRoot();
+        }
+
+        private float GetSprintingSpeedMultiplier()
+        {
+            bool boostActive = Time.time < sprintingSpeedBoostEndTime;
+
+            bool hasSprintingTrait = player != null && player.CurrentTraits.HasTrait(CreatureTraits.Sprinting);
+
+            return boostActive && hasSprintingTrait
+                ? CreatureTraitSettings.SprintingSpeedMultiplier
+                : 1f;
+        }
+
+        private void HandleDamaged(ActorHealth health, int damageAmount)
+        {
+            if (damageAmount <= 0 ||
+                player == null ||
+                !player.CurrentTraits.HasTrait(
+                    CreatureTraits.Sprinting))
+            {
+                return;
+            }
+
+            sprintingSpeedBoostEndTime = Time.time + CreatureTraitSettings.SprintingDuration;
+
+            Debug.Log(
+                "복제 플레이어 질주형 발동" +
+                " / 기본 속도: " +
+                swimSpeed +
+                " / 증가 속도: " +
+                swimSpeed *
+                CreatureTraitSettings
+                    .SprintingSpeedMultiplier +
+                " / 지속시간: 3초",
+                this);
+        }
+
+        private void HandleFormChanged(CreatureDefinition definition)
+        {
+            sprintingSpeedBoostEndTime = 0f;
+        }
+
+        private void HandleDied(ActorHealth health)
+        {
+            sprintingSpeedBoostEndTime = 0f;
         }
 
         private void ConfigureRigidbody()
@@ -130,8 +272,16 @@ namespace MimicCell.Player
             }
         }
 
-        private static Vector2 ReadKeyboardMove()
+        private  Vector2 ReadKeyboardMove()
         {
+            if (anoxiaEffect == null)
+    anoxiaEffect = GetComponent<AnoxiaEffect>();
+
+if (anoxiaEffect != null &&
+    anoxiaEffect.TryReadMovement(out Vector2 anoxiaMove))
+{
+    return anoxiaMove;
+}
             Vector2 move = Vector2.zero;
 
 #if ENABLE_INPUT_SYSTEM
