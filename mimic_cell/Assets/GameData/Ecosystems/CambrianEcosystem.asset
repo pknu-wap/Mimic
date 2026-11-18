@@ -28,6 +28,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c90e50377dd4f034b841802263c984c3, type: 2}
   - {fileID: 11400000, guid: b6e709b197a43684c989ffa3d8413565, type: 2}
   - {fileID: 11400000, guid: da2e9d91ab4c6bb4b87f2f118b7570f6, type: 2}
+  - {fileID: 11400000, guid: 244ba4a33fa8f5c48911800e5396ec59, type: 2}
+  - {fileID: 11400000, guid: fc1be9471ae9a36479e33acad7fb0aa9, type: 2}
   spawnSettings:
     firstSpawnDelay: 2
     spawnInterval: 4
