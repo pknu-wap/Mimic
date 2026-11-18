@@ -33,13 +33,17 @@ namespace MimicCell.Player
         private float headingAngle;
         private float headingVelocity;
         private bool isForcedMoving;
-private Vector2 forcedMoveDirection;
-private float forcedMoveSpeed;
+        private Vector2 forcedMoveDirection;
+        private float forcedMoveSpeed;
+        private float baseSwimSpeed;
 
         private void Awake()
         {
             attachedRigidbody = GetComponent<Rigidbody2D>();
             statusEffectController = GetComponent<StatusEffectController>();
+
+            baseSwimSpeed = swimSpeed;
+
             ConfigureRigidbody();
             ResolveVisualRoot();
         }
@@ -127,6 +131,16 @@ public void StopForcedMovement()
     moveInput = Vector2.zero;
     StopMovement();
 }
+
+        public void SetRuntimeSpeed(float speed)
+        {
+            swimSpeed = Mathf.Max(0f, speed);
+        }
+
+        public void RestoreBaseSpeed()
+        {
+            swimSpeed = baseSwimSpeed;
+        }
 
         public void Configure(Transform newVisualRoot)
         {

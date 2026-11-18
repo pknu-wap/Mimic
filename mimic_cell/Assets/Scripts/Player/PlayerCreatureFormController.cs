@@ -96,7 +96,10 @@ namespace MimicCell.Player
 
             creatureFormCollider.enabled = true;
 
+            movementController.SetCreatureSpeed(definition.SwimSpeed);
+
             currentDefinition = definition;
+
             FormChanged?.Invoke(currentDefinition);
 
             return true;
@@ -113,6 +116,8 @@ namespace MimicCell.Player
 
             baseVisualRoot.SetActive(true);
             baseCollider.enabled = true;
+
+            movementController.RestoreBaseSpeed();
 
             FormChanged?.Invoke(null);
         }
