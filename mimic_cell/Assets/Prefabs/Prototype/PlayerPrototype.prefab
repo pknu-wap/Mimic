@@ -215,6 +215,59 @@ Transform:
   - {fileID: 6310024010803169380}
   m_Father: {fileID: 5270640567023923783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6310024010803169379
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6310024010803169380}
+  - component: {fileID: 6310024010803169381}
+  m_Layer: 0
+  m_Name: Tentacle Aim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6310024010803169380
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6310024010803169379}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 443478555875500913}
+  - {fileID: 3700055706403466707}
+  - {fileID: 2858970063871305406}
+  - {fileID: 4089249121876393094}
+  - {fileID: 1319961253938493012}
+  m_Father: {fileID: 54910889850090819}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6310024010803169381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6310024010803169379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db2c595ea7704e72a513f05592c480b6, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleStrike
+  windup: 0.28
+  lash: 0.12
+  retract: 0.45
+  bodyLean: 0.22
 --- !u!210 &2782922287327151865
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -731,42 +784,6 @@ MonoBehaviour:
   - {fileID: 7820882185777394718}
   extractionTentacleRenderer: {fileID: 1067667902512533719}
   targetRigidbody: {fileID: 1762910099152333045}
-  bodyMeshColumns: 16
-  bodyMeshRows: 18
-  idlePulseAmplitude: 0.014
-  idlePulseFrequency: 0.46
-  shapeSpring: 14
-  shapeDamping: 3.4
-  surfaceSpring: 27
-  surfaceDamping: 5.3
-  surfaceCohesion: 22
-  referenceSpeed: 3
-  pressureStretch: 0.16
-  pressureTaper: 0.3
-  frontCompression: 0.13
-  rearElongation: 0.19
-  bodyWaveAmplitude: 0.045
-  bodyWaveFrequency: 0.92
-  bodyWaveCycles: 1.45
-  accelerationInertia: 0.055
-  maximumBodyOffset: 0.78
-  impactCompression: 0.48
-  displacedFluidBulge: 0.34
-  contactInfluence: 0.82
-  fullImpactSpeed: 3.5
-  impactKick: 2.8
-  impactSpring: 22
-  impactDamping: 3.4
-  collisionStayCompression: 0.32
-  contactRecoverySpeed: 2.4
-  tentacleRows: 28
-  tentacleWaveForce: 2.4
-  tentacleWaveFrequency: 0.42
-  waterFlowDrag: 2
-  wakeGatherForce: 2.4
-  idleWaveScale: 0.55
-  rootRigidFraction: 0.07
-  rootAnchorInset: 0.02
 --- !u!114 &1813012810062947295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -859,8 +876,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 17ccca83d25c4e53a41999d0c22be346, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerAttack
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerDnaExtraction
+  extractionRange: 6
 --- !u!114 &9003527612338714761
 MonoBehaviour:
   m_ObjectHideFlags: 0
