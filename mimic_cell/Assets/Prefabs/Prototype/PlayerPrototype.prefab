@@ -263,11 +263,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db2c595ea7704e72a513f05592c480b6, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleStrike
-  windup: 0.28
-  lash: 0.12
-  retract: 0.45
-  bodyLean: 0.22
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleAim
+  aimHoldSeconds: 0.25
+  returnSpeed: 720
 --- !u!210 &2782922287327151865
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -717,6 +715,42 @@ MonoBehaviour:
   - {fileID: 7820882185777394718}
   extractionTentacleRenderer: {fileID: 1067667902512533719}
   targetRigidbody: {fileID: 1762910099152333045}
+  bodyMeshColumns: 16
+  bodyMeshRows: 18
+  idlePulseAmplitude: 0.014
+  idlePulseFrequency: 0.46
+  shapeSpring: 14
+  shapeDamping: 3.4
+  surfaceSpring: 27
+  surfaceDamping: 5.3
+  surfaceCohesion: 22
+  referenceSpeed: 3
+  pressureStretch: 0.16
+  pressureTaper: 0.3
+  frontCompression: 0.13
+  rearElongation: 0.19
+  bodyWaveAmplitude: 0.045
+  bodyWaveFrequency: 0.92
+  bodyWaveCycles: 1.45
+  accelerationInertia: 0.055
+  maximumBodyOffset: 0.78
+  impactCompression: 0.48
+  displacedFluidBulge: 0.34
+  contactInfluence: 0.82
+  fullImpactSpeed: 3.5
+  impactKick: 2.8
+  impactSpring: 22
+  impactDamping: 3.4
+  collisionStayCompression: 0.32
+  contactRecoverySpeed: 2.4
+  tentacleRows: 28
+  tentacleWaveForce: 2.4
+  tentacleWaveFrequency: 0.42
+  waterFlowDrag: 2
+  wakeGatherForce: 2.4
+  idleWaveScale: 0.55
+  rootRigidFraction: 0.07
+  rootAnchorInset: 0.02
 --- !u!114 &1813012810062947295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -810,8 +844,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 17ccca83d25c4e53a41999d0c22be346, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerDnaExtraction
-  extractionRange: 6
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerAttack
 --- !u!114 &9003527612338714761
 MonoBehaviour:
   m_ObjectHideFlags: 0
