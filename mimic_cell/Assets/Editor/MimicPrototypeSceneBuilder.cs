@@ -197,7 +197,7 @@ namespace MimicCell.EditorTools
                 player.AddComponent<ActorHealth>().Configure(20);
                 player.AddComponent<StatusEffectController>();
                 player.AddComponent<PrototypePlayer>();
-                player.AddComponent<PlayerAttack>();
+                player.AddComponent<PlayerDnaExtraction>();
 
                 return PrefabUtility.SaveAsPrefabAsset(player, PlayerPrefabPath);
             }
@@ -226,7 +226,7 @@ namespace MimicCell.EditorTools
 
             Transform aimPivot = new GameObject("Tentacle Aim").transform;
             aimPivot.SetParent(visual.transform, false);
-            aimPivot.gameObject.AddComponent<PlayerTentacleAim>();
+            aimPivot.gameObject.AddComponent<PlayerTentacleStrike>();
 
             Vector2 bodyLowerLeft = new Vector2(282f, 495f);
             Vector2 bodyCenter = bodyLowerLeft + (bodySprite.rect.size * 0.5f);

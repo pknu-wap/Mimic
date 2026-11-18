@@ -27,6 +27,7 @@ namespace MimicCell.Player
         private bool controlsEnabled = true;
 
         public PlayerMovementMode CurrentMode { get; private set; }
+        public bool ControlsEnabled => controlsEnabled;
 
         private void Awake()
         {
@@ -36,7 +37,7 @@ namespace MimicCell.Player
 
         private void Update()
         {
-            if (!controlsEnabled || !allowNumberKeySwitching)
+            if (!ControlsEnabled || !allowNumberKeySwitching)
             {
                 return;
             }
@@ -77,19 +78,31 @@ namespace MimicCell.Player
             ApplyMovementMode(CurrentMode);
         }
 
+        public void SetCreatureSpeed(float speed)
+        {
+            ResolveComponents();
+            wasdMovement.SetRuntimeSpeed(speed);
+        }
+
+        public void RestoreBaseSpeed()
+        {
+            ResolveComponents();
+            wasdMovement.RestoreBaseSpeed();
+        }
+
         private void ApplyMovementMode(PlayerMovementMode mode)
         {
             ResolveComponents();
 
             bool useWasd = mode == PlayerMovementMode.WasdSwim;
-            wasdMovement.enabled = controlsEnabled && useWasd;
-            mouseHoldMovement.enabled = controlsEnabled && !useWasd;
+            wasdMovement.enabled = ControlsEnabled && useWasd;
+            mouseHoldMovement.enabled = ControlsEnabled && !useWasd;
             CurrentMode = mode;
         }
 
         private bool IsModeApplied(PlayerMovementMode mode)
         {
-            if (!controlsEnabled)
+            if (!ControlsEnabled)
             {
                 return !wasdMovement.enabled && !mouseHoldMovement.enabled;
             }
