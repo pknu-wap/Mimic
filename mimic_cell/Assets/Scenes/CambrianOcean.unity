@@ -621,11 +621,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2055101682}
     m_Modifications:
-    - target: {fileID: 191149480787358697, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+    - target: {fileID: 466188932796104859, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       propertyPath: aimLine
       value: 
       objectReference: {fileID: 1918069293}
-    - target: {fileID: 191149480787358697, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+    - target: {fileID: 466188932796104859, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       propertyPath: aimCamera
       value: 
       objectReference: {fileID: 519420031}
@@ -684,14 +684,6 @@ PrefabInstance:
     - target: {fileID: 5270640567023923783, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5407580790764318428, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5407580790764318428, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
-      propertyPath: m_WasSpriteAssigned
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       propertyPath: m_Name

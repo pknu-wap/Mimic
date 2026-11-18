@@ -496,57 +496,6 @@ Transform:
   - {fileID: 2728273293877189270}
   m_Father: {fileID: 6310024010803169380}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &6310024010803169379
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6310024010803169380}
-  - component: {fileID: 6310024010803169381}
-  m_Layer: 0
-  m_Name: Tentacle Aim
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6310024010803169380
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6310024010803169379}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 443478555875500913}
-  - {fileID: 3700055706403466707}
-  - {fileID: 2858970063871305406}
-  - {fileID: 4089249121876393094}
-  - {fileID: 1319961253938493012}
-  m_Father: {fileID: 54910889850090819}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6310024010803169381
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6310024010803169379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db2c595ea7704e72a513f05592c480b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleAim
-  aimHoldSeconds: 0.25
-  returnSpeed: 720
 --- !u!1 &7775672073312203066
 GameObject:
   m_ObjectHideFlags: 0
@@ -1159,6 +1108,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.AssimilationDarkeningEffect
   useTestValue: 0
   testPercent: 0
+--- !u!114 &4951052446100699018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e14c055f9c863ac4ebd4600caea9034d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerCreatureFormDebugTester
+  testForms:
+  - {fileID: 11400000, guid: a4f7d7e42c45fcb4881863cf16961b9a, type: 2}
+  - {fileID: 11400000, guid: 58ada217901325642ada598f389e371f, type: 2}
+  - {fileID: 11400000, guid: 96357d3a8b4a65c44be50ed57b33bf70, type: 2}
+  - {fileID: 11400000, guid: 244ba4a33fa8f5c48911800e5396ec59, type: 2}
+  - {fileID: 11400000, guid: 7b17282320db20e4fa46db46d420c849, type: 2}
+  - {fileID: 11400000, guid: c1483d1d102b8b84dafd86fa43c2c643, type: 2}
+  - {fileID: 11400000, guid: c90e50377dd4f034b841802263c984c3, type: 2}
+  - {fileID: 11400000, guid: 9b1dad70da20fd14da8ab11ba97c5bdd, type: 2}
+  - {fileID: 11400000, guid: b6e709b197a43684c989ffa3d8413565, type: 2}
+  - {fileID: 11400000, guid: 8143815d75cf5e146829c4d1af1dfaed, type: 2}
+  - {fileID: 11400000, guid: 4dfc1a01796967240a9ab273c73d9c03, type: 2}
+  - {fileID: 11400000, guid: fc1be9471ae9a36479e33acad7fb0aa9, type: 2}
+  - {fileID: 11400000, guid: 98f6b35a84ead0e479b05795f93dbec8, type: 2}
+  - {fileID: 11400000, guid: da2e9d91ab4c6bb4b87f2f118b7570f6, type: 2}
+  - {fileID: 11400000, guid: a487bde7b8fe1e44c89be4ff1d36e43e, type: 2}
+--- !u!114 &1187911215741923973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0e236edb117fd749b261408c1e91268, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerCreatureContactAttack
+  contactCooldown: 0.8
 --- !u!1 &8312001107895383215
 GameObject:
   m_ObjectHideFlags: 0
