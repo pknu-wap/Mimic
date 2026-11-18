@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -15,9 +16,36 @@ namespace MimicCell.Prologue
         [SerializeField, Min(1f)] private float charactersPerSecond = 30f;
 
         private Coroutine typing;
+        private readonly Queue<string> remainingLines = new Queue<string>();
 
-        public void ShowText(string message)
-        {
+
+public void ShowText(string message)
+{
+    ShowSequence(message);
+}
+
+public void ShowSequence(params string[] messages)
+{
+    if (dialogueText == null || !isActiveAndEnabled)
+        return;
+
+    remainingLines.Clear();
+
+    foreach (string message in messages)
+    {
+        if (!string.IsNullOrWhiteSpace(message))
+            remainingLines.Enqueue(message);
+    }
+
+    ShowNextLine();
+}
+
+private void ShowNextLine()
+{
+    if (remainingLines.Count > 0)
+        DisplayText(remainingLines.Dequeue());
+}
+private void DisplayText(string message)        {
             if (dialogueText == null || !isActiveAndEnabled)
                 return;
 
@@ -48,11 +76,18 @@ namespace MimicCell.Prologue
         }
 
         private void Update()
-        {
-            if (typing != null && WasConfirmPressed())
-                FinishTyping();
-        }
+{
+    if (!WasConfirmPressed())
+        return;
 
+    if (typing != null)
+    {
+        FinishTyping();
+        return;
+    }
+
+    ShowNextLine();
+}
         private void FinishTyping()
         {
             if (typing != null)
@@ -68,6 +103,8 @@ namespace MimicCell.Prologue
         private void OnDisable()
         {
             FinishTyping();
+            remainingLines.Clear();
+
         }
 
         private static bool WasConfirmPressed()
