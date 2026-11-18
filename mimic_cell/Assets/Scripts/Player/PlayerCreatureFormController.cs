@@ -1,11 +1,13 @@
 using System;
 using MimicCell.Creatures;
 using UnityEngine;
+using MimicCell.Gameplay;
 
 namespace MimicCell.Player
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(ActorHealth))]
     [RequireComponent(typeof(PlayerMovementController))]
     public sealed class PlayerCreatureFormController : MonoBehaviour
     {
@@ -17,15 +19,24 @@ namespace MimicCell.Player
         [SerializeField] private Collider2D baseCollider;
         [SerializeField] private BoxCollider2D creatureFormCollider;
 
+        [Header("Base Combat")]
+        [SerializeField, Min(0)] private int baseAttackDamage = 0;
+
+        private ActorHealth actorHealth;
+        private int baseMaxHealth;
+        private int currentAttackDamage;
+        private float currentVariation;
         private Rigidbody2D attachedRigidbody;
         private PlayerMovementController movementController;
         private CreatureDefinition currentDefinition;
-
-        public CreatureDefinition CurrentDefinition =>
-            currentDefinition;
-
-        public bool IsCreatureForm =>
-            currentDefinition != null;
+        public CreatureDefinition CurrentDefinition => currentDefinition;
+        public bool IsCreatureForm => currentDefinition != null;
+        public int CurrentAttackDamage => currentAttackDamage;
+        public float CurrentVariation => currentVariation;
+        public CreatureTraits CurrentTraits =>
+            currentDefinition != null
+                ? currentDefinition.Traits
+                : CreatureTraits.None;
 
         public event Action<CreatureDefinition> FormChanged;
 
@@ -34,6 +45,14 @@ namespace MimicCell.Player
             attachedRigidbody = GetComponent<Rigidbody2D>();
 
             movementController = GetComponent<PlayerMovementController>();
+
+            actorHealth = GetComponent<ActorHealth>();
+
+            baseMaxHealth = actorHealth.MaxHealth;
+
+            currentAttackDamage = baseAttackDamage;
+
+            currentVariation = 0f;
 
             if (baseVisualRoot == null ||
                 creatureFormRenderer == null ||
@@ -70,6 +89,12 @@ namespace MimicCell.Player
 
             CreaturePlayerFormSettings form = definition.PlayerForm;
 
+            float variation = UnityEngine.Random.value;
+
+            int newMaxHealth = definition.HealthRange.Evaluate(variation);
+
+            int newAttackDamage = definition.AttackRange.Evaluate(variation);
+
             baseVisualRoot.SetActive(false);
 
             creatureFormRenderer.sprite = form.Sprite;
@@ -98,6 +123,12 @@ namespace MimicCell.Player
 
             movementController.SetCreatureSpeed(definition.SwimSpeed);
 
+            actorHealth.Configure(newMaxHealth);
+
+            currentAttackDamage = newAttackDamage;
+
+            currentVariation = variation;
+
             currentDefinition = definition;
 
             FormChanged?.Invoke(currentDefinition);
@@ -118,6 +149,12 @@ namespace MimicCell.Player
             baseCollider.enabled = true;
 
             movementController.RestoreBaseSpeed();
+
+            actorHealth.Configure(baseMaxHealth);
+
+            currentAttackDamage = baseAttackDamage;
+
+            currentVariation = 0f;
 
             FormChanged?.Invoke(null);
         }

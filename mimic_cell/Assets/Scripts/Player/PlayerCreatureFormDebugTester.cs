@@ -90,7 +90,15 @@ namespace MimicCell.Player
                 "복제 적용 성공: " +
                 definition.DisplayName +
                 " / 먹이층: " +
-                definition.FoodTier,
+                player.CurrentFoodTier +
+                " / 체력: " +
+                player.Health.CurrentHealth +
+                "/" +
+                player.Health.MaxHealth +
+                " / 공격력: " +
+                player.CurrentAttackDamage +
+                " / 특징: " +
+                player.CurrentTraits,
                 this);
         }
 

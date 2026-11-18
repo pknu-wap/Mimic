@@ -51,6 +51,26 @@ namespace MimicCell.Player
             }
         }
 
+        public int CurrentAttackDamage
+        {
+            get
+            {
+                return formController != null
+                    ? formController.CurrentAttackDamage
+                    : 0;
+            }
+        }
+
+        public CreatureTraits CurrentTraits
+        {
+            get
+            {
+                return formController != null
+                    ? formController.CurrentTraits
+                    : CreatureTraits.None;
+            }
+        }
+
         public event Action<PrototypePlayer> Defeated;
 
         private void Awake()

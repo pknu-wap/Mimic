@@ -607,6 +607,7 @@ GameObject:
   - component: {fileID: -1720600722151849923}
   - component: {fileID: -7109796891368331952}
   - component: {fileID: 4951052446100699018}
+  - component: {fileID: 1187911215741923973}
   m_Layer: 0
   m_Name: PlayerPrototype
   m_TagString: Player
@@ -875,6 +876,7 @@ MonoBehaviour:
   creatureFormRenderer: {fileID: 375565811458019847}
   baseCollider: {fileID: 8625969747926017587}
   creatureFormCollider: {fileID: -7109796891368331952}
+  baseAttackDamage: 0
 --- !u!61 &-7109796891368331952
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -949,6 +951,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 98f6b35a84ead0e479b05795f93dbec8, type: 2}
   - {fileID: 11400000, guid: da2e9d91ab4c6bb4b87f2f118b7570f6, type: 2}
   - {fileID: 11400000, guid: a487bde7b8fe1e44c89be4ff1d36e43e, type: 2}
+--- !u!114 &1187911215741923973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0e236edb117fd749b261408c1e91268, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerCreatureContactAttack
+  contactCooldown: 0.8
 --- !u!1 &8312001107895383215
 GameObject:
   m_ObjectHideFlags: 0
