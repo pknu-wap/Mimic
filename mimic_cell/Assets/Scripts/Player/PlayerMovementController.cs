@@ -78,6 +78,18 @@ namespace MimicCell.Player
             ApplyMovementMode(CurrentMode);
         }
 
+        public void SetCreatureSpeed(float speed)
+        {
+            ResolveComponents();
+            wasdMovement.SetRuntimeSpeed(speed);
+        }
+
+        public void RestoreBaseSpeed()
+        {
+            ResolveComponents();
+            wasdMovement.RestoreBaseSpeed();
+        }
+
         private void ApplyMovementMode(PlayerMovementMode mode)
         {
             ResolveComponents();

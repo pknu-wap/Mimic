@@ -14,8 +14,13 @@ namespace MimicCell.StatusEffects
     {
         [SerializeField]
 private Material blurMaterial;
-private readonly Dictionary<CreatureController, TierOneLightPulse> preyLights = new();[SerializeField]
-private StatusEffectDefinition tunnelVisionDefinition;
+private const float RecoveryDuration = 0.8f;
+private static readonly int BlurStrengthId = Shader.PropertyToID("_BlurStrength");
+
+private Material runtimeBlurMaterial;
+private float fullBlurStrength;
+private float visionWeight;
+[SerializeField] private StatusEffectDefinition tunnelVisionDefinition;
 
 private StatusEffectController statusController;
 
@@ -27,6 +32,11 @@ private readonly Dictionary<SpriteRenderer, Material> originalMaterials
 private void Awake()
 {
     statusController = GetComponent<StatusEffectController>();
+    if (blurMaterial != null)
+{
+    runtimeBlurMaterial = new Material(blurMaterial);
+    fullBlurStrength = runtimeBlurMaterial.GetFloat(BlurStrengthId);
+}
 }
 
         
@@ -80,7 +90,6 @@ if (statusController == null ||
     tunnelVisionDefinition == null ||
     !statusController.HasEffect(tunnelVisionDefinition))
 {
-    RestoreMaterials();
     return;
 }
 
@@ -101,12 +110,9 @@ foreach (CreatureController creature in creatures)
 
     switch (creature.Definition.FoodTier)
     {
-        case CreatureFoodTier.Tier1:
-            ShowPreyLight(creature);
-continue;
         case CreatureFoodTier.Tier3:
-            effectMaterial = blurMaterial;
-            break;
+    effectMaterial = runtimeBlurMaterial;
+    break;
         default:
             continue;
     }
@@ -128,37 +134,35 @@ continue;
 
 }
 
-  private void ShowPreyLight(CreatureController creature)
+ 
+
+private void LateUpdate()
 {
-    if (preyLights.TryGetValue(creature, out TierOneLightPulse existing) &&
-        existing != null)
-    {
-        return;
-    }
+    bool active = statusController != null &&
+                  tunnelVisionDefinition != null &&
+                  statusController.HasEffect(tunnelVisionDefinition);
 
-    SpriteRenderer body = creature.GetComponentInChildren<SpriteRenderer>();
-    if (body == null || body.sprite == null)
-        return;
+    visionWeight = active
+        ? 1f
+        : Mathf.MoveTowards(visionWeight, 0f, Time.deltaTime / RecoveryDuration);
 
-    var lightObject = new GameObject("Tier 1 Prey Light");
-    lightObject.transform.SetParent(creature.transform, false);
+    if (runtimeBlurMaterial != null)
+        runtimeBlurMaterial.SetFloat(BlurStrengthId, fullBlurStrength * visionWeight);
 
-    var pulse = lightObject.AddComponent<TierOneLightPulse>();
-    pulse.Initialize(body, Random.Range(0f, 0.35f));
-    preyLights[creature] = pulse;
+   
 }
 
-private void ClearPreyLights()
+private void OnDisable()
 {
-    foreach (TierOneLightPulse pulse in preyLights.Values)
-    {
-        if (pulse != null)
-            Destroy(pulse.gameObject);
-    }
+    visionWeight = 0f;
+    RestoreMaterials();
+}
 
-    preyLights.Clear();
-} 
-
+private void OnDestroy()
+{
+    if (runtimeBlurMaterial != null)
+        Destroy(runtimeBlurMaterial);
+}
 private void RestoreMaterials()
 {
     foreach (var pair in originalMaterials)
@@ -170,7 +174,6 @@ private void RestoreMaterials()
     }
 
     originalMaterials.Clear();
-    ClearPreyLights();
 }
 
     }
