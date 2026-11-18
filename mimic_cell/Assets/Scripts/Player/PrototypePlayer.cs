@@ -1,4 +1,5 @@
 using System;
+using MimicCell.Creatures;
 using MimicCell.Gameplay;
 using UnityEngine;
 
@@ -8,15 +9,66 @@ namespace MimicCell.Player
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(ActorHealth))]
     [RequireComponent(typeof(PlayerMovementController))]
+    [RequireComponent(typeof(PlayerCreatureFormController))]
     public sealed class PrototypePlayer : MonoBehaviour
     {
         private Rigidbody2D attachedRigidbody;
         private ActorHealth actorHealth;
         private PlayerMovementController movementController;
+        private PlayerCreatureFormController formController;
 
         public ActorHealth Health
         {
             get { return actorHealth; }
+        }
+
+        public bool IsCreatureForm
+        {
+            get 
+            { 
+                return formController != null && 
+                         formController.IsCreatureForm; 
+            }
+        }
+
+        public CreatureDefinition CurrentCreatureDefinition
+        {
+            get 
+            { 
+                return formController != null
+                    ? formController.CurrentDefinition
+                    : null; 
+            }
+        }
+
+        public CreatureFoodTier CurrentFoodTier
+        {
+            get
+            {
+                return CurrentCreatureDefinition != null
+                    ? CurrentCreatureDefinition.FoodTier
+                    : CreatureFoodTier.Tier1;
+            }
+        }
+
+        public int CurrentAttackDamage
+        {
+            get
+            {
+                return formController != null
+                    ? formController.CurrentAttackDamage
+                    : 0;
+            }
+        }
+
+        public CreatureTraits CurrentTraits
+        {
+            get
+            {
+                return formController != null
+                    ? formController.CurrentTraits
+                    : CreatureTraits.None;
+            }
         }
 
         public event Action<PrototypePlayer> Defeated;
@@ -38,6 +90,18 @@ namespace MimicCell.Player
         public bool TakeDamage(int amount)
         {
             return actorHealth.TakeDamage(amount);
+        }
+
+        public bool TryApplyCreatureForm(CreatureDefinition definition)
+        {
+            ResolveComponents();
+
+            if (definition == null || formController == null)
+            {
+                return false;
+            }
+
+            return formController.ApplyCreatureForm(definition);
         }
 
         public void SetControlsEnabled(bool controlsEnabled)
@@ -78,6 +142,11 @@ namespace MimicCell.Player
             if (movementController == null)
             {
                 movementController = GetComponent<PlayerMovementController>();
+            }
+
+            if (formController == null)
+            {
+                formController = GetComponent<PlayerCreatureFormController>();
             }
         }
     }

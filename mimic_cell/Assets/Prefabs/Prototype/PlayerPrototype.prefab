@@ -620,6 +620,8 @@ GameObject:
   - component: {fileID: 6229979757139261874}
   - component: {fileID: 685834636763645069}
   - component: {fileID: 1608336687325080483}
+  - component: {fileID: 4951052446100699018}
+  - component: {fileID: 1187911215741923973}
   m_Layer: 0
   m_Name: PlayerPrototype
   m_TagString: Player
@@ -820,7 +822,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerMovementController
   startingMode: 0
-  allowNumberKeySwitching: 1
+  allowNumberKeySwitching: 0
 --- !u!114 &2097008861271464530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -888,6 +890,7 @@ MonoBehaviour:
   creatureFormRenderer: {fileID: 375565811458019847}
   baseCollider: {fileID: 8625969747926017587}
   creatureFormCollider: {fileID: -7109796891368331952}
+  baseAttackDamage: 0
 --- !u!61 &-7109796891368331952
 BoxCollider2D:
   m_ObjectHideFlags: 0

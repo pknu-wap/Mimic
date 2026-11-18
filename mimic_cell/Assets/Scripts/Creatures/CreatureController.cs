@@ -75,6 +75,7 @@ namespace MimicCell.Creatures
         private float stateTimeRemaining;
         private float decisionTimeRemaining;
         private float contactCooldownRemaining;
+        private float sprintingSpeedBoostEndTime;
         private bool extinctionFrenzy;
         private bool extinctionCold;
         private Vector2 extinctionEscapeDirection;
@@ -82,6 +83,7 @@ namespace MimicCell.Creatures
         private float extinctionWanderTime;
         private float coldPursuitMemory;
         private CreatureController coldPrey;
+        private FoodChainTarget currentFoodChainTarget;
 
         public string SpeciesName
         {
@@ -91,6 +93,31 @@ namespace MimicCell.Creatures
         public CreatureDefinition Definition
         {
             get { return definition; }
+        }
+
+        public ActorHealth Health
+        {
+            get { return actorHealth; }
+        }
+
+        public CreatureFoodTier CurrentFoodTier
+        {
+            get
+            {
+                return definition != null
+                    ? definition.FoodTier
+                    : CreatureFoodTier.Tier1;
+            }
+        }
+
+        public CreatureTraits CurrentTraits
+        {
+            get
+            {
+                return definition != null
+                    ? definition.Traits
+                    : CreatureTraits.None;
+            }
         }
 
         public float InstanceVariation
@@ -130,6 +157,7 @@ namespace MimicCell.Creatures
             attachedRigidbody.interpolation = RigidbodyInterpolation2D.Interpolate;
 
             actorHealth.Died += HandleDied;
+            actorHealth.Damaged += HandleDamaged;
             ResolveVisualRoot();
             BeginWanderCycle();
         }
@@ -139,7 +167,24 @@ namespace MimicCell.Creatures
             if (actorHealth != null)
             {
                 actorHealth.Died -= HandleDied;
+                actorHealth.Damaged -= HandleDamaged;
             }
+        }
+
+        private void HandleDamaged(ActorHealth health, int damageAmount)
+        {
+            if (damageAmount <= 0 || !CurrentTraits.HasTrait(CreatureTraits.Sprinting))
+            {
+                return;
+            }
+
+            sprintingSpeedBoostEndTime = Time.time + CreatureTraitSettings.SprintingDuration;
+
+            Debug.Log(
+                "질주형 피격 가속 발동: " +
+                speciesName +
+                " / 속도 1.3배 / 3초",
+                this);
         }
 
         private void Update()
@@ -166,7 +211,7 @@ namespace MimicCell.Creatures
             if (decisionTimeRemaining <= 0f)
             {
                 decisionTimeRemaining = decisionInterval;
-                EvaluatePlayer();
+                EvaluateFoodChain();
             }
 
             if (CurrentState == CreatureState.Idle || CurrentState == CreatureState.Wander)
@@ -449,56 +494,118 @@ namespace MimicCell.Creatures
                 Mathf.Max(0.01f, uniformScale);
         }
 
-        private void EvaluatePlayer()
+        private void EvaluateFoodChain()
         {
-            if (player == null)
-            {
-                player = FindFirstObjectByType<PrototypePlayer>();
-            }
-
             float radius = perceptionRadius * (extinctionCold ? 1.3f : 1f);
-            bool canSeePlayer = player != null &&
-                                player.Health != null &&
-                                player.Health.IsAlive &&
-                                ((Vector2)player.transform.position - attachedRigidbody.position).sqrMagnitude <=
-                                radius * radius;
 
-            if (canSeePlayer && disposition == CreatureDisposition.Aggressive)
+            FoodChainTarget closestPrey = default;
+            FoodChainTarget closestThreat = default;
+
+            float closestPreyDistance = float.PositiveInfinity;
+
+            float closestThreatDistance = float.PositiveInfinity;
+
+            Collider2D[] nearbyColliders = Physics2D.OverlapCircleAll(attachedRigidbody.position, radius);
+
+            foreach (Collider2D candidateCollider in nearbyColliders)
             {
-                coldPrey = null;
-                if (extinctionCold) coldPursuitMemory = 1.2f;
-                SetState(CreatureState.Chase);
-                return;
+                if (!FoodChainRules.TryResolveTarget(candidateCollider, out FoodChainTarget candidate))
+                {
+                    continue;
+                }
+
+                if (candidate.Owner == this || candidate.Health == actorHealth)
+                {
+                    continue;
+                }
+
+                Vector2 offset = (Vector2)candidate.Transform.position - attachedRigidbody.position;
+
+                float distanceSquared = offset.sqrMagnitude;
+
+                if (FoodChainRules.MustFleeFrom(CurrentFoodTier, candidate.FoodTier))
+                {
+                    if (distanceSquared < closestThreatDistance)
+                    {
+                        closestThreat = candidate;
+                        closestThreatDistance = distanceSquared;
+                    }
+
+                    continue;
+                }
+
+                if (disposition ==
+                        CreatureDisposition.Aggressive &&
+                    FoodChainRules.CanAttack(CurrentFoodTier, candidate.FoodTier))
+                {
+                    if (distanceSquared < closestPreyDistance)
+                    {
+                        closestPrey = candidate;
+                        closestPreyDistance = distanceSquared;
+                    }
+                }
             }
 
-            if (canSeePlayer && disposition == CreatureDisposition.Timid)
+            if (closestThreat.IsValid)
             {
                 coldPrey = null;
-                if (extinctionCold) coldPursuitMemory = 1.2f;
+
+                currentFoodChainTarget = closestThreat;
+
+                if (extinctionCold)
+                {
+                    coldPursuitMemory = 1.2f;
+                }
+
                 SetState(CreatureState.Flee);
                 return;
             }
 
-            if (extinctionCold && disposition == CreatureDisposition.Aggressive &&
-                definition != null && definition.FoodTier >= CreatureFoodTier.Tier2)
+            if (closestPrey.IsValid)
+            {
+                coldPrey = null;
+
+                currentFoodChainTarget = closestPrey;
+
+                if (extinctionCold)
+                {
+                    coldPursuitMemory = 1.2f;
+                }
+
+                SetState(CreatureState.Chase);
+                return;
+            }
+
+            if (extinctionCold &&
+                disposition ==
+                    CreatureDisposition.Aggressive &&
+                definition != null &&
+                definition.FoodTier >=
+                    CreatureFoodTier.Tier2)
             {
                 CreatureController candidate = FindSmallerSameTierPrey(radius);
+
                 if (candidate != null)
                 {
+                    currentFoodChainTarget = default;
                     coldPrey = candidate;
                     coldPursuitMemory = 1.2f;
+
                     SetState(CreatureState.Chase);
                     return;
                 }
             }
 
-            if (extinctionCold && coldPursuitMemory > 0f &&
-                (CurrentState == CreatureState.Chase || CurrentState == CreatureState.Flee))
+            if (extinctionCold &&
+                coldPursuitMemory > 0f &&
+                (CurrentState == CreatureState.Chase ||
+                 CurrentState == CreatureState.Flee))
             {
                 return;
             }
 
             coldPrey = null;
+            currentFoodChainTarget = default;
 
             if (CurrentState == CreatureState.Chase || CurrentState == CreatureState.Flee)
             {
@@ -546,10 +653,10 @@ namespace MimicCell.Creatures
             switch (CurrentState)
             {
                 case CreatureState.Chase:
-                    return DirectionToPlayer(currentPosition);
+                    return DirectionToFoodChainTarget(currentPosition);
 
                 case CreatureState.Flee:
-                    return -DirectionToPlayer(currentPosition);
+                    return -DirectionToFoodChainTarget(currentPosition);
 
                 case CreatureState.Idle:
                     return hasGroupMovementDirection
@@ -574,48 +681,81 @@ namespace MimicCell.Creatures
             }
         }
 
-        private Vector2 DirectionToPlayer(Vector2 currentPosition)
+        private Vector2 DirectionToFoodChainTarget(
+    Vector2 currentPosition)
         {
-            if (coldPrey != null && coldPrey.CurrentState != CreatureState.Dead)
+            if (coldPrey != null &&
+                coldPrey.CurrentState !=
+                    CreatureState.Dead)
             {
-                Vector2 toPrey = (Vector2)coldPrey.transform.position - currentPosition;
-                return toPrey.sqrMagnitude > 0.001f ? toPrey.normalized : Vector2.zero;
+                Vector2 toColdPrey = (Vector2)coldPrey.transform.position - currentPosition;
+
+                return toColdPrey.sqrMagnitude > 0.001f
+                    ? toColdPrey.normalized
+                    : Vector2.zero;
             }
 
-            if (player == null)
+            if (!currentFoodChainTarget.IsValid)
             {
                 return Vector2.zero;
             }
 
-            Vector2 direction = (Vector2)player.transform.position - currentPosition;
-            return direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.zero;
+            Vector2 direction = (Vector2)currentFoodChainTarget.Transform.position - currentPosition;
+
+            return direction.sqrMagnitude > 0.001f
+                ? direction.normalized
+                : Vector2.zero;
         }
 
         private float GetCurrentSpeed()
         {
             ExtinctionStatusEffects status = GetComponent<ExtinctionStatusEffects>();
-            float speedMultiplier = status != null ? status.SpeedMultiplier : 1f;
+
+            float statusSpeedMultiplier = status != null
+                    ? status.SpeedMultiplier
+                    : 1f;
+
+            float stateSpeed;
+
             if (extinctionFrenzy)
             {
-                return sprintSpeed * speedMultiplier;
+                stateSpeed = sprintSpeed;
             }
-            switch (CurrentState)
+            else
             {
-                case CreatureState.Chase:
-                case CreatureState.Flee:
-                    return sprintSpeed * speedMultiplier;
+                switch (CurrentState)
+                {
+                    case CreatureState.Chase:
+                    case CreatureState.Flee:
+                        stateSpeed = sprintSpeed;
+                        break;
 
-                case CreatureState.Idle:
-                    return hasGroupMovementDirection
-                        ? moveSpeed * speedMultiplier
-                        : 0f;
+                    case CreatureState.Idle: 
+                        stateSpeed = hasGroupMovementDirection 
+                            ? moveSpeed
+                            : 0f;
+                        break;
 
-                case CreatureState.Wander:
-                    return moveSpeed * speedMultiplier;
+                    case CreatureState.Wander:
+                        stateSpeed = moveSpeed;
+                        break;
 
-                default:
-                    return 0f;
+                    default:
+                        stateSpeed = 0f;
+                        break;
+                }
             }
+
+            bool sprintingBoostActive =
+                Time.time <
+                    sprintingSpeedBoostEndTime && 
+                    CurrentTraits.HasTrait(CreatureTraits.Sprinting);
+
+            float traitSpeedMultiplier = sprintingBoostActive
+                    ? CreatureTraitSettings.SprintingSpeedMultiplier
+                    : 1f;
+
+            return stateSpeed * statusSpeedMultiplier * traitSpeedMultiplier;
         }
 
         private void BeginWanderCycle()
@@ -789,33 +929,82 @@ namespace MimicCell.Creatures
 
         private void OnTriggerStay2D(Collider2D other)
         {
-            if (disposition != CreatureDisposition.Aggressive ||
-                CurrentState == CreatureState.Dead ||
+            if (CurrentState == CreatureState.Dead ||
                 contactCooldownRemaining > 0f ||
                 contactDamage <= 0)
             {
                 return;
             }
 
-            if (extinctionCold && coldPrey != null &&
-                other.GetComponentInParent<CreatureController>() == coldPrey)
+            if (extinctionCold &&
+                coldPrey != null &&
+                other.GetComponentInParent<CreatureController>()
+                    == coldPrey)
             {
-                ActorHealth preyHealth = coldPrey.GetComponent<ActorHealth>();
-                if (preyHealth != null && preyHealth.TakeDamage(contactDamage))
+                ActorHealth preyHealth = coldPrey.Health;
+
+                int coldDamage = 
+                    CreatureCombatRules.CalculateDamage(
+                        contactDamage,
+                        CurrentFoodTier,
+                        coldPrey.CurrentFoodTier,
+                        coldPrey.CurrentTraits);
+
+                if (preyHealth != null && preyHealth.TakeDamage(coldDamage))
                 {
                     contactCooldownRemaining = contactCooldown;
                 }
+
                 return;
             }
 
-            PrototypePlayer hitPlayer = other.GetComponentInParent<PrototypePlayer>();
-            if (hitPlayer == null || hitPlayer != player)
+            if (disposition !=
+                    CreatureDisposition.Aggressive ||
+                CurrentState != CreatureState.Chase)
             {
                 return;
             }
 
-            if (hitPlayer.TakeDamage(contactDamage))
+            if (!FoodChainRules.TryResolveTarget(other, out FoodChainTarget hitTarget))
             {
+                return;
+            }
+
+            if (hitTarget.Health == actorHealth)
+            {
+                return;
+            }
+
+            if (!FoodChainRules.CanAttack(CurrentFoodTier, hitTarget.FoodTier))
+            {
+                return;
+            }
+
+            int finalDamage = 
+                CreatureCombatRules.CalculateDamage(
+                    contactDamage,
+                    CurrentFoodTier,
+                    hitTarget.FoodTier,
+                    hitTarget.Traits);
+
+            if (hitTarget.Health.TakeDamage(finalDamage))
+            {
+                if (hitTarget.Owner is PrototypePlayer)
+                {
+                    Debug.Log(
+                        "복제 플레이어 피격: " +
+                        speciesName +
+                        " / 기본 피해량: " +
+                        contactDamage +
+                        " / 실제 피해량: " +
+                        finalDamage +
+                        " / 남은 체력: " +
+                        hitTarget.Health.CurrentHealth +
+                        "/" +
+                        hitTarget.Health.MaxHealth,
+                        this);
+                }
+
                 contactCooldownRemaining = contactCooldown;
             }
         }
@@ -823,14 +1012,12 @@ namespace MimicCell.Creatures
         private void HandleDied(ActorHealth health)
         {
             attachedRigidbody.linearVelocity = Vector2.zero;
+
             attachedCollider.enabled = false;
+
             SetState(CreatureState.Dead);
 
-            SpriteRenderer renderer = visualRoot != null ? visualRoot.GetComponent<SpriteRenderer>() : null;
-            if (renderer != null)
-            {
-                renderer.color = new Color(0.35f, 0.35f, 0.35f, 0.4f);
-            }
+            Destroy(gameObject);
         }
 
         private void RestoreVisualColor()
