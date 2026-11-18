@@ -57,21 +57,28 @@ namespace MimicCell.Player
                 return;
             }
 
-            if (target.Health.TakeDamage(attackDamage))
+            int finalDamage = CreatureCombatRules.CalculateDamage(
+                attackDamage, 
+                player.CurrentFoodTier,
+                target.CurrentFoodTier,
+                target.CurrentTraits);
+
+            if (target.Health.TakeDamage(finalDamage))
             {
                 Debug.Log(
                     "복제 몬스터 공격 성공: " +
                     target.SpeciesName +
-                    " / 피해량: " +
+                    " / 기본 피해량: " +
                     attackDamage +
+                    " / 실제 피해량: " +
+                    finalDamage +
                     " / 남은 체력: " +
                     target.Health.CurrentHealth +
                     "/" +
                     target.Health.MaxHealth,
                     this);
 
-                cooldownRemaining =
-                    contactCooldown;
+                cooldownRemaining = contactCooldown;
             }
         }
     }

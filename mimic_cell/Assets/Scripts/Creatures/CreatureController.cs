@@ -109,6 +109,16 @@ namespace MimicCell.Creatures
             }
         }
 
+        public CreatureTraits CurrentTraits
+        {
+            get
+            {
+                return definition != null
+                    ? definition.Traits
+                    : CreatureTraits.None;
+            }
+        }
+
         public float InstanceVariation
         {
             get { return instanceVariation; }
@@ -888,9 +898,16 @@ namespace MimicCell.Creatures
                 other.GetComponentInParent<CreatureController>()
                     == coldPrey)
             {
-                ActorHealth preyHealth = coldPrey.GetComponent<ActorHealth>();
+                ActorHealth preyHealth = coldPrey.Health;
 
-                if (preyHealth != null && preyHealth.TakeDamage(contactDamage))
+                int coldDamage = 
+                    CreatureCombatRules.CalculateDamage(
+                        contactDamage,
+                        CurrentFoodTier,
+                        coldPrey.CurrentFoodTier,
+                        coldPrey.CurrentTraits);
+
+                if (preyHealth != null && preyHealth.TakeDamage(coldDamage))
                 {
                     contactCooldownRemaining = contactCooldown;
                 }
@@ -920,8 +937,31 @@ namespace MimicCell.Creatures
                 return;
             }
 
-            if (hitTarget.Health.TakeDamage(contactDamage))
+            int finalDamage = 
+                CreatureCombatRules.CalculateDamage(
+                    contactDamage,
+                    CurrentFoodTier,
+                    hitTarget.FoodTier,
+                    hitTarget.Traits);
+
+            if (hitTarget.Health.TakeDamage(finalDamage))
             {
+                if (hitTarget.Owner is PrototypePlayer)
+                {
+                    Debug.Log(
+                        "복제 플레이어 피격: " +
+                        speciesName +
+                        " / 기본 피해량: " +
+                        contactDamage +
+                        " / 실제 피해량: " +
+                        finalDamage +
+                        " / 남은 체력: " +
+                        hitTarget.Health.CurrentHealth +
+                        "/" +
+                        hitTarget.Health.MaxHealth,
+                        this);
+                }
+
                 contactCooldownRemaining = contactCooldown;
             }
         }

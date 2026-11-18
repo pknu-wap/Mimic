@@ -6,11 +6,12 @@ namespace MimicCell.Creatures
 {
     public readonly struct FoodChainTarget
     {
-        public FoodChainTarget(Component owner, ActorHealth health, CreatureFoodTier foodTier)
+        public FoodChainTarget(Component owner, ActorHealth health, CreatureFoodTier foodTier, CreatureTraits traits)
         {
             Owner = owner;
             Health = health;
             FoodTier = foodTier;
+            Traits = traits;
         }
 
         public Component Owner { get; }
@@ -18,6 +19,8 @@ namespace MimicCell.Creatures
         public ActorHealth Health { get; }
 
         public CreatureFoodTier FoodTier { get; }
+
+        public CreatureTraits Traits { get; }
 
         public Transform Transform
         {
@@ -65,7 +68,11 @@ namespace MimicCell.Creatures
 
             if (creature != null)
             {
-                target = new FoodChainTarget(creature, creature.Health, creature.CurrentFoodTier);
+                target = new FoodChainTarget(
+                    creature,
+                    creature.Health,
+                    creature.CurrentFoodTier,
+                    creature.CurrentTraits);
 
                 return target.IsValid;
             }
@@ -74,7 +81,11 @@ namespace MimicCell.Creatures
 
             if (player != null)
             {
-                target = new FoodChainTarget(player, player.Health, player.CurrentFoodTier);
+                target = new FoodChainTarget(
+                    player,
+                    player.Health,
+                    player.CurrentFoodTier,
+                    player.CurrentTraits);
 
                 return target.IsValid;
             }
