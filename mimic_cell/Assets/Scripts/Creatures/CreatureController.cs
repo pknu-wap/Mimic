@@ -75,6 +75,7 @@ namespace MimicCell.Creatures
         private float stateTimeRemaining;
         private float decisionTimeRemaining;
         private float contactCooldownRemaining;
+        private float sprintingSpeedBoostEndTime;
         private bool extinctionFrenzy;
         private bool extinctionCold;
         private Vector2 extinctionEscapeDirection;
@@ -156,6 +157,7 @@ namespace MimicCell.Creatures
             attachedRigidbody.interpolation = RigidbodyInterpolation2D.Interpolate;
 
             actorHealth.Died += HandleDied;
+            actorHealth.Damaged += HandleDamaged;
             ResolveVisualRoot();
             BeginWanderCycle();
         }
@@ -165,7 +167,24 @@ namespace MimicCell.Creatures
             if (actorHealth != null)
             {
                 actorHealth.Died -= HandleDied;
+                actorHealth.Damaged -= HandleDamaged;
             }
+        }
+
+        private void HandleDamaged(ActorHealth health, int damageAmount)
+        {
+            if (damageAmount <= 0 || !CurrentTraits.HasTrait(CreatureTraits.Sprinting))
+            {
+                return;
+            }
+
+            sprintingSpeedBoostEndTime = Time.time + CreatureTraitSettings.SprintingDuration;
+
+            Debug.Log(
+                "질주형 피격 가속 발동: " +
+                speciesName +
+                " / 속도 1.3배 / 3초",
+                this);
         }
 
         private void Update()
@@ -691,28 +710,52 @@ namespace MimicCell.Creatures
         private float GetCurrentSpeed()
         {
             ExtinctionStatusEffects status = GetComponent<ExtinctionStatusEffects>();
-            float speedMultiplier = status != null ? status.SpeedMultiplier : 1f;
+
+            float statusSpeedMultiplier = status != null
+                    ? status.SpeedMultiplier
+                    : 1f;
+
+            float stateSpeed;
+
             if (extinctionFrenzy)
             {
-                return sprintSpeed * speedMultiplier;
+                stateSpeed = sprintSpeed;
             }
-            switch (CurrentState)
+            else
             {
-                case CreatureState.Chase:
-                case CreatureState.Flee:
-                    return sprintSpeed * speedMultiplier;
+                switch (CurrentState)
+                {
+                    case CreatureState.Chase:
+                    case CreatureState.Flee:
+                        stateSpeed = sprintSpeed;
+                        break;
 
-                case CreatureState.Idle:
-                    return hasGroupMovementDirection
-                        ? moveSpeed * speedMultiplier
-                        : 0f;
+                    case CreatureState.Idle: 
+                        stateSpeed = hasGroupMovementDirection 
+                            ? moveSpeed
+                            : 0f;
+                        break;
 
-                case CreatureState.Wander:
-                    return moveSpeed * speedMultiplier;
+                    case CreatureState.Wander:
+                        stateSpeed = moveSpeed;
+                        break;
 
-                default:
-                    return 0f;
+                    default:
+                        stateSpeed = 0f;
+                        break;
+                }
             }
+
+            bool sprintingBoostActive =
+                Time.time <
+                    sprintingSpeedBoostEndTime && 
+                    CurrentTraits.HasTrait(CreatureTraits.Sprinting);
+
+            float traitSpeedMultiplier = sprintingBoostActive
+                    ? CreatureTraitSettings.SprintingSpeedMultiplier
+                    : 1f;
+
+            return stateSpeed * statusSpeedMultiplier * traitSpeedMultiplier;
         }
 
         private void BeginWanderCycle()
