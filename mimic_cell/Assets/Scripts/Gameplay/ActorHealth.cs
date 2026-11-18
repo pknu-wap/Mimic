@@ -27,6 +27,7 @@ namespace MimicCell.Gameplay
         public event Action<ActorHealth> HealthChanged;
         public event Action<ActorHealth, int> Damaged;
         public event Action<ActorHealth> Died;
+        public event Action<ActorHealth> DamageTaken;
 
         private void Awake()
         {
@@ -63,6 +64,7 @@ namespace MimicCell.Gameplay
             int appliedDamage = previousHealth - currentHealth;
 
             HealthChanged?.Invoke(this);
+            DamageTaken?.Invoke(this);
 
             Damaged?.Invoke(this, appliedDamage);
 

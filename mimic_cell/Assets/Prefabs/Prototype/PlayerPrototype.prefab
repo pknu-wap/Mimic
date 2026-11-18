@@ -606,6 +606,20 @@ GameObject:
   - component: {fileID: 9003527612338714761}
   - component: {fileID: -1720600722151849923}
   - component: {fileID: -7109796891368331952}
+  - component: {fileID: 7834850408324203229}
+  - component: {fileID: 4461017084329520170}
+  - component: {fileID: 2539467558973441306}
+  - component: {fileID: 3717247147293340529}
+  - component: {fileID: 4553001731044001113}
+  - component: {fileID: 1841475437759172380}
+  - component: {fileID: 3550283129862528974}
+  - component: {fileID: 3387828546965028878}
+  - component: {fileID: 3857243708321578278}
+  - component: {fileID: 7407789154703846171}
+  - component: {fileID: 8784220054850352270}
+  - component: {fileID: 6229979757139261874}
+  - component: {fileID: 685834636763645069}
+  - component: {fileID: 1608336687325080483}
   - component: {fileID: 4951052446100699018}
   - component: {fileID: 1187911215741923973}
   m_Layer: 0
@@ -923,7 +937,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &4951052446100699018
+--- !u!114 &7834850408324203229
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -932,26 +946,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8258282004123880317}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e14c055f9c863ac4ebd4600caea9034d, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f320169601cc2e419dbaf70b55852eb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerCreatureFormDebugTester
-  testForms:
-  - {fileID: 11400000, guid: a4f7d7e42c45fcb4881863cf16961b9a, type: 2}
-  - {fileID: 11400000, guid: 58ada217901325642ada598f389e371f, type: 2}
-  - {fileID: 11400000, guid: 96357d3a8b4a65c44be50ed57b33bf70, type: 2}
-  - {fileID: 11400000, guid: 244ba4a33fa8f5c48911800e5396ec59, type: 2}
-  - {fileID: 11400000, guid: 7b17282320db20e4fa46db46d420c849, type: 2}
-  - {fileID: 11400000, guid: c1483d1d102b8b84dafd86fa43c2c643, type: 2}
-  - {fileID: 11400000, guid: c90e50377dd4f034b841802263c984c3, type: 2}
-  - {fileID: 11400000, guid: 9b1dad70da20fd14da8ab11ba97c5bdd, type: 2}
-  - {fileID: 11400000, guid: b6e709b197a43684c989ffa3d8413565, type: 2}
-  - {fileID: 11400000, guid: 8143815d75cf5e146829c4d1af1dfaed, type: 2}
-  - {fileID: 11400000, guid: 4dfc1a01796967240a9ab273c73d9c03, type: 2}
-  - {fileID: 11400000, guid: fc1be9471ae9a36479e33acad7fb0aa9, type: 2}
-  - {fileID: 11400000, guid: 98f6b35a84ead0e479b05795f93dbec8, type: 2}
-  - {fileID: 11400000, guid: da2e9d91ab4c6bb4b87f2f118b7570f6, type: 2}
-  - {fileID: 11400000, guid: a487bde7b8fe1e44c89be4ff1d36e43e, type: 2}
---- !u!114 &1187911215741923973
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.TunnelVisionEffect
+  blurMaterial: {fileID: 2100000, guid: b3e528529f2696640846ded54576bdfc, type: 2}
+  tunnelVisionDefinition: {fileID: 11400000, guid: 7ea99e1b393cd6e4faceae8339660e0a, type: 2}
+--- !u!114 &4461017084329520170
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -960,10 +960,187 @@ MonoBehaviour:
   m_GameObject: {fileID: 8258282004123880317}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0e236edb117fd749b261408c1e91268, type: 3}
+  m_Script: {fileID: 11500000, guid: f2a5614de9882204ab0c0c2dd3c1f307, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerCreatureContactAttack
-  contactCooldown: 0.8
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PanicEffect
+  panicDefinition: {fileID: 11400000, guid: 5351c5c526f3cc148ae4da7cc314c478, type: 2}
+  dashSpeed: 7
+  dashDuration: 2
+  cooldown: 3
+  randomAngle: 30
+--- !u!114 &2539467558973441306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74a3289200a609e4f8b31ac317b0e045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.StatusEffectTester
+  dopamineRelease: {fileID: 11400000, guid: 5b61560198cae734184348c31f65cc5a, type: 2}
+--- !u!114 &3717247147293340529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdec51b2ec404e44cb444263f4a8a843, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.BerserkEffect
+  berserkDefinition: {fileID: 11400000, guid: c0dd5fe92fad8a348a2f4646d64eaa1b, type: 2}
+  detectionRadius: 5
+  dashSpeed: 7
+  stoppingDistance: 1.2
+--- !u!114 &4553001731044001113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 208e97a47409ecc459ada80408baced7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PressureMaladaptationEffect
+  oceanWorld: {fileID: 0}
+  useTestHabitat: 1
+  testAllowedHabitats: 0
+--- !u!114 &1841475437759172380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2222897173f6784693f44e10e366642, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.MudCoatingEffect
+  mudCoatingDefinition: {fileID: 11400000, guid: 954c832a54ebdd243882c54f59711951, type: 2}
+  enableTestKey: 1
+  showScreenEffect: 1
+  damagePercentPerSecond: 10
+--- !u!114 &3550283129862528974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f66ca4513aefc42987cfac41134276, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.DopamineVisualEffect
+  dopamineDefinition: {fileID: 11400000, guid: 5b61560198cae734184348c31f65cc5a, type: 2}
+  dopamineVolume: {fileID: 0}
+--- !u!114 &3387828546965028878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94ce73119bd785b44b7452f32b9fab4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.AssimilationShakeEffect
+  cameraFollow: {fileID: 0}
+  tunnelVision: {fileID: 11400000, guid: 7ea99e1b393cd6e4faceae8339660e0a, type: 2}
+  berserk: {fileID: 11400000, guid: c0dd5fe92fad8a348a2f4646d64eaa1b, type: 2}
+  panic: {fileID: 11400000, guid: 5351c5c526f3cc148ae4da7cc314c478, type: 2}
+  beatInterval: 0.85
+--- !u!114 &3857243708321578278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c1faab1eb36df54c9018b8abdff0f9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PlayerDamageShakeEffect
+  cameraFollow: {fileID: 0}
+--- !u!114 &7407789154703846171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 529f5c2eedafeb443a12fdd054757fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.FreezingEffect
+  freezingDefinition: {fileID: 11400000, guid: f3bc4f2094b475749a08434fddbd98c3, type: 2}
+  enableTestKey: 0
+  frozenTint: {r: 0.65, g: 0.85, b: 1, a: 1}
+--- !u!114 &8784220054850352270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caffff4772dc389428ccf958a1c60ae1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.AnoxiaEffect
+  enableTestKey: 0
+  anoxiaBubbleAnimation: {fileID: 0}
+--- !u!114 &6229979757139261874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8503165abfa9c5b4591f78c6cd16d689, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.ExhaustionEffect
+  exhaustionDefinition: {fileID: 11400000, guid: 7db89a17be7dfef4094595a6cdd8673b, type: 2}
+--- !u!114 &685834636763645069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 963e39660eb9cbc44a62ff5e97b907b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.BurnEffect
+  showScreenEffect: 1
+--- !u!114 &1608336687325080483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08f14cd833f7af143b8132fb3a2095b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.AssimilationDarkeningEffect
+  useTestValue: 0
+  testPercent: 0
 --- !u!1 &8312001107895383215
 GameObject:
   m_ObjectHideFlags: 0

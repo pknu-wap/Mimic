@@ -32,6 +32,7 @@ namespace MimicCell.Player
         private Rigidbody2D attachedRigidbody;
         private StatusEffectController statusEffectController;
         private Vector2 moveInput;
+        private AnoxiaEffect anoxiaEffect;
         private float headingAngle;
         private float headingVelocity;
         private bool isForcedMoving;
@@ -106,12 +107,12 @@ namespace MimicCell.Player
         {
             if (isForcedMoving)
             {
-                attachedRigidbody.linearVelocity = forcedMoveDirection * forcedMoveSpeed;
-                
+                attachedRigidbody.linearVelocity =
+                    forcedMoveDirection * forcedMoveSpeed;
                 return;
             }
             Vector2 velocity = attachedRigidbody.linearVelocity;
-            
+
 
             if (moveInput.sqrMagnitude > 0.001f)
             {
@@ -271,8 +272,16 @@ namespace MimicCell.Player
             }
         }
 
-        private static Vector2 ReadKeyboardMove()
+        private  Vector2 ReadKeyboardMove()
         {
+            if (anoxiaEffect == null)
+    anoxiaEffect = GetComponent<AnoxiaEffect>();
+
+if (anoxiaEffect != null &&
+    anoxiaEffect.TryReadMovement(out Vector2 anoxiaMove))
+{
+    return anoxiaMove;
+}
             Vector2 move = Vector2.zero;
 
 #if ENABLE_INPUT_SYSTEM
