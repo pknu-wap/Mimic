@@ -20,6 +20,9 @@ Shader "MimicCell/Burn Heat Distortion"
             float _MimicCellBurnScreenStrength;
             float _MimicCellPressureScreenStrength;
             float _MimicCellAssimilation;
+            float _MimicCellExhaustion;
+
+
 
             half4 ReadScreen(float2 uv)
             {
@@ -27,6 +30,9 @@ Shader "MimicCell/Burn Heat Distortion"
             }
 half4 ApplyAssimilationDarkening(half4 color, float2 screenUV)
 {
+
+  
+
     float assimilation = saturate(_MimicCellAssimilation);
 
     float amount = smoothstep(0.60, 0.95, assimilation);

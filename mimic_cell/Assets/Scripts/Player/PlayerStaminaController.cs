@@ -23,6 +23,10 @@ private float storedStaminaRatio = 1f;
         [SerializeField] private StatusEffectDefinition exhaustionDefinition;
         [SerializeField] private StatusEffectDefinition dopamineDefinition;
 private float lastSprintAt = float.NegativeInfinity;
+private static readonly int ExhaustionScreenId =
+    Shader.PropertyToID("_MimicCellExhaustion");
+
+private float exhaustionScreenStrength;
         [SerializeField, Min(0f)] private float baseFormSwimSpeed = 4f;
         
 private StatusEffectController statusController;
@@ -64,6 +68,9 @@ private void OnDisable()
 {
     if (formController != null)
         formController.FormChanged -= HandleFormChanged;
+
+          exhaustionScreenStrength = 0f;
+    Shader.SetGlobalFloat(ExhaustionScreenId, 0f);
 }
 
 private void HandleFormChanged(CreatureDefinition definition)
@@ -119,6 +126,12 @@ if (isSprintingType)
 
        private void LateUpdate()
 {
+    float targetStrength = health.IsAlive && IsExhausted ? 1f : 0f;
+
+exhaustionScreenStrength = Mathf.MoveTowards(
+    exhaustionScreenStrength, targetStrength, Time.deltaTime * 4f);
+
+Shader.SetGlobalFloat(ExhaustionScreenId, exhaustionScreenStrength);
     if (!health.IsAlive)
         return;
 
@@ -150,8 +163,7 @@ private void ApplyExhaustionIfDepleted()
    float calculatedDuration =
     Mathf.Abs((definition.SwimSpeed - baseFormSwimSpeed) * 0.8f) + 1f;
 
-float duration = Mathf.Max(3f, calculatedDuration * 2f);
-
+float duration = Mathf.Max(6f, calculatedDuration * 3f);
     statusController.ApplyEffect(exhaustionDefinition, duration);
 
     Debug.Log(

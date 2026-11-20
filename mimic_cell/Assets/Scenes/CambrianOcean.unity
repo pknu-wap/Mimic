@@ -711,6 +711,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1196324069}
+    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1196324096}
   m_SourcePrefab: {fileID: 100100000, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
 --- !u!4 &1196324024 stripped
 Transform:
@@ -774,7 +777,22 @@ MonoBehaviour:
   recoveryDelay: 0.3
   currentStamina: 0
   exhaustionDefinition: {fileID: 11400000, guid: 7db89a17be7dfef4094595a6cdd8673b, type: 2}
+  dopamineDefinition: {fileID: 11400000, guid: 5b61560198cae734184348c31f65cc5a, type: 2}
   baseFormSwimSpeed: 3
+--- !u!114 &1196324096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8711956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10e4bee484ba1334299e76f552a83d6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.ExhaustionBodyFlash
+  bodyRenderer: {fileID: 2118552994}
+  flashMaterial: {fileID: 2100000, guid: 929707b40ad565841952c98bd7cb0d9b, type: 2}
 --- !u!1 &1452000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -1046,6 +1064,11 @@ MonoBehaviour:
   ocean: {fileID: 1175212828}
   terrain: {fileID: 1452000003}
   cameraFollow: {fileID: 519420033}
+--- !u!212 &2118552994 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 375565811458019847, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+  m_PrefabInstance: {fileID: 1196324023}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
