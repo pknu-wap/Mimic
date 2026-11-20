@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Exhuastion
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.StatusEffectDefinition
   effectId: 
-  displayName: 
+  displayName: "\uD0C8\uC9C4"
   category: 1
   targetType: 0
   durationType: 0

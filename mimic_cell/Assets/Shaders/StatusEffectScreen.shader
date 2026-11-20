@@ -27,14 +27,16 @@ Shader "MimicCell/Burn Heat Distortion"
             }
 half4 ApplyAssimilationDarkening(half4 color, float2 screenUV)
 {
-float amount = smoothstep(0.60, 1.0, _MimicCellAssimilation);    
-float2 fromCenter = (screenUV - 0.5) * 2.0;
-    float edge = smoothstep(0.25, 1.2, length(fromCenter));
+    float assimilation = saturate(_MimicCellAssimilation);
 
-    float edgeDarkness = edge * amount * 0.55;
-float fullDarkness = smoothstep(0.0, 1.0, amount);
+    float amount = smoothstep(0.60, 0.95, assimilation);
+    float2 fromCenter = (screenUV - 0.5) * 2.0;
+    float edge = smoothstep(0.65, 1.3, length(fromCenter));
 
-color.rgb *= (1.0 - edgeDarkness) * (1.0 - fullDarkness);
+    float edgeDarkness = edge * amount * 0.25;
+    float fullDarkness = smoothstep(0.95, 1.0, assimilation);
+
+    color.rgb *= (1.0 - edgeDarkness) * (1.0 - fullDarkness);
     return color;
 }
             half4 Frag(Varyings input) : SV_Target
