@@ -221,7 +221,49 @@ lastSprintAt = Time.time;
 ApplyExhaustionIfDepleted();
 
 return !IsExhausted;
-}        public bool TrySpend(float amount)
+}        
+public bool TrySpendForAttack()
+{
+    if (formController == null)
+        return false;
+
+    CreatureDefinition definition = formController.CurrentDefinition;
+    if (definition == null)
+        return false;
+
+    float cost;
+
+    switch (definition.FoodTier)
+    {
+        case CreatureFoodTier.Tier2:
+            cost = 10f;
+            break;
+
+        case CreatureFoodTier.Tier3:
+            cost = 35f;
+            break;
+
+        default:
+            return false;
+    }
+
+    return TrySpend(cost);
+}
+
+[ContextMenu("Test Stamina - Attack Attempt")]
+private void TestAttackAttempt()
+{
+    if (!Application.isPlaying)
+        return;
+
+    bool succeeded = TrySpendForAttack();
+
+    Debug.Log(
+        $"[공격 스태미나] 공격 가능 {succeeded} · " +
+        $"잔량 {currentStamina:F1}/{maxStamina:F1}",
+        this);
+}
+public bool TrySpend(float amount)
         {
             if (!isActiveAndEnabled || health == null || !health.IsAlive ||
                 amount <= 0f || float.IsNaN(amount) || float.IsInfinity(amount))
