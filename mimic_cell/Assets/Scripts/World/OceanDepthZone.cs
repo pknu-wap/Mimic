@@ -33,6 +33,8 @@ namespace MimicCell.World
         public float BBBottomY { get; }
         public float BCBottomY { get; }
         public float SeabedY { get; }
+        // Virtual reference for the water bands; physical rock is owned by SeabedTerrainWorld.
+        public float DepthReferenceY { get { return SeabedY; } }
 
         public OceanDepthZone GetZone(float worldY)
         {

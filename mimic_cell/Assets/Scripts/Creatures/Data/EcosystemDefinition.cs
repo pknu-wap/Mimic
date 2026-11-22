@@ -133,6 +133,12 @@ namespace MimicCell.Creatures
         [SerializeField, Min(0.1f)]
         private float targetSpacing = 1.5f;
 
+        [SerializeField, Min(0.1f)]
+        private float roamDirectionMinDuration = 2f;
+
+        [SerializeField, Min(0.1f)]
+        private float roamDirectionMaxDuration = 4f;
+
         [SerializeField, Min(1f)]
         private float returnDistanceMultiplier = 3f;
 
@@ -150,6 +156,12 @@ namespace MimicCell.Creatures
 
         public float TargetSpacing => targetSpacing;
 
+        public float RoamDirectionMinDuration => 
+            roamDirectionMinDuration;
+
+        public float RoamDirectionMaxDuration =>
+            roamDirectionMaxDuration;
+
         public float ReturnDistance =>
             targetSpacing * returnDistanceMultiplier;
 
@@ -166,6 +178,12 @@ namespace MimicCell.Creatures
         public void Validate()
         {
             targetSpacing = Mathf.Max(0.1f, targetSpacing);
+
+            roamDirectionMinDuration =
+                Mathf.Max(0.1f, roamDirectionMinDuration);
+
+            roamDirectionMaxDuration =
+                Mathf.Max(roamDirectionMinDuration, roamDirectionMaxDuration);
 
             returnDistanceMultiplier =
                 Mathf.Max(1f, returnDistanceMultiplier);

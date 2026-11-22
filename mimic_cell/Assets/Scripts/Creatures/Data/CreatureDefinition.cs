@@ -2,6 +2,54 @@ using UnityEngine;
 
 namespace MimicCell.Creatures
 {
+    [System.Serializable]
+    public sealed class CreaturePlayerFormSettings
+    {
+        [SerializeField]
+        private Sprite sprite;
+
+        [SerializeField]
+        private Vector2 visualScale = Vector2.one;
+
+        [SerializeField]
+        private Vector2 colliderSize = Vector2.one;
+
+        [SerializeField]
+        private Vector2 colliderOffset = Vector2.zero;
+
+        [SerializeField]
+        private bool flipXToFaceRight = true;
+
+        public Sprite Sprite => sprite;
+
+        public Vector2 VisualScale => visualScale;
+
+        public Vector2 ColliderSize => colliderSize;
+
+        public Vector2 ColliderOffset => colliderOffset;
+
+        public bool FlipXToFaceRight =>
+            flipXToFaceRight;
+
+        public bool IsConfigured =>
+            sprite != null;
+
+        public void Validate()
+        {
+            visualScale.x =
+                Mathf.Max(0.01f, visualScale.x);
+
+            visualScale.y =
+                Mathf.Max(0.01f, visualScale.y);
+
+            colliderSize.x =
+                Mathf.Max(0.01f, colliderSize.x);
+
+            colliderSize.y =
+                Mathf.Max(0.01f, colliderSize.y);
+        }
+    }
+
     [CreateAssetMenu(
         fileName = "NewCreatureData",
         menuName = "Mimic/Creatures/Creature Definition")]
@@ -11,6 +59,10 @@ namespace MimicCell.Creatures
         [SerializeField] private string creatureId = "NewCreature";
         [SerializeField] private string displayName = "새 생물";
         [SerializeField] private GameObject prefab;
+
+        [Header("Player Form")]
+        [SerializeField]
+        private CreaturePlayerFormSettings playerForm = new CreaturePlayerFormSettings();
 
         [Header("Ecology")]
         [SerializeField]
@@ -67,6 +119,8 @@ namespace MimicCell.Creatures
 
         public GameObject Prefab => prefab;
 
+        public CreaturePlayerFormSettings PlayerForm => playerForm;
+
         public CreatureSpawnKind SpawnKind => spawnKind;
 
         public CreatureFoodTier FoodTier => foodTier;
@@ -121,6 +175,10 @@ namespace MimicCell.Creatures
             displayName = string.IsNullOrWhiteSpace(displayName)
                 ? creatureId
                 : displayName.Trim();
+
+            playerForm ??= new CreaturePlayerFormSettings();
+
+            playerForm.Validate();
 
             designSizeRange.Validate();
             healthRange.Validate(1);

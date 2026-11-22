@@ -16,6 +16,14 @@ namespace MimicCell.CameraSystem
         [SerializeField] private Vector2 maxBounds = new Vector2(20f, 8f);
 
         private Vector3 dampVelocity;
+        private const float ShakeDuration = 0.25f;
+private const float ShakeStrength = 0.06f;
+
+private const float DamageShakeDuration = 0.18f;
+private const float DamageShakeStrength = 0.32f;
+private float damageShakeRemaining;
+private float shakeRemaining;
+private Vector3 shakeOffset;
 
         private void OnValidate()
         {
@@ -32,7 +40,10 @@ namespace MimicCell.CameraSystem
         }
 
         private void LateUpdate()
-        {
+        { 
+            transform.position -= shakeOffset;
+    shakeOffset = Vector3.zero;
+
             if (target == null)
             {
                 return;
@@ -60,7 +71,51 @@ namespace MimicCell.CameraSystem
             }
 
             transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref dampVelocity, smoothTime);
-        }
+if (damageShakeRemaining > 0f)
+{
+    float fade = damageShakeRemaining / DamageShakeDuration;
+    shakeOffset = (Vector3)(Random.insideUnitCircle * DamageShakeStrength * fade);
+    transform.position += shakeOffset;
+    damageShakeRemaining = Mathf.Max(0f, damageShakeRemaining - Time.deltaTime);
+}
+else if (shakeRemaining > 0f){
+    float progress = 1f - shakeRemaining / ShakeDuration;
+    float fade = Mathf.Sin(progress * Mathf.PI);
+    float swing = Mathf.Sin(progress * Mathf.PI * 4f);
+
+    shakeOffset = new Vector3(
+        swing * fade * ShakeStrength,
+        swing * fade * ShakeStrength * 0.3f,
+        0f);
+
+    transform.position += shakeOffset;
+    shakeRemaining = Mathf.Max(0f, shakeRemaining - Time.deltaTime);
+}
+}
+public void PlayPressureShake()
+{
+    if (!isActiveAndEnabled || damageShakeRemaining > 0f)
+        return;
+
+    shakeRemaining = ShakeDuration;
+}
+
+public void PlayDamageShake()
+{
+    if (!isActiveAndEnabled)
+        return;
+
+    shakeRemaining = 0f;
+    damageShakeRemaining = DamageShakeDuration;
+}
+
+private void OnDisable()
+{
+    transform.position -= shakeOffset;
+    shakeOffset = Vector3.zero;
+    shakeRemaining = 0f;
+    damageShakeRemaining = 0f;
+}
 
         public void SetTarget(Transform newTarget)
         {
