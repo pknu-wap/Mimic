@@ -28,6 +28,7 @@ namespace MimicCell.Gameplay
         public event Action<ActorHealth, int> Damaged;
         public event Action<ActorHealth> Died;
         public event Action<ActorHealth> DamageTaken;
+        public event Action<ActorHealth, ActorDamageContext, int> DamageApplied;
 
         private void Awake()
         {
@@ -52,6 +53,16 @@ namespace MimicCell.Gameplay
 
         public bool TakeDamage(int amount)
         {
+            ActorDamageContext context =
+                new ActorDamageContext(amount, null, ActorDamageType.Unknown);
+
+            return TakeDamage(context);
+        }
+
+        public bool TakeDamage(ActorDamageContext context)
+        {
+            int amount = context.Amount;
+
             if (amount <= 0 || !IsAlive)
             {
                 return false;
@@ -65,8 +76,9 @@ namespace MimicCell.Gameplay
 
             HealthChanged?.Invoke(this);
             DamageTaken?.Invoke(this);
-
             Damaged?.Invoke(this, appliedDamage);
+
+            DamageApplied?.Invoke(this, context, appliedDamage);
 
             if (previousHealth > 0 && currentHealth == 0)
             {

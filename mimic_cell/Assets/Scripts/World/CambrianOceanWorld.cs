@@ -263,6 +263,44 @@ namespace MimicCell.World
             }
         }
 
+        public bool TryGetHabitatBottomY(CreatureHabitatMask allowedHabitats, float worldX, out float bottomY)
+        {
+            OceanColumnProfile column = GetColumnProfile(worldX);
+
+            if ((allowedHabitats & CreatureHabitatMask.OceanCC) != 0)
+            {
+                bottomY = GetSeabedY(worldX);
+                return true;
+            }
+
+            if ((allowedHabitats & CreatureHabitatMask.OceanBC) != 0)
+            {
+                bottomY = column.BCBottomY;
+                return true;
+            }
+
+            if ((allowedHabitats & CreatureHabitatMask.OceanBB) != 0)
+            {
+                bottomY = column.BBBottomY;
+                return true;
+            }
+
+            if ((allowedHabitats & CreatureHabitatMask.OceanAB) != 0)
+            {
+                bottomY = column.ABBottomY;
+                return true;
+            }
+
+            if ((allowedHabitats & CreatureHabitatMask.OceanAA) != 0)
+            {
+                bottomY = column.AABottomY;
+                return true;
+            }
+
+            bottomY = 0f;
+            return false;
+        }
+
         public float GetSeabedY(float worldX)
         {
             return terrainWorld != null ? terrainWorld.GetSurfaceY(worldX) : GetColumnProfile(worldX).SeabedY;

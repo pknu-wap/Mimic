@@ -18,7 +18,7 @@ namespace MimicCell.Player
 
         [Header("Colliders")]
         [SerializeField] private Collider2D baseCollider;
-        [SerializeField] private BoxCollider2D creatureFormCollider;
+        [SerializeField] private PolygonCollider2D creatureFormCollider;
 
         [Header("Base Combat")]
         [SerializeField, Min(0)] private int baseAttackDamage = 0;
@@ -29,8 +29,11 @@ namespace MimicCell.Player
         private float currentVariation;
         private Rigidbody2D attachedRigidbody;
         private PlayerMovementController movementController;
+        private PlayerCreatureTraitController traitController;
+        private CreatureCombatTraitController combatTraitController;
         private CreatureDefinition currentDefinition;
         public CreatureDefinition CurrentDefinition => currentDefinition;
+        public PolygonCollider2D CreatureFormCollider => creatureFormCollider;
         public bool IsCreatureForm => currentDefinition != null;
         public int CurrentAttackDamage => currentAttackDamage;
         public float CurrentVariation => currentVariation;
@@ -46,6 +49,10 @@ namespace MimicCell.Player
             attachedRigidbody = GetComponent<Rigidbody2D>();
 
             movementController = GetComponent<PlayerMovementController>();
+
+            traitController = GetComponent<PlayerCreatureTraitController>();
+
+            combatTraitController = GetComponent<CreatureCombatTraitController>();
 
             actorHealth = GetComponent<ActorHealth>();
 
@@ -94,6 +101,11 @@ namespace MimicCell.Player
 
             CreaturePlayerFormSettings form = definition.PlayerForm;
 
+            if (!ApplyCreatureCollider(definition))
+            {
+                return false;
+            }
+
             float variation = UnityEngine.Random.value;
 
             int newMaxHealth = definition.HealthRange.Evaluate(variation);
@@ -117,7 +129,8 @@ namespace MimicCell.Player
                     form.VisualScale.y,
                     1f);
 
-            creatureFormRenderer.flipX = form.FlipXToFaceRight;
+            creatureFormRenderer.flipX = false;
+            SetCreatureFacing(true, form);
 
             creatureFormAnimator.runtimeAnimatorController = form.MovementController;
             creatureFormAnimator.enabled = form.MovementController != null;
@@ -132,10 +145,6 @@ namespace MimicCell.Player
 
             baseCollider.enabled = false;
 
-            creatureFormCollider.size = form.ColliderSize;
-
-            creatureFormCollider.offset = form.ColliderOffset;
-
             creatureFormCollider.enabled = true;
 
             movementController.SetCreatureSpeed(definition.SwimSpeed);
@@ -148,13 +157,82 @@ namespace MimicCell.Player
 
             currentDefinition = definition;
 
+            if (combatTraitController != null)
+            {
+                combatTraitController.Configure(currentDefinition, currentVariation);
+            }
+
+            if (traitController != null)
+            {
+                traitController.ApplyTraits(currentDefinition);
+            }
+
             FormChanged?.Invoke(currentDefinition);
+
+            return true;
+        }
+
+        private bool ApplyCreatureCollider(CreatureDefinition definition)
+        {
+            CreatureController sourceCreature = definition.Prefab != null
+                    ? definition.Prefab.GetComponent<CreatureController>()
+                    : null;
+
+            PolygonCollider2D sourceCollider = sourceCreature != null
+                    ? sourceCreature.BodyCollider
+                    : null;
+
+            if (sourceCollider == null)
+            {
+                Debug.LogWarning(
+                    "Creature body PolygonCollider2D is missing: " +
+                    definition.DisplayName,
+                    this);
+
+                return false;
+            }
+
+            creatureFormCollider.pathCount = sourceCollider.pathCount;
+
+            Vector2 colliderOffset = sourceCollider.offset;
+
+            colliderOffset.x *= -1f;
+
+            creatureFormCollider.offset = colliderOffset;
+
+            creatureFormCollider.useDelaunayMesh = sourceCollider.useDelaunayMesh;
+
+            for (int pathIndex = 0;
+                 pathIndex < sourceCollider.pathCount;
+                 pathIndex++)
+            {
+                Vector2[] path = sourceCollider.GetPath(pathIndex);
+
+                for (int pointIndex = 0;
+                     pointIndex < path.Length;
+                     pointIndex++)
+                {
+                    path[pointIndex].x *= -1f;
+                }
+
+                creatureFormCollider.SetPath(pathIndex, path);
+            }
 
             return true;
         }
 
         public void RestoreBaseForm()
         {
+            if (traitController != null)
+            {
+                traitController.ClearTraits();
+            }
+
+            if (combatTraitController != null)
+            {
+                combatTraitController.Clear();
+            }
+
             currentDefinition = null;
 
             creatureFormAnimator.enabled = false;
@@ -179,6 +257,21 @@ namespace MimicCell.Player
             FormChanged?.Invoke(null);
         }
 
+        private void SetCreatureFacing(bool facingRight, CreaturePlayerFormSettings form)
+        {
+            bool shouldFlip = facingRight
+                    ? form.FlipXToFaceRight
+                    : !form.FlipXToFaceRight;
+
+            Vector3 visualScale = creatureFormRenderer.transform.localScale;
+
+            visualScale.x = Mathf.Abs(visualScale.x) * (shouldFlip ? -1f : 1f);
+
+            creatureFormRenderer.transform.localScale = visualScale;
+
+            creatureFormRenderer.flipX = false;
+        }
+
         private void LateUpdate()
         {
             if (!IsCreatureForm || attachedRigidbody == null)
@@ -197,12 +290,7 @@ namespace MimicCell.Player
 
             bool movingRight = horizontalVelocity > 0f;
 
-            bool flipToFaceRight = currentDefinition.PlayerForm.FlipXToFaceRight;
-
-            creatureFormRenderer.flipX =
-                movingRight
-                    ? flipToFaceRight
-                    : !flipToFaceRight;
+            SetCreatureFacing(movingRight, currentDefinition.PlayerForm);
         }
     }
 }

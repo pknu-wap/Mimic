@@ -1,5 +1,6 @@
 using MimicCell.Creatures;
 using UnityEngine;
+using MimicCell.Gameplay;
 
 namespace MimicCell.Player
 {
@@ -34,6 +35,11 @@ namespace MimicCell.Player
                 return;
             }
 
+            if (!CreatureColliderRole.IsBodyCollider(other))
+            {
+                return;
+            }
+
             if (!player.IsCreatureForm)
             {
                 return;
@@ -63,7 +69,13 @@ namespace MimicCell.Player
                 target.CurrentFoodTier,
                 target.CurrentTraits);
 
-            if (target.Health.TakeDamage(finalDamage))
+            ActorDamageContext damageContext =
+                new ActorDamageContext(
+                    finalDamage,
+                    player.Health,
+                    ActorDamageType.Contact);
+
+            if (target.Health.TakeDamage(damageContext))
             {
                 Debug.Log(
                     "복제 몬스터 공격 성공: " +
