@@ -31,6 +31,7 @@ namespace MimicCell.Player
 
         private Rigidbody2D attachedRigidbody;
         private StatusEffectController statusEffectController;
+        private PlayerStaminaController staminaController;
         private Vector2 moveInput;
         private AnoxiaEffect anoxiaEffect;
         private float headingAngle;
@@ -49,6 +50,7 @@ namespace MimicCell.Player
             attachedRigidbody = GetComponent<Rigidbody2D>();
             
             statusEffectController = GetComponent<StatusEffectController>();
+            staminaController = GetComponent<PlayerStaminaController>();
             
             actorHealth = GetComponent<ActorHealth>();
 
@@ -97,6 +99,20 @@ namespace MimicCell.Player
             StopMovement();
         }
 
+private static bool IsShiftHeld()
+{
+#if ENABLE_INPUT_SYSTEM
+    var keyboard = Keyboard.current;
+    return keyboard != null &&
+           (keyboard.leftShiftKey.isPressed ||
+            keyboard.rightShiftKey.isPressed);
+#elif ENABLE_LEGACY_INPUT_MANAGER
+    return Input.GetKey(KeyCode.LeftShift) ||
+           Input.GetKey(KeyCode.RightShift);
+#else
+    return false;
+#endif
+}
         private void Update()
         {
             moveInput = ReadKeyboardMove();
@@ -112,6 +128,11 @@ namespace MimicCell.Player
                 return;
             }
             Vector2 velocity = attachedRigidbody.linearVelocity;
+
+            bool wantsSprint = IsShiftHeld() && moveInput.sqrMagnitude > 0.001f;
+
+if (!wantsSprint && staminaController != null)
+    staminaController.ReleaseSprint();
 
 
             if (moveInput.sqrMagnitude > 0.001f)
@@ -131,12 +152,24 @@ namespace MimicCell.Player
 
                 float traitSpeedMultiplier = GetSprintingSpeedMultiplier();
 
-                float finalSwimSpeed = swimSpeed * speedMultiplier * traitSpeedMultiplier;
+CreatureDefinition definition = formController != null
+    ? formController.CurrentDefinition
+    : null;
 
+bool sprinting = wantsSprint &&
+    definition != null &&
+    staminaController != null &&
+    staminaController.TrySprint(Time.fixedDeltaTime);
+
+float movementSpeed = sprinting
+    ? definition.SprintSpeed
+    : swimSpeed;
+
+float finalSwimSpeed =
+    movementSpeed * speedMultiplier * traitSpeedMultiplier;
                 if (Mathf.Abs(speedMultiplier - 1f) > 0.001f)
                 {
-                    Debug.Log("도파민 적용 중! 최대 이동속도: " + finalSwimSpeed);
-                }
+Debug.Log("상태이상 속도 보정 중 · 최대 이동속도: " + finalSwimSpeed);                }
 
                 velocity = Vector2.ClampMagnitude(velocity, finalSwimSpeed);
             }
