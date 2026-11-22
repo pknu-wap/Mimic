@@ -9,6 +9,9 @@ namespace MimicCell.Creatures
         private Sprite sprite;
 
         [SerializeField]
+        private RuntimeAnimatorController movementController;
+
+        [SerializeField]
         private Vector2 visualScale = Vector2.one;
 
         [SerializeField]
@@ -21,6 +24,8 @@ namespace MimicCell.Creatures
         private bool flipXToFaceRight = true;
 
         public Sprite Sprite => sprite;
+
+        public RuntimeAnimatorController MovementController => movementController;
 
         public Vector2 VisualScale => visualScale;
 

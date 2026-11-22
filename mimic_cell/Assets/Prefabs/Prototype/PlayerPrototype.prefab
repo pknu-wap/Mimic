@@ -101,6 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5682004573302582175}
   - component: {fileID: 375565811458019847}
+  - component: {fileID: 1055669671014761362}
   m_Layer: 0
   m_Name: CreatureFormVisual
   m_TagString: Untagged
@@ -182,6 +183,28 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
+--- !u!95 &1055669671014761362
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 479215617225678523}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1608280221626086780
 GameObject:
   m_ObjectHideFlags: 0
@@ -215,59 +238,6 @@ Transform:
   - {fileID: 6310024010803169380}
   m_Father: {fileID: 5270640567023923783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &6310024010803169379
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6310024010803169380}
-  - component: {fileID: 6310024010803169381}
-  m_Layer: 0
-  m_Name: Tentacle Aim
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6310024010803169380
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6310024010803169379}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 443478555875500913}
-  - {fileID: 3700055706403466707}
-  - {fileID: 2858970063871305406}
-  - {fileID: 4089249121876393094}
-  - {fileID: 1319961253938493012}
-  m_Father: {fileID: 54910889850090819}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6310024010803169381
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6310024010803169379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db2c595ea7704e72a513f05592c480b6, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleStrike
-  windup: 0.28
-  lash: 0.12
-  retract: 0.45
-  bodyLean: 0.22
 --- !u!210 &2782922287327151865
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -496,6 +466,59 @@ Transform:
   - {fileID: 2728273293877189270}
   m_Father: {fileID: 6310024010803169380}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6310024010803169379
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6310024010803169380}
+  - component: {fileID: 6310024010803169381}
+  m_Layer: 0
+  m_Name: Tentacle Aim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6310024010803169380
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6310024010803169379}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 443478555875500913}
+  - {fileID: 3700055706403466707}
+  - {fileID: 2858970063871305406}
+  - {fileID: 4089249121876393094}
+  - {fileID: 1319961253938493012}
+  m_Father: {fileID: 54910889850090819}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6310024010803169381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6310024010803169379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db2c595ea7704e72a513f05592c480b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleStrike
+  windup: 0.28
+  lash: 0.12
+  retract: 0.45
+  bodyLean: 0.22
 --- !u!1 &7775672073312203066
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,7 +848,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 17ccca83d25c4e53a41999d0c22be346, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerDnaExtraction
   extractionRange: 6
 --- !u!114 &9003527612338714761
@@ -855,6 +878,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerCreatureFormController
   baseVisualRoot: {fileID: 1608280221626086780}
   creatureFormRenderer: {fileID: 375565811458019847}
+  creatureFormAnimator: {fileID: 1055669671014761362}
   baseCollider: {fileID: 8625969747926017587}
   creatureFormCollider: {fileID: -7109796891368331952}
   baseAttackDamage: 0
@@ -977,7 +1001,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PressureMaladaptationEffect
   oceanWorld: {fileID: 0}
-  useTestHabitat: 1
+  useTestHabitat: 0
   testAllowedHabitats: 0
 --- !u!114 &1841475437759172380
 MonoBehaviour:
@@ -1118,7 +1142,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e14c055f9c863ac4ebd4600caea9034d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerCreatureFormDebugTester
   testForms:
   - {fileID: 11400000, guid: a4f7d7e42c45fcb4881863cf16961b9a, type: 2}
@@ -1146,7 +1170,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0e236edb117fd749b261408c1e91268, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerCreatureContactAttack
   contactCooldown: 0.8
 --- !u!1 &8312001107895383215

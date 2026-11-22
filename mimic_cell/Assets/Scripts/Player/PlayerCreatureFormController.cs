@@ -14,6 +14,7 @@ namespace MimicCell.Player
         [Header("Visuals")]
         [SerializeField] private GameObject baseVisualRoot;
         [SerializeField] private SpriteRenderer creatureFormRenderer;
+        [SerializeField] private Animator creatureFormAnimator;
 
         [Header("Colliders")]
         [SerializeField] private Collider2D baseCollider;
@@ -56,6 +57,7 @@ namespace MimicCell.Player
 
             if (baseVisualRoot == null ||
                 creatureFormRenderer == null ||
+                creatureFormAnimator == null ||
                 baseCollider == null ||
                 creatureFormCollider == null)
             {
@@ -68,6 +70,9 @@ namespace MimicCell.Player
             }
 
             baseVisualRoot.SetActive(true);
+
+            creatureFormAnimator.enabled = false;
+            creatureFormAnimator.runtimeAnimatorController = null;
             creatureFormRenderer.gameObject.SetActive(false);
 
             baseCollider.enabled = true;
@@ -97,6 +102,9 @@ namespace MimicCell.Player
 
             baseVisualRoot.SetActive(false);
 
+            creatureFormAnimator.enabled = false;
+            creatureFormAnimator.runtimeAnimatorController = null;
+
             creatureFormRenderer.sprite = form.Sprite;
 
             creatureFormRenderer.transform.localPosition = Vector3.zero;
@@ -111,7 +119,16 @@ namespace MimicCell.Player
 
             creatureFormRenderer.flipX = form.FlipXToFaceRight;
 
+            creatureFormAnimator.runtimeAnimatorController = form.MovementController;
+            creatureFormAnimator.enabled = form.MovementController != null;
+
             creatureFormRenderer.gameObject.SetActive(true);
+
+            if (creatureFormAnimator.enabled)
+            {
+                creatureFormAnimator.Rebind();
+                creatureFormAnimator.Update(0f);
+            }
 
             baseCollider.enabled = false;
 
@@ -139,6 +156,9 @@ namespace MimicCell.Player
         public void RestoreBaseForm()
         {
             currentDefinition = null;
+
+            creatureFormAnimator.enabled = false;
+            creatureFormAnimator.runtimeAnimatorController = null;
 
             creatureFormRenderer.gameObject.SetActive(false);
             creatureFormRenderer.sprite = null;

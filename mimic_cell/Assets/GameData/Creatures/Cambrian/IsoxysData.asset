@@ -17,6 +17,7 @@ MonoBehaviour:
   prefab: {fileID: 4854711201897119062, guid: 652c27dabfd63af489ba53c04328eb4d, type: 3}
   playerForm:
     sprite: {fileID: 21300000, guid: d3e963bae82201b4891dec28ff0a91aa, type: 3}
+    movementController: {fileID: 9100000, guid: f73598ad307fb7a468598679be627122, type: 2}
     visualScale: {x: 2.31, y: 2.31}
     colliderSize: {x: 7.92, y: 5.94}
     colliderOffset: {x: 0, y: 0}

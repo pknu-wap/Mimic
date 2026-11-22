@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ecd253f0c0d5c5c4884117fed6a82f13
+guid: 45c86211c8391944497726bfc558306c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1784782533756910241
-    second: 1111_0
+      213: 7775969405660293576
+    second: Myllokunmingia_move3_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 1111_0
+      name: Myllokunmingia_move3_0
       rect:
         serializedVersion: 2
-        x: 223
-        y: 410
-        width: 94
-        height: 104
-      alignment: 9
-      pivot: {x: 0.39264637, y: 0.7221234}
+        x: 67
+        y: 254
+        width: 635
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f550912edbd2b37e0800000000000000
-      internalID: -1784782533756910241
+      spriteID: 8c9efa0c9fac9eb60800000000000000
+      internalID: 7775969405660293576
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: d95bb1bc7b9bbbd449042de251795dde
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      1111_0: -1784782533756910241
+      Myllokunmingia_move3_0: 7775969405660293576
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
