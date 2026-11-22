@@ -53,9 +53,14 @@ namespace MimicCell.Creatures
         [SerializeField] private CreatureState currentState;
 
         private Rigidbody2D attachedRigidbody;
-        private Collider2D attachedCollider;
+        [SerializeField] private Collider2D attachedCollider;
         private ActorHealth actorHealth;
         private PrototypePlayer player;
+
+        private CreatureMovementTraitController movementTraitController;
+
+        private CreaturePerceptionTraitController perceptionTraitController;
+        private CreatureCombatTraitController combatTraitController;
 
         private CreatureDefinition definition;
         private EcosystemDefinition ecosystem;
@@ -74,6 +79,7 @@ namespace MimicCell.Creatures
 
         private float stateTimeRemaining;
         private float decisionTimeRemaining;
+        private float behaviorMemoryTimeRemaining;
         private float contactCooldownRemaining;
         private float sprintingSpeedBoostEndTime;
         private bool extinctionFrenzy;
@@ -98,6 +104,14 @@ namespace MimicCell.Creatures
         public ActorHealth Health
         {
             get { return actorHealth; }
+        }
+
+        public PolygonCollider2D BodyCollider
+        {
+            get
+            {
+                return attachedCollider as PolygonCollider2D;
+            }
         }
 
         public CreatureFoodTier CurrentFoodTier
@@ -195,6 +209,9 @@ namespace MimicCell.Creatures
             }
 
             contactCooldownRemaining = Mathf.Max(0f, contactCooldownRemaining - Time.deltaTime);
+
+            behaviorMemoryTimeRemaining = Mathf.Max(0f, behaviorMemoryTimeRemaining - Time.deltaTime);
+
             if (extinctionFrenzy)
             {
                 extinctionWanderTime -= Time.deltaTime;
@@ -233,6 +250,16 @@ namespace MimicCell.Creatures
             }
 
             Vector2 movementDirection = GetMovementDirection();
+
+            if (movementTraitController != null)
+            {
+                movementDirection =
+                    movementTraitController.AdjustDirection(
+                        movementDirection,
+                        attachedRigidbody.position,
+                        attachedCollider.bounds.extents.y);
+            }
+
             movementDirection = KeepDirectionInsideBounds(movementDirection);
 
             float currentSpeed = GetCurrentSpeed();
@@ -296,7 +323,23 @@ namespace MimicCell.Creatures
             environment = newEnvironment;
             player = targetPlayer;
 
+            if (movementTraitController != null)
+            {
+                movementTraitController.Configure(definition.Traits, definition.AllowedHabitats, environment);
+            }
+
+            if (perceptionTraitController != null)
+            {
+                perceptionTraitController.Configure(definition.Traits, ecosystem.PerceptionSettings);
+            }
+
             instanceVariation = spawnContext.Variation;
+
+            if (combatTraitController != null)
+            {
+                combatTraitController.Configure(definition, instanceVariation);
+            }
+
             spawnRegionId = spawnContext.RegionId;
             spawnStableSeed = spawnContext.StableSeed;
 
@@ -426,10 +469,17 @@ namespace MimicCell.Creatures
                 0.1f,
                 definition.WanderRadius);
 
-            perceptionRadius =
+            float basePerceptionRadius =
                 definition.GetPerceptionRadius(
                     ecosystem.PerceptionSettings
                         .CommonPerceptionRadius);
+
+            perceptionRadius =
+                perceptionTraitController != null
+                    ? perceptionTraitController
+                        .AdjustPerceptionRadius(
+                            basePerceptionRadius)
+                    : basePerceptionRadius;
 
             decisionInterval = Mathf.Max(
                 0.02f,
@@ -557,6 +607,7 @@ namespace MimicCell.Creatures
                     coldPursuitMemory = 1.2f;
                 }
 
+                RefreshBehaviorMemory(CreatureState.Flee);
                 SetState(CreatureState.Flee);
                 return;
             }
@@ -572,6 +623,7 @@ namespace MimicCell.Creatures
                     coldPursuitMemory = 1.2f;
                 }
 
+                RefreshBehaviorMemory(CreatureState.Chase);
                 SetState(CreatureState.Chase);
                 return;
             }
@@ -604,10 +656,20 @@ namespace MimicCell.Creatures
                 return;
             }
 
+            if ((CurrentState == CreatureState.Chase ||
+                 CurrentState == CreatureState.Flee) &&
+                behaviorMemoryTimeRemaining > 0f &&
+                currentFoodChainTarget.IsValid)
+            {
+                return;
+            }
+
+            behaviorMemoryTimeRemaining = 0f;
             coldPrey = null;
             currentFoodChainTarget = default;
 
-            if (CurrentState == CreatureState.Chase || CurrentState == CreatureState.Flee)
+            if (CurrentState == CreatureState.Chase ||
+                CurrentState == CreatureState.Flee)
             {
                 BeginWanderCycle();
             }
@@ -681,8 +743,7 @@ namespace MimicCell.Creatures
             }
         }
 
-        private Vector2 DirectionToFoodChainTarget(
-    Vector2 currentPosition)
+        private Vector2 DirectionToFoodChainTarget(Vector2 currentPosition)
         {
             if (coldPrey != null &&
                 coldPrey.CurrentState !=
@@ -756,6 +817,13 @@ namespace MimicCell.Creatures
                     : 1f;
 
             return stateSpeed * statusSpeedMultiplier * traitSpeedMultiplier;
+        }
+
+        private void RefreshBehaviorMemory(CreatureState behaviorState)
+        {
+            behaviorMemoryTimeRemaining = perceptionTraitController != null
+                    ? perceptionTraitController.GetBehaviorMemoryDuration(CurrentFoodTier, behaviorState)
+                    : 0f;
         }
 
         private void BeginWanderCycle()
@@ -916,12 +984,27 @@ namespace MimicCell.Creatures
 
             if (attachedCollider == null)
             {
-                attachedCollider = GetComponent<Collider2D>();
+                attachedCollider = GetComponentInChildren<Collider2D>(true);
             }
 
             if (actorHealth == null)
             {
                 actorHealth = GetComponent<ActorHealth>();
+            }
+
+            if (movementTraitController == null)
+            {
+                movementTraitController = GetComponent<CreatureMovementTraitController>();
+            }
+
+            if (perceptionTraitController == null)
+            {
+                perceptionTraitController = GetComponent<CreaturePerceptionTraitController>();
+            }
+
+            if (combatTraitController == null)
+            {
+                combatTraitController = GetComponent<CreatureCombatTraitController>();
             }
 
             ResolveVisualRoot();
@@ -932,6 +1015,11 @@ namespace MimicCell.Creatures
             if (CurrentState == CreatureState.Dead ||
                 contactCooldownRemaining > 0f ||
                 contactDamage <= 0)
+            {
+                return;
+            }
+
+            if (!CreatureColliderRole.IsBodyCollider(other))
             {
                 return;
             }
@@ -950,7 +1038,13 @@ namespace MimicCell.Creatures
                         coldPrey.CurrentFoodTier,
                         coldPrey.CurrentTraits);
 
-                if (preyHealth != null && preyHealth.TakeDamage(coldDamage))
+                ActorDamageContext coldDamageContext =
+                    new ActorDamageContext(
+                        coldDamage,
+                        actorHealth,
+                        ActorDamageType.Contact);
+
+                if (preyHealth != null && preyHealth.TakeDamage(coldDamageContext))
                 {
                     contactCooldownRemaining = contactCooldown;
                 }
@@ -987,7 +1081,13 @@ namespace MimicCell.Creatures
                     hitTarget.FoodTier,
                     hitTarget.Traits);
 
-            if (hitTarget.Health.TakeDamage(finalDamage))
+            ActorDamageContext damageContext =
+                new ActorDamageContext(
+                    finalDamage,
+                    actorHealth,
+                    ActorDamageType.Contact);
+
+            if (hitTarget.Health.TakeDamage(damageContext))
             {
                 if (hitTarget.Owner is PrototypePlayer)
                 {

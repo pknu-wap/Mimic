@@ -9,20 +9,16 @@ namespace MimicCell.Creatures
 
         event Action<int> RegionDeactivated;
 
-        CreatureHabitatMask GetHabitatAt(
-            Vector2 worldPosition);
+        bool TryGetHabitatBottomY(CreatureHabitatMask allowedHabitats, float worldX, out float bottomY);
 
-        bool IsInsidePlayableArea(
-            Vector2 worldPosition);
+        CreatureHabitatMask GetHabitatAt(Vector2 worldPosition);
 
-        int GetRegionId(
-            Vector2 worldPosition);
+        bool IsInsidePlayableArea(Vector2 worldPosition);
 
-        int GetStableRegionSeed(
-            Vector2 worldPosition);
+        int GetRegionId(Vector2 worldPosition);
 
-        bool TryGetActiveRegionRoot(
-            Vector2 worldPosition,
-            out Transform regionRoot);
+        int GetStableRegionSeed(Vector2 worldPosition);
+
+        bool TryGetActiveRegionRoot(Vector2 worldPosition, out Transform regionRoot);
     }
 }
