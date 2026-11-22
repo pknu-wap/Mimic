@@ -73,51 +73,49 @@ public void SetOwnerType(StatusEffectTarget type)
         }
 
         // 상태이상 적용
-        public void ApplyEffect(StatusEffectDefinition effect)
-        {
-            if (effect == null)
-            {
-                Debug.LogWarning("적용할 상태이상 데이터가 없습니다.");
-                return;
-            }
-            // 상태이상의 적용 대상이 맞는지 확인
-if (effect.TargetType != StatusEffectTarget.Both &&
-    effect.TargetType != ownerType)
+       public void ApplyEffect(StatusEffectDefinition effect)
 {
-    Debug.LogWarning(
-        effect.DisplayName + "은(는) 이 대상에게 적용할 수 없습니다."
-    );
-    return;
+    ApplyEffect(effect, effect != null ? effect.Duration : 0f);
 }
 
-            // 이미 적용된 상태이상인지 확인
-            ActiveStatusEffect existing = FindEffect(effect);
+public void ApplyEffect(StatusEffectDefinition effect, float duration)
+{
+    if (effect == null)
+    {
+        Debug.LogWarning("적용할 상태이상 데이터가 없습니다.");
+        return;
+    }
 
-            if (existing != null)
-            {
-                // 같은 상태이상은 중복 생성하지 않고 지속시간 갱신
-                existing.remainingTime = effect.Duration;
-                return;
-            }
+    if (effect.TargetType != StatusEffectTarget.Both &&
+        effect.TargetType != ownerType)
+    {
+        Debug.LogWarning(
+            effect.DisplayName + "은(는) 이 대상에게 적용할 수 없습니다.");
+        return;
+    }
 
-            // 지속시간이 0인 고정 상태이상은 적용하지 않음
-            if (effect.DurationType ==
-                StatusEffectDurationType.FixedDuration &&
-                effect.Duration <= 0f)
-            {
-                return;
-            }
+    if (effect.DurationType == StatusEffectDurationType.FixedDuration &&
+        (duration <= 0f || float.IsNaN(duration) || float.IsInfinity(duration)))
+    {
+        return;
+    }
 
-            // 새로운 상태이상 추가
-            ActiveStatusEffect newEffect =
-                new ActiveStatusEffect(effect);
+    ActiveStatusEffect existing = FindEffect(effect);
 
-            activeEffects.Add(newEffect);
+    if (existing != null)
+    {
+        existing.remainingTime = duration;
+        return;
+    }
 
-            EffectApplied?.Invoke(effect);
+    ActiveStatusEffect newEffect = new ActiveStatusEffect(effect);
+    newEffect.remainingTime = duration;
 
-            Debug.Log(effect.DisplayName + " 상태이상 적용!");
-        }
+    activeEffects.Add(newEffect);
+    EffectApplied?.Invoke(effect);
+
+    Debug.Log(effect.DisplayName + " 상태이상 적용!");
+}
 
         // 특정 상태이상 해제
         public void RemoveEffect(StatusEffectDefinition effect)

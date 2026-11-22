@@ -117,6 +117,10 @@ namespace MimicCell.World
         public float ChunkWidth { get { return chunkWidth; } }
         public int ActiveChunkRadius { get { return activeChunkRadius; } }
 
+        internal Camera StreamingCamera => streamingCamera;
+        internal Color SurfaceTint => aaColor;
+        internal Material WaterMaterial => oceanMaterial;
+
         public void RegisterTerrain(SeabedTerrainWorld terrain)
         {
             terrainWorld = terrain;
@@ -382,7 +386,10 @@ namespace MimicCell.World
                 : verticalMargin * (16f / 9f);
 
             minBounds = new Vector2(worldMinX + horizontalMargin, worldMinY + verticalMargin);
-            maxBounds = new Vector2(worldMaxX - horizontalMargin, surfaceY - verticalMargin);
+            float cameraCeiling = TryGetComponent(out CambrianOceanSurface surface) && surface.enabled
+                ? surfaceY
+                : surfaceY - verticalMargin;
+            maxBounds = new Vector2(worldMaxX - horizontalMargin, cameraCeiling);
         }
 
         private void InitializeIfNeeded()

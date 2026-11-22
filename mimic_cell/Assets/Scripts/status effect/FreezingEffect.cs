@@ -13,7 +13,6 @@ namespace MimicCell.StatusEffects
     {
         private const int DurationSeconds = 4;
         private const int DamagePercent = 8;
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
         [SerializeField] private StatusEffectDefinition freezingDefinition;
         [SerializeField] private bool enableTestKey;
@@ -22,8 +21,6 @@ namespace MimicCell.StatusEffects
 
         private readonly Dictionary<SpriteRenderer, Color> originalSpriteColors =
             new Dictionary<SpriteRenderer, Color>();
-        private readonly Dictionary<Material, Color> originalMeshColors =
-            new Dictionary<Material, Color>();
 
         private ActorHealth health;
         private StatusEffectController statusController;
@@ -66,12 +63,12 @@ private float nextDamageAt;
             if (!statusController.HasEffect(freezingDefinition))
                 return;
 
-               frozen = true;
-    nextDamageAt = Time.time + 1f;
-    releaseAt = Time.time + DurationSeconds;
-    damageRemainder = 0;
-}
-        
+            frozen = true;
+            nextDamageAt = Time.time + 1f;
+            releaseAt = Time.time + DurationSeconds;
+            damageRemainder = 0;
+            ApplySpriteTint();
+        }
 
         private void Update()
         {
@@ -112,35 +109,12 @@ private float nextDamageAt;
         EndFreezing();
 }
 
-        private void LateUpdate()
+        private void ApplySpriteTint()
         {
-            if (!frozen)
-                return;
-
-            foreach (SpriteRenderer sprite in GetComponentsInChildren<SpriteRenderer>())
+            foreach (SpriteRenderer sprite in GetComponentsInChildren<SpriteRenderer>(true))
             {
-                if (originalSpriteColors.ContainsKey(sprite))
-                    continue;
-
                 originalSpriteColors.Add(sprite, sprite.color);
                 sprite.color = ApplyTint(sprite.color);
-            }
-
-            foreach (MeshRenderer mesh in GetComponentsInChildren<MeshRenderer>())
-            {
-                // PlayerJellyVisual이 생성한 전용 머티리얼만 색을 바꾼다.
-                if (mesh.gameObject.name != "Fluid Pudding Mesh" &&
-                    mesh.gameObject.name != "Rope Physics Mesh")
-                    continue;
-
-                Material material = mesh.sharedMaterial;
-                if (material == null || !material.HasProperty(ColorProperty) ||
-                    originalMeshColors.ContainsKey(material))
-                    continue;
-
-                Color original = material.GetColor(ColorProperty);
-                originalMeshColors.Add(material, original);
-                material.SetColor(ColorProperty, ApplyTint(original));
             }
         }
 
@@ -163,17 +137,15 @@ private float nextDamageAt;
             foreach (var entry in originalSpriteColors)
             {
                 if (entry.Key != null)
-                    entry.Key.color = entry.Value;
-            }
-
-            foreach (var entry in originalMeshColors)
-            {
-                if (entry.Key != null)
-                    entry.Key.SetColor(ColorProperty, entry.Value);
+                {
+                    // The extraction animation can change the sprite's opacity while it is frozen.
+                    Color original = entry.Value;
+                    original.a = entry.Key.color.a;
+                    entry.Key.color = original;
+                }
             }
 
             originalSpriteColors.Clear();
-            originalMeshColors.Clear();
 
             if (statusController != null)
                 statusController.RemoveEffect(freezingDefinition);
