@@ -10,9 +10,9 @@ namespace MimicCell.Player
         [SerializeField, Min(0.01f)] private float lash = 0.12f;
         [SerializeField, Min(0.01f)] private float retract = 0.45f;
         [SerializeField, Min(0f)] private float bodyLean = 0.22f;
+        [SerializeField] private PlayerExtractionTentacleVisual extractionVisual;
 
         private const float ContactHold = 0.05f;
-        private PlayerJellyVisual jelly;
         private Vector3 restPosition;
         private Quaternion restRotation;
         private Quaternion lastAimRotation;
@@ -25,15 +25,13 @@ namespace MimicCell.Player
 
         private void Awake()
         {
-            jelly = GetComponentInParent<PlayerJellyVisual>();
             restPosition = transform.localPosition;
             restRotation = transform.localRotation;
         }
 
         public bool Play(Vector2 point)
         {
-            if (!isActiveAndEnabled || jelly == null ||
-                !jelly.TryGetExtractionAttachmentDirection(out _))
+            if (!isActiveAndEnabled || extractionVisual == null || !extractionVisual.TryGetAttachmentDirection(out _))
             {
                 return false;
             }
@@ -55,7 +53,7 @@ namespace MimicCell.Player
             }
 
             float elapsed = Time.time - startedAt;
-            if (elapsed >= ImpactTime + RecoveryTime)
+            if (extractionVisual == null || elapsed >= ImpactTime + RecoveryTime)
             {
                 Cancel();
                 return;
@@ -75,11 +73,11 @@ namespace MimicCell.Player
             {
                 transform.localRotation = Quaternion.Slerp(lastAimRotation, restRotation, 1f - released);
             }
-            else if (direction.sqrMagnitude > 0.0001f &&
-                jelly.TryGetExtractionAttachmentDirection(out Vector2 attachment))
+            else if (direction.sqrMagnitude > 0.0001f && extractionVisual.TryGetAttachmentDirection(out Vector2 attachment))
             {
                 Quaternion currentRotation = transform.localRotation;
-                float angle = Vector2.SignedAngle(attachment, direction);
+                float angle = Vector2.SignedAngle(transform.parent.InverseTransformVector(attachment),
+                    transform.parent.InverseTransformVector(direction));
                 Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward) * currentRotation;
                 float turnTime = Mathf.Min(elapsed, Time.deltaTime);
 
@@ -96,7 +94,7 @@ namespace MimicCell.Player
                 lastAimRotation = transform.localRotation;
             }
 
-            jelly.SetExtractionPose(target, reach, curl);
+            extractionVisual.SetPose(target, reach, curl);
         }
 
         private void OnDisable() => Cancel();
@@ -110,9 +108,9 @@ namespace MimicCell.Player
             playing = false;
             transform.localPosition = restPosition;
             transform.localRotation = restRotation;
-            if (jelly != null)
+            if (extractionVisual != null)
             {
-                jelly.SetExtractionPose(default, 0f, 0f);
+                extractionVisual.SetPose(default, 0f, 0f);
             }
         }
     }
