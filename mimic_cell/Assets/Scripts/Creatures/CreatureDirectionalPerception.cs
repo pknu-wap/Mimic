@@ -1,3 +1,4 @@
+using MimicCell.StatusEffects;
 using UnityEngine;
 
 namespace MimicCell.Creatures
@@ -10,7 +11,16 @@ namespace MimicCell.Creatures
 
         [SerializeField, Range(0f, 1f)]
         private float surroundingRadiusRatio = 0.25f;
+private float GetCurrentFrontViewAngle()
+{
+    if (TryGetComponent<CreatureInjuryEffect>(out var injury) &&
+        injury.isActiveAndEnabled)
+    {
+        return frontViewAngle * injury.ViewAngleMultiplier;
+    }
 
+    return frontViewAngle;
+}
         public bool CanDetect(
             Vector2 offset, Transform visualRoot, float perceptionRadius)
         {
@@ -33,7 +43,7 @@ namespace MimicCell.Creatures
                 return false;
 
             float minimumDot =
-                Mathf.Cos(frontViewAngle * 0.5f * Mathf.Deg2Rad);
+    Mathf.Cos(GetCurrentFrontViewAngle() * 0.5f * Mathf.Deg2Rad);
 
             return Vector2.Dot(forward.normalized, offset.normalized)
                 >= minimumDot;
@@ -54,8 +64,9 @@ namespace MimicCell.Creatures
     if (forward.sqrMagnitude <= 0.0001f)
         return;
 
-    float heading = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
-    float startAngle = heading - frontViewAngle * 0.5f;
+    float viewAngle = GetCurrentFrontViewAngle();
+float heading = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
+float startAngle = heading - viewAngle * 0.5f;
 
     Gizmos.color = Color.green;
 
@@ -65,7 +76,7 @@ namespace MimicCell.Creatures
     for (int i = 0; i <= segments; i++)
     {
         float angle =
-            (startAngle + frontViewAngle * i / segments) * Mathf.Deg2Rad;
+    (startAngle + viewAngle * i / segments) * Mathf.Deg2Rad;
 
         Vector3 point = origin + new Vector3(
             Mathf.Cos(angle), Mathf.Sin(angle), 0f) * radius;

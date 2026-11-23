@@ -1,3 +1,4 @@
+using MimicCell.StatusEffects;
 using System;
 using MimicCell.Gameplay;
 using MimicCell.Player;
@@ -248,8 +249,23 @@ namespace MimicCell.Creatures
                 attachedRigidbody.linearVelocity = Vector2.zero;
                 return;
             }
+            if (TryGetComponent<CreatureInjuryEffect>(out var injury) &&
+    injury.isActiveAndEnabled &&
+    !injury.CanSwim)
+{
+    attachedRigidbody.linearVelocity = Vector2.zero;
+    return;
+}
 
             Vector2 movementDirection = GetMovementDirection();
+
+            if (injury != null && injury.isActiveAndEnabled)
+{
+    movementDirection = injury.AdjustMovement(
+        movementDirection,
+        attachedRigidbody.linearVelocity,
+        Time.fixedDeltaTime);
+}
 
             if (movementTraitController != null)
             {
@@ -543,11 +559,21 @@ namespace MimicCell.Creatures
                 Vector3.one *
                 Mathf.Max(0.01f, uniformScale);
         }
+private float GetCurrentPerceptionRadius()
+{
+    float radius = perceptionRadius * (extinctionCold ? 1.3f : 1f);
 
+    if (TryGetComponent<CreatureInjuryEffect>(out var injury) &&
+        injury.isActiveAndEnabled)
+    {
+        radius *= injury.PerceptionRadiusMultiplier;
+    }
+
+    return radius;
+}
         private void EvaluateFoodChain()
         {
-            float radius = perceptionRadius * (extinctionCold ? 1.3f : 1f);
-
+float radius = GetCurrentPerceptionRadius();
             CreatureDirectionalPerception directionalPerception =
     GetComponent<CreatureDirectionalPerception>();
 
@@ -1156,7 +1182,7 @@ float distance = offset.sqrMagnitude;
 
        private void OnDrawGizmosSelected()
 {
-    float radius = perceptionRadius * (extinctionCold ? 1.3f : 1f);
+    float radius = GetCurrentPerceptionRadius();
 
     CreatureDirectionalPerception directionalPerception =
         GetComponent<CreatureDirectionalPerception>();

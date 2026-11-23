@@ -82,7 +82,17 @@ private float anoxiaOffset;
                 RefreshCreatures();
             }
         }
+private void OnDisable()
+{
+    CreatureController[] creatures =
+        FindObjectsByType<CreatureController>(FindObjectsSortMode.None);
 
+    foreach (CreatureController creature in creatures)
+    {
+        if (creature.TryGetComponent<ExtinctionStatusEffects>(out var effects))
+            effects.SetExposure(ExtinctionStatus.None);
+    }
+}
         private void OnDestroy()
         {
             CreatureController[] creatures = FindObjectsByType<CreatureController>(FindObjectsSortMode.None);
@@ -208,7 +218,22 @@ if (actor.TryGetComponent<MudCoatingEffect>(out var mud) &&
         if (handledByPlayerEffect)
             return;
     }
+if (actor.GetComponent<CreatureController>() != null)
+{
+    ExtinctionStatusEffects npcEffects =
+        actor.GetComponent<ExtinctionStatusEffects>();
 
+    if (npcEffects == null && hasHazard)
+        npcEffects = actor.AddComponent<ExtinctionStatusEffects>();
+
+    if (npcEffects != null)
+    {
+        npcEffects.SetExposure(
+            hasHazard ? status : ExtinctionStatus.None);
+    }
+
+    return;
+}
     if (!hasHazard)
         return;
 

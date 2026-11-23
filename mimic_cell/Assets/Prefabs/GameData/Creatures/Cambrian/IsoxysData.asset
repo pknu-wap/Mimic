@@ -42,9 +42,9 @@ MonoBehaviour:
     max: 2
   swimSpeed: 2.8
   sprintSpeed: 3.9
-  wanderRadius: 3.5
-  usePerceptionRadiusOverride: 0
-  perceptionRadius: 5
+  wanderRadius: 12
+  usePerceptionRadiusOverride: 1
+  perceptionRadius: 10
   spawnWeight: 1
   maxAlive: 4
   groupSizeRange:
