@@ -548,6 +548,9 @@ namespace MimicCell.Creatures
         {
             float radius = perceptionRadius * (extinctionCold ? 1.3f : 1f);
 
+            CreatureDirectionalPerception directionalPerception =
+    GetComponent<CreatureDirectionalPerception>();
+
             FoodChainTarget closestPrey = default;
             FoodChainTarget closestThreat = default;
 
@@ -570,6 +573,14 @@ namespace MimicCell.Creatures
                 }
 
                 Vector2 offset = (Vector2)candidate.Transform.position - attachedRigidbody.position;
+
+                if (!CurrentTraits.HasTrait(CreatureTraits.Sensing) &&
+                    directionalPerception != null &&
+    directionalPerception.isActiveAndEnabled &&
+    !directionalPerception.CanDetect(offset, visualRoot, radius))
+{
+    continue;
+}
 
                 float distanceSquared = offset.sqrMagnitude;
 
@@ -677,6 +688,9 @@ namespace MimicCell.Creatures
 
         private CreatureController FindSmallerSameTierPrey(float radius)
         {
+            CreatureDirectionalPerception directionalPerception =
+    GetComponent<CreatureDirectionalPerception>();
+
             Collider2D[] nearby = Physics2D.OverlapCircleAll(attachedRigidbody.position, radius);
             CreatureController closest = null;
             float closestDistance = radius * radius;
@@ -691,7 +705,18 @@ namespace MimicCell.Creatures
                     continue;
                 }
 
-                float distance = ((Vector2)candidate.transform.position - attachedRigidbody.position).sqrMagnitude;
+Vector2 offset =
+    (Vector2)candidate.transform.position - attachedRigidbody.position;
+
+if (!CurrentTraits.HasTrait(CreatureTraits.Sensing) &&
+    directionalPerception != null &&
+    directionalPerception.isActiveAndEnabled &&
+    !directionalPerception.CanDetect(offset, visualRoot, radius))
+{
+    continue;
+}
+
+float distance = offset.sqrMagnitude;                
                 if (distance < closestDistance)
                 {
                     closest = candidate;
@@ -1129,14 +1154,34 @@ namespace MimicCell.Creatures
             }
         }
 
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = disposition == CreatureDisposition.Aggressive ? Color.red : Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, perceptionRadius);
+       private void OnDrawGizmosSelected()
+{
+    float radius = perceptionRadius * (extinctionCold ? 1.3f : 1f);
 
-            Gizmos.color = Color.cyan;
-            Vector3 home = Application.isPlaying ? (Vector3)homePosition : transform.position;
-            Gizmos.DrawWireSphere(home, wanderRadius);
-        }
+    CreatureDirectionalPerception directionalPerception =
+        GetComponent<CreatureDirectionalPerception>();
+
+    bool sensing = CurrentTraits.HasTrait(CreatureTraits.Sensing);
+
+    if (!sensing &&
+        directionalPerception != null &&
+        directionalPerception.isActiveAndEnabled)
+    {
+        directionalPerception.DrawDetectionGizmos(
+            transform.position, visualRoot, radius);
+    }
+    else
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, radius);
+    }
+
+    Gizmos.color = Color.cyan;
+    Vector3 home = Application.isPlaying
+        ? (Vector3)homePosition
+        : transform.position;
+
+    Gizmos.DrawWireSphere(home, wanderRadius);
+}
     }
 }
