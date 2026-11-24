@@ -20,6 +20,10 @@ namespace MimicCell.Player
             float nearest = float.PositiveInfinity;
             foreach (Collider2D collider in clickHits)
             {
+                if (!CreatureColliderRole.IsBodyCollider(collider))
+                {
+                    continue;
+                }
                 var creature = collider.GetComponentInParent<CreatureController>();
                 if (creature == null || creature.Definition == null ||
                     (accepts != null && !accepts(creature.Definition)))
@@ -46,6 +50,28 @@ namespace MimicCell.Player
                 return false;
             }
 
+            return TryProjectPointer(screenPosition, origin, out point);
+        }
+
+        public static bool TryReadPointer(Vector3 origin, out Vector2 point)
+        {
+            point = default;
+#if ENABLE_INPUT_SYSTEM
+            if (Mouse.current != null)
+            {
+                return TryProjectPointer(Mouse.current.position.ReadValue(), origin, out point);
+            }
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            return TryProjectPointer(Input.mousePosition, origin, out point);
+#else
+            return false;
+#endif
+        }
+
+        private static bool TryProjectPointer(Vector2 screenPosition, Vector3 origin, out Vector2 point)
+        {
+            point = default;
             Camera camera = Camera.main;
             if (camera == null)
             {
