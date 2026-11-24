@@ -10,41 +10,41 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
-  m_Name: AnomalocarisData
+  m_Name: OpabiniaData
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
-  creatureId: Anomalocaris
-  displayName: "\uC544\uB178\uB9D0\uB85C\uCE74\uB9AC\uC2A4"
-  prefab: {fileID: 1638649213579617319, guid: b32d607183caa67478968c9c7f92c160, type: 3}
+  creatureId: Opabinia
+  displayName: "\uC624\uD30C\uBE44\uB2C8\uC544"
+  prefab: {fileID: 7524175620898974430, guid: b4bf9a4d3431c8c48a467f4d41f85952, type: 3}
   playerForm:
-    sprite: {fileID: 21300000, guid: 7695eeeb1eedc944687594587f94ce1a, type: 3}
-    movementController: {fileID: 9100000, guid: 17b1be3cf67cb774d929a8ddf88692d1, type: 2}
-    visualScale: {x: 3.3, y: 3.3}
-    colliderSize: {x: 21.12, y: 7.92}
+    sprite: {fileID: 4856847405467277849, guid: cf220738b1eb34e48a77443aecc95cff, type: 3}
+    movementController: {fileID: 9100000, guid: 05ceb8e83c50890419ee4ea0e4dc1298, type: 2}
+    visualScale: {x: 1.386, y: 1.386}
+    colliderSize: {x: 9.24, y: 3.96}
     colliderOffset: {x: 0, y: 0}
     flipXToFaceRight: 1
   spawnKind: 0
-  foodTier: 3
-  bodySize: 2
-  allowedHabitats: 14
-  traits: 23
+  foodTier: 2
+  bodySize: 0
+  allowedHabitats: 24
+  traits: 21
   disposition: 2
   designSizeRange:
-    min: {x: 54, y: 27}
-    max: {x: 74, y: 37}
+    min: {x: 25, y: 10}
+    max: {x: 31, y: 14}
   healthRange:
-    min: 130
-    max: 160
+    min: 35
+    max: 40
   attackRange:
-    min: 25
-    max: 30
+    min: 3
+    max: 5
   reflectionDamageRange:
     min: 0
     max: 0
-  swimSpeed: 3.8
-  sprintSpeed: 7
-  wanderRadius: 7
-  usePerceptionRadiusOverride: 0
-  perceptionRadius: 5
+  swimSpeed: 1.5
+  sprintSpeed: 3.3
+  wanderRadius: 8
+  usePerceptionRadiusOverride: 1
+  perceptionRadius: 14
   spawnWeight: 1
   maxAlive: 4
   groupSizeRange:

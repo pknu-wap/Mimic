@@ -10,40 +10,41 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
-  m_Name: WiwaxiaData
+  m_Name: TrainingAlienData
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
-  creatureId: Wiwaxia
-  displayName: "\uC704\uC641\uC2DC\uC544"
-  prefab: {fileID: 282857271902515287, guid: c7866bc76574ff44ab623a168a46ff31, type: 3}
+  creatureId: Training_Alien
+  displayName: "\uD6C8\uB828\uAC1C\uCCB4"
+  prefab: {fileID: 2513940238013089828, guid: 97ee90fae06db5c4ba13c3a092a1b874, type: 3}
   playerForm:
-    sprite: {fileID: 21300000, guid: 52af8b3688b017647829b7aeb1b5704d, type: 3}
+    sprite: {fileID: 21300000, guid: 0689ace28c70db04ca6554e783080052, type: 3}
+    movementController: {fileID: 9100000, guid: 7c460fd3e8b979040bf3b5dca621ee1a, type: 2}
     visualScale: {x: 1.32, y: 1.32}
-    colliderSize: {x: 5.445, y: 3.795}
+    colliderSize: {x: 9.57, y: 3.135}
     colliderOffset: {x: 0, y: 0}
     flipXToFaceRight: 1
   spawnKind: 0
   foodTier: 1
   bodySize: 0
-  allowedHabitats: 3
-  traits: 224
+  allowedHabitats: 15
+  traits: 3
   disposition: 1
   designSizeRange:
-    min: {x: 16, y: 10}
-    max: {x: 20, y: 14}
+    min: {x: 21, y: 7}
+    max: {x: 28, y: 9}
   healthRange:
-    min: 25
-    max: 30
+    min: 15
+    max: 20
   attackRange:
     min: 0
     max: 0
   reflectionDamageRange:
-    min: 3
-    max: 5
-  swimSpeed: 0.6
-  sprintSpeed: 0.9
-  wanderRadius: 3
-  usePerceptionRadiusOverride: 0
-  perceptionRadius: 5
+    min: 0
+    max: 0
+  swimSpeed: 2.5
+  sprintSpeed: 5
+  wanderRadius: 7
+  usePerceptionRadiusOverride: 1
+  perceptionRadius: 12
   spawnWeight: 1
   maxAlive: 4
   groupSizeRange:

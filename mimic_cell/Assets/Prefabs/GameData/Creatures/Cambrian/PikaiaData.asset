@@ -10,41 +10,41 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
-  m_Name: LargeTrilobitaData
+  m_Name: PikaiaData
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
-  creatureId: LargeTrilobita
-  displayName: "\uB300\uD615\uC0BC\uC5FD\uCDA9"
-  prefab: {fileID: 10025463094168247, guid: eb0bd8a3f3b526d4994a464670807c6c, type: 3}
+  creatureId: Pikaia
+  displayName: "\uD53C\uCE74\uC774\uC544"
+  prefab: {fileID: 2513940238013089828, guid: 97ee90fae06db5c4ba13c3a092a1b874, type: 3}
   playerForm:
-    sprite: {fileID: 21300000, guid: a8abb79e6d41b694eb8be584fcac8ca9, type: 3}
-    movementController: {fileID: 9100000, guid: 481e82f4e5c78f84cb45601b0a4f8c13, type: 2}
-    visualScale: {x: 1.848, y: 1.848}
-    colliderSize: {x: 11.22, y: 6.27}
+    sprite: {fileID: 21300000, guid: 0689ace28c70db04ca6554e783080052, type: 3}
+    movementController: {fileID: 9100000, guid: 7c460fd3e8b979040bf3b5dca621ee1a, type: 2}
+    visualScale: {x: 1.32, y: 1.32}
+    colliderSize: {x: 9.57, y: 3.135}
     colliderOffset: {x: 0, y: 0}
     flipXToFaceRight: 1
   spawnKind: 0
-  foodTier: 2
-  bodySize: 2
+  foodTier: 1
+  bodySize: 0
   allowedHabitats: 15
-  traits: 196
-  disposition: 2
+  traits: 3
+  disposition: 1
   designSizeRange:
-    min: {x: 29, y: 18}
-    max: {x: 35, y: 22}
+    min: {x: 21, y: 7}
+    max: {x: 28, y: 9}
   healthRange:
-    min: 70
-    max: 80
+    min: 15
+    max: 20
   attackRange:
-    min: 4
-    max: 6
+    min: 0
+    max: 0
   reflectionDamageRange:
     min: 0
     max: 0
-  swimSpeed: 1.5
-  sprintSpeed: 2.2
-  wanderRadius: 4.5
-  usePerceptionRadiusOverride: 0
-  perceptionRadius: 5
+  swimSpeed: 2.5
+  sprintSpeed: 5
+  wanderRadius: 7
+  usePerceptionRadiusOverride: 1
+  perceptionRadius: 12
   spawnWeight: 1
   maxAlive: 4
   groupSizeRange:

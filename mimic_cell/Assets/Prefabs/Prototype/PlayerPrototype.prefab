@@ -1015,8 +1015,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PanicEffect
   panicDefinition: {fileID: 11400000, guid: 5351c5c526f3cc148ae4da7cc314c478, type: 2}
-  dashSpeed: 7
-  dashDuration: 2
+  dashSpeed: 4
+  dashDuration: 0.5
   cooldown: 3
   randomAngle: 30
 --- !u!114 &2539467558973441306

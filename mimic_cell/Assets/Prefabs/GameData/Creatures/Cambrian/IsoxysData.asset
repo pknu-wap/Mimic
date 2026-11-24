@@ -10,41 +10,41 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
-  m_Name: OpabiniaData
+  m_Name: IsoxysData
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
-  creatureId: Opabinia
-  displayName: "\uC624\uD30C\uBE44\uB2C8\uC544"
-  prefab: {fileID: 7524175620898974430, guid: b4bf9a4d3431c8c48a467f4d41f85952, type: 3}
+  creatureId: Isoxys
+  displayName: "\uC774\uC18C\uC2DC\uC2A4"
+  prefab: {fileID: 4854711201897119062, guid: 652c27dabfd63af489ba53c04328eb4d, type: 3}
   playerForm:
-    sprite: {fileID: 4856847405467277849, guid: cf220738b1eb34e48a77443aecc95cff, type: 3}
-    movementController: {fileID: 9100000, guid: 05ceb8e83c50890419ee4ea0e4dc1298, type: 2}
-    visualScale: {x: 1.386, y: 1.386}
-    colliderSize: {x: 9.24, y: 3.96}
+    sprite: {fileID: 21300000, guid: d3e963bae82201b4891dec28ff0a91aa, type: 3}
+    movementController: {fileID: 9100000, guid: f73598ad307fb7a468598679be627122, type: 2}
+    visualScale: {x: 2.31, y: 2.31}
+    colliderSize: {x: 7.92, y: 5.94}
     colliderOffset: {x: 0, y: 0}
     flipXToFaceRight: 1
   spawnKind: 0
   foodTier: 2
-  bodySize: 0
-  allowedHabitats: 24
-  traits: 21
+  bodySize: 1
+  allowedHabitats: -1
+  traits: 61
   disposition: 2
   designSizeRange:
-    min: {x: 25, y: 10}
-    max: {x: 31, y: 14}
+    min: {x: 21, y: 14}
+    max: {x: 27, y: 18}
   healthRange:
-    min: 35
-    max: 40
+    min: 40
+    max: 45
   attackRange:
-    min: 3
-    max: 5
+    min: 5
+    max: 7
   reflectionDamageRange:
-    min: 0
-    max: 0
-  swimSpeed: 1.5
-  sprintSpeed: 3.3
-  wanderRadius: 4
-  usePerceptionRadiusOverride: 0
-  perceptionRadius: 5
+    min: 1
+    max: 2
+  swimSpeed: 2.8
+  sprintSpeed: 3.9
+  wanderRadius: 12
+  usePerceptionRadiusOverride: 1
+  perceptionRadius: 10
   spawnWeight: 1
   maxAlive: 4
   groupSizeRange:

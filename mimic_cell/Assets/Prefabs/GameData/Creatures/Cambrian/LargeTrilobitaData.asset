@@ -10,41 +10,41 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
-  m_Name: CambrorasterData
+  m_Name: LargeTrilobitaData
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
-  creatureId: Cambroraster
-  displayName: "\uCE84\uBE0C\uB85C\uB77C\uC2A4\uD130"
-  prefab: {fileID: 5815851924503633734, guid: 7ea8a55560251534fab1ed19aaf4d8d6, type: 3}
+  creatureId: LargeTrilobita
+  displayName: "\uB300\uD615\uC0BC\uC5FD\uCDA9"
+  prefab: {fileID: 10025463094168247, guid: eb0bd8a3f3b526d4994a464670807c6c, type: 3}
   playerForm:
-    sprite: {fileID: 21300000, guid: ec0115e68cc7b284f8ca36cfaf820f68, type: 3}
-    movementController: {fileID: 9100000, guid: d64c901f4c6e4c44cb11d38303793524, type: 2}
-    visualScale: {x: 2.706, y: 2.706}
-    colliderSize: {x: 16.5, y: 8.91}
+    sprite: {fileID: 21300000, guid: a8abb79e6d41b694eb8be584fcac8ca9, type: 3}
+    movementController: {fileID: 9100000, guid: 481e82f4e5c78f84cb45601b0a4f8c13, type: 2}
+    visualScale: {x: 1.848, y: 1.848}
+    colliderSize: {x: 11.22, y: 6.27}
     colliderOffset: {x: 0, y: 0}
     flipXToFaceRight: 1
   spawnKind: 0
   foodTier: 2
   bodySize: 2
-  allowedHabitats: 30
-  traits: 17
+  allowedHabitats: 15
+  traits: 196
   disposition: 2
   designSizeRange:
-    min: {x: 44, y: 32}
-    max: {x: 54, y: 40}
+    min: {x: 29, y: 18}
+    max: {x: 35, y: 22}
   healthRange:
-    min: 110
-    max: 130
+    min: 70
+    max: 80
   attackRange:
-    min: 10
-    max: 14
+    min: 4
+    max: 6
   reflectionDamageRange:
     min: 0
     max: 0
-  swimSpeed: 2.4
-  sprintSpeed: 3.8
-  wanderRadius: 6
-  usePerceptionRadiusOverride: 0
-  perceptionRadius: 5
+  swimSpeed: 1.5
+  sprintSpeed: 2.2
+  wanderRadius: 4
+  usePerceptionRadiusOverride: 1
+  perceptionRadius: 13
   spawnWeight: 1
   maxAlive: 4
   groupSizeRange:
