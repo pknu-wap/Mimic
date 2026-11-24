@@ -51,6 +51,7 @@ namespace MimicCell.Creatures
 
         [Header("References")]
         [SerializeField] private Transform visualRoot;
+        internal Transform VisualRoot => visualRoot;
         [SerializeField] private CreatureState currentState;
 
         private Rigidbody2D attachedRigidbody;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using MimicCell.Creatures;
 using MimicCell.Gameplay;
@@ -21,11 +22,11 @@ namespace MimicCell.Player
         private readonly TentacleTargeting targeting = new TentacleTargeting();
         private ActorHealth health;
         private PrototypePlayer player;
-        private PlayerCreatureFormController form;
         private PlayerMovementController movement;
         private PlayerTentacleStrike tentacle;
         private PlayerTentacleAttack attack;
         private Coroutine strike;
+        private Predicate<CreatureDefinition> canExtract;
         private float discardTime;
 
         internal bool IsExtracting => strike != null;
@@ -33,11 +34,11 @@ namespace MimicCell.Player
         private void Awake()
         {
             player = GetComponent<PrototypePlayer>();
-            form = GetComponent<PlayerCreatureFormController>();
             health = GetComponent<ActorHealth>();
             movement = GetComponent<PlayerMovementController>();
             tentacle = GetComponentInChildren<PlayerTentacleStrike>(true);
             attack = GetComponent<PlayerTentacleAttack>();
+            canExtract = CanExtract;
         }
 
         private void OnEnable() => health.Died += OnDeath;
@@ -68,7 +69,7 @@ namespace MimicCell.Player
                 return;
             }
 
-            TentacleTargeting.Target target = targeting.Find(point, CanExtract);
+            TentacleTargeting.Target target = targeting.Find(point, canExtract);
             if (target.IsAlive && tentacle.Play(point))
             {
                 strike = StartCoroutine(Extract(target));
@@ -107,6 +108,11 @@ namespace MimicCell.Player
         private bool CanExtract(CreatureDefinition species) =>
             sample.Accepts(species) && species.PlayerForm != null && species.PlayerForm.IsConfigured;
 
+        internal CreatureController FindAimCreature(Vector2 point) =>
+            isActiveAndEnabled && !sample.IsComplete && tentacle != null && tentacle.isActiveAndEnabled && IsInRange(point)
+                ? targeting.Find(point, canExtract).Creature
+                : null;
+
         private bool IsInRange(Vector2 point)
         {
             return (point - (Vector2)transform.position).sqrMagnitude <= extractionRange * extractionRange;
@@ -124,10 +130,6 @@ namespace MimicCell.Player
             if (discardTime >= DiscardSeconds)
             {
                 CancelStrike();
-                if (player.CurrentCreatureDefinition == sample.Species)
-                {
-                    form.RestoreBaseForm();
-                }
                 sample.Clear();
                 Debug.Log("[DNA] 샘플 폐기.", this);
             }
