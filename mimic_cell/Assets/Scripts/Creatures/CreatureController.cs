@@ -260,14 +260,35 @@ namespace MimicCell.Creatures
                         attachedCollider.bounds.extents.y);
             }
 
+            float currentSpeed = GetCurrentSpeed();
+
+            bool constrainRoamingHabitat =
+                ShouldConstrainRoamingToAllowedHabitats();
+
+            if (constrainRoamingHabitat)
+            {
+                movementDirection =
+                    ConstrainRoamingDirectionToAllowedHabitats(
+                        movementDirection,
+                        currentSpeed);
+            }
+
             movementDirection = KeepDirectionInsideBounds(movementDirection);
 
-            float currentSpeed = GetCurrentSpeed();
             Vector2 targetVelocity = movementDirection * currentSpeed;
-            attachedRigidbody.linearVelocity = Vector2.MoveTowards(
+            Vector2 nextVelocity = Vector2.MoveTowards(
                 attachedRigidbody.linearVelocity,
                 targetVelocity,
                 acceleration * Time.fixedDeltaTime);
+
+            if (constrainRoamingHabitat)
+            {
+                nextVelocity =
+                    ConstrainRoamingVelocityToAllowedHabitats(
+                        nextVelocity);
+            }
+
+            attachedRigidbody.linearVelocity = nextVelocity;
 
             ClampPositionToBounds();
             UpdateVisualFacing(movementDirection);
@@ -910,6 +931,329 @@ namespace MimicCell.Creatures
             return direction.sqrMagnitude > 1f
                 ? direction.normalized
                 : direction;
+        }
+
+        private bool ShouldConstrainRoamingToAllowedHabitats()
+        {
+            if (definition == null ||
+                environment == null ||
+                attachedCollider == null ||
+                extinctionFrenzy ||
+                definition.AllowedHabitats ==
+                    CreatureHabitatMask.None)
+            {
+                return false;
+            }
+
+            if (CurrentState == CreatureState.Wander)
+            {
+                return true;
+            }
+
+            return CurrentState == CreatureState.Idle &&
+                hasGroupMovementDirection;
+        }
+
+        private Vector2 ConstrainRoamingDirectionToAllowedHabitats(
+            Vector2 direction,
+            float currentSpeed)
+        {
+            Vector2 position = attachedRigidbody.position;
+
+            if (!IsBodyInsideAllowedHabitats(position))
+            {
+                return GetAllowedHabitatRecoveryDirection(
+                    position,
+                    direction);
+            }
+
+            if (direction.sqrMagnitude <= 0.001f)
+            {
+                return Vector2.zero;
+            }
+
+            float probeDistance = Mathf.Max(
+                0.25f,
+                currentSpeed * Time.fixedDeltaTime);
+
+            Vector2 normalizedDirection = direction.normalized;
+            Vector2 probePosition =
+                position +
+                normalizedDirection * probeDistance;
+
+            if (IsBodyInsideAllowedHabitats(probePosition))
+            {
+                return direction;
+            }
+
+            Vector2 horizontalDirection =
+                new Vector2(direction.x, 0f);
+
+            if (horizontalDirection.sqrMagnitude > 0.001f)
+            {
+                horizontalDirection.Normalize();
+
+                Vector2 horizontalProbe =
+                    position +
+                    horizontalDirection * probeDistance;
+
+                if (IsBodyInsideAllowedHabitats(
+                        horizontalProbe))
+                {
+                    return horizontalDirection;
+                }
+            }
+
+            return Vector2.zero;
+        }
+
+        private Vector2 ConstrainRoamingVelocityToAllowedHabitats(
+            Vector2 velocity)
+        {
+            if (velocity.sqrMagnitude <= 0.001f)
+            {
+                return Vector2.zero;
+            }
+
+            Vector2 position = attachedRigidbody.position;
+
+            if (!IsBodyInsideAllowedHabitats(position))
+            {
+                Vector2 recoveryDirection =
+                    GetAllowedHabitatRecoveryDirection(
+                        position,
+                        velocity);
+
+                float recoverySpeed = Vector2.Dot(
+                    velocity,
+                    recoveryDirection);
+
+                return recoverySpeed > 0f
+                    ? recoveryDirection * recoverySpeed
+                    : Vector2.zero;
+            }
+
+            Vector2 predictedPosition =
+                position +
+                velocity * Time.fixedDeltaTime;
+
+            if (IsBodyInsideAllowedHabitats(predictedPosition))
+            {
+                return velocity;
+            }
+
+            Vector2 horizontalVelocity =
+                new Vector2(velocity.x, 0f);
+
+            Vector2 horizontalPosition =
+                position +
+                horizontalVelocity * Time.fixedDeltaTime;
+
+            return IsBodyInsideAllowedHabitats(horizontalPosition)
+                ? horizontalVelocity
+                : Vector2.zero;
+        }
+
+        private bool IsBodyInsideAllowedHabitats(
+            Vector2 bodyPosition)
+        {
+            Bounds bounds = attachedCollider.bounds;
+
+            Vector2 colliderCenterOffset =
+                (Vector2)bounds.center -
+                attachedRigidbody.position;
+
+            Vector2 center =
+                bodyPosition + colliderCenterOffset;
+
+            float halfWidth = Mathf.Max(
+                0.01f,
+                bounds.extents.x - 0.02f);
+
+            float halfHeight = Mathf.Max(
+                0.01f,
+                bounds.extents.y - 0.02f);
+
+            return
+                IsAllowedHabitatAt(center) &&
+                IsAllowedHabitatAt(
+                    center + new Vector2(0f, halfHeight)) &&
+                IsAllowedHabitatAt(
+                    center - new Vector2(0f, halfHeight)) &&
+                IsAllowedHabitatAt(
+                    center + new Vector2(halfWidth, halfHeight)) &&
+                IsAllowedHabitatAt(
+                    center + new Vector2(halfWidth, -halfHeight)) &&
+                IsAllowedHabitatAt(
+                    center + new Vector2(-halfWidth, halfHeight)) &&
+                IsAllowedHabitatAt(
+                    center - new Vector2(halfWidth, halfHeight));
+        }
+
+        private bool IsAllowedHabitatAt(Vector2 position)
+        {
+            CreatureHabitatMask habitat =
+                environment.GetHabitatAt(position);
+
+            return habitat != CreatureHabitatMask.None &&
+                (definition.AllowedHabitats & habitat) != 0;
+        }
+
+        private Vector2 GetAllowedHabitatRecoveryDirection(
+            Vector2 position,
+            Vector2 originalDirection)
+        {
+            Bounds bounds = attachedCollider.bounds;
+
+            Vector2 colliderCenterOffset =
+                (Vector2)bounds.center -
+                attachedRigidbody.position;
+
+            Vector2 colliderCenter =
+                position + colliderCenterOffset;
+
+            float halfHeight = Mathf.Max(
+                0.01f,
+                bounds.extents.y - 0.02f);
+
+            bool topAllowed = IsAllowedHabitatAt(
+                colliderCenter + Vector2.up * halfHeight);
+
+            bool bottomAllowed = IsAllowedHabitatAt(
+                colliderCenter + Vector2.down * halfHeight);
+
+            if (topAllowed != bottomAllowed)
+            {
+                float verticalDirection =
+                    topAllowed ? 1f : -1f;
+
+                Vector2 edgeRecoveryDirection =
+                    new Vector2(
+                        originalDirection.x,
+                        verticalDirection);
+
+                return edgeRecoveryDirection.sqrMagnitude > 0.001f
+                    ? edgeRecoveryDirection.normalized
+                    : Vector2.up * verticalDirection;
+            }
+
+            CreatureHabitatMask currentHabitat =
+                environment.GetHabitatAt(colliderCenter);
+
+            int currentDepthIndex =
+                GetHabitatDepthIndex(currentHabitat);
+
+            int nearestAllowedDepthIndex =
+                GetNearestAllowedHabitatDepthIndex(
+                    currentDepthIndex,
+                    definition.AllowedHabitats);
+
+            if (currentDepthIndex >= 0 &&
+                nearestAllowedDepthIndex >= 0 &&
+                currentDepthIndex != nearestAllowedDepthIndex)
+            {
+                float verticalDirection =
+                    nearestAllowedDepthIndex < currentDepthIndex
+                        ? 1f
+                        : -1f;
+
+                Vector2 recoveryDirection =
+                    new Vector2(
+                        originalDirection.x,
+                        verticalDirection);
+
+                return recoveryDirection.sqrMagnitude > 0.001f
+                    ? recoveryDirection.normalized
+                    : Vector2.up * verticalDirection;
+            }
+
+            Vector2 directionToHome =
+                homePosition - position;
+
+            return directionToHome.sqrMagnitude > 0.001f
+                ? directionToHome.normalized
+                : Vector2.zero;
+        }
+
+        private static int GetNearestAllowedHabitatDepthIndex(
+            int currentDepthIndex,
+            CreatureHabitatMask allowedHabitats)
+        {
+            int nearestIndex = -1;
+            int nearestDistance = int.MaxValue;
+
+            for (int index = 0; index < 5; index++)
+            {
+                CreatureHabitatMask habitat =
+                    GetHabitatForDepthIndex(index);
+
+                if ((allowedHabitats & habitat) == 0)
+                {
+                    continue;
+                }
+
+                int distance = currentDepthIndex >= 0
+                    ? Mathf.Abs(index - currentDepthIndex)
+                    : index;
+
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestIndex = index;
+                }
+            }
+
+            return nearestIndex;
+        }
+
+        private static int GetHabitatDepthIndex(
+            CreatureHabitatMask habitat)
+        {
+            switch (habitat)
+            {
+                case CreatureHabitatMask.OceanAA:
+                    return 0;
+
+                case CreatureHabitatMask.OceanAB:
+                    return 1;
+
+                case CreatureHabitatMask.OceanBB:
+                    return 2;
+
+                case CreatureHabitatMask.OceanBC:
+                    return 3;
+
+                case CreatureHabitatMask.OceanCC:
+                    return 4;
+
+                default:
+                    return -1;
+            }
+        }
+
+        private static CreatureHabitatMask GetHabitatForDepthIndex(
+            int depthIndex)
+        {
+            switch (depthIndex)
+            {
+                case 0:
+                    return CreatureHabitatMask.OceanAA;
+
+                case 1:
+                    return CreatureHabitatMask.OceanAB;
+
+                case 2:
+                    return CreatureHabitatMask.OceanBB;
+
+                case 3:
+                    return CreatureHabitatMask.OceanBC;
+
+                case 4:
+                    return CreatureHabitatMask.OceanCC;
+
+                default:
+                    return CreatureHabitatMask.None;
+            }
         }
 
         private void ClampPositionToBounds()
