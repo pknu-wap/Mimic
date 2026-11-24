@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 1593012905926074991}
   - component: {fileID: -6146987992315376813}
   - component: {fileID: 1012354889735977938}
+  - component: {fileID: -6371114792628346635}
   m_Layer: 0
   m_Name: CreatureBase
   m_TagString: Untagged
@@ -181,13 +182,28 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5100830523769901341}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d09c6f4a357ad343808628484c14219, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.CreatureFreezingVisual
   body: {fileID: 6021030491659640245}
   frozenTint: {r: 0.55, g: 0.8, b: 1, a: 1}
+--- !u!114 &-6371114792628346635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5100830523769901341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccf25b265bdae6f4f88800cc87bc3eb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.CreatureStatusTintVisual
+  body: {fileID: 6021030491659640245}
+  frozenTint: {r: 0.55, g: 0.8, b: 1, a: 1}
+  mudTint: {r: 0.7, g: 0.45, b: 0.25, a: 1}
 --- !u!1 &6162547733366903643
 GameObject:
   m_ObjectHideFlags: 0
