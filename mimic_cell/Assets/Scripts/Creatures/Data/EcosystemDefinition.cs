@@ -5,6 +5,47 @@ using UnityEngine;
 namespace MimicCell.Creatures
 {
     [Serializable]
+    public sealed class CreatureFoodTierSpawnWeights
+    {
+        [SerializeField, Min(0f)]
+        [Tooltip("Relative chance to choose food tier 1 when it has eligible spawn candidates.")]
+        private float tier1 = 55f;
+
+        [SerializeField, Min(0f)]
+        [Tooltip("Relative chance to choose food tier 2 when it has eligible spawn candidates.")]
+        private float tier2 = 30f;
+
+        [SerializeField, Min(0f)]
+        [Tooltip("Relative chance to choose food tier 3 when it has eligible spawn candidates.")]
+        private float tier3 = 15f;
+
+        public float GetWeight(CreatureFoodTier foodTier)
+        {
+            switch (foodTier)
+            {
+                case CreatureFoodTier.Tier1:
+                    return tier1;
+
+                case CreatureFoodTier.Tier2:
+                    return tier2;
+
+                case CreatureFoodTier.Tier3:
+                    return tier3;
+
+                default:
+                    return 0f;
+            }
+        }
+
+        public void Validate()
+        {
+            tier1 = Mathf.Max(0f, tier1);
+            tier2 = Mathf.Max(0f, tier2);
+            tier3 = Mathf.Max(0f, tier3);
+        }
+    }
+
+    [Serializable]
     public sealed class CreatureSpawnSettings
     {
         [SerializeField, Min(0f)]
@@ -25,6 +66,11 @@ namespace MimicCell.Creatures
         [SerializeField, Min(0f)]
         private float maxSpawnDistance = 30f;
 
+        [Header("Food Tier Selection")]
+        [SerializeField]
+        private CreatureFoodTierSpawnWeights foodTierWeights =
+            new CreatureFoodTierSpawnWeights();
+
         [SerializeField]
         private bool allowSpawnDuringCombat = true;
 
@@ -40,6 +86,9 @@ namespace MimicCell.Creatures
 
         public float MaxSpawnDistance => maxSpawnDistance;
 
+        public CreatureFoodTierSpawnWeights FoodTierWeights =>
+            foodTierWeights;
+
         public bool AllowSpawnDuringCombat =>
             allowSpawnDuringCombat;
 
@@ -51,6 +100,14 @@ namespace MimicCell.Creatures
             candidateAttempts = Mathf.Max(1, candidateAttempts);
             offscreenPadding = Mathf.Max(0f, offscreenPadding);
             maxSpawnDistance = Mathf.Max(0f, maxSpawnDistance);
+
+            if (foodTierWeights == null)
+            {
+                foodTierWeights =
+                    new CreatureFoodTierSpawnWeights();
+            }
+
+            foodTierWeights.Validate();
         }
     }
 
