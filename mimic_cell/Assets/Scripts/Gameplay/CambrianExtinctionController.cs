@@ -51,6 +51,11 @@ private float anoxiaOffset;
             player = FindFirstObjectByType<PrototypePlayer>();
             viewCamera = Camera.main;
             RollBoundaryOffsets();
+
+               Debug.Log(
+        $"[대멸종 연결] 바다 {ocean != null} · " +
+        $"플레이어 {player != null} · 카메라 {viewCamera != null}",
+        this);
         }
 
         private void Update()
@@ -337,19 +342,33 @@ private float AnoxiaFront(OceanColumnProfile column)
 }
 
         private void OnGUI()
-        {
-            if (ocean == null || viewCamera == null)
-            {
-                return;
-            }
+{
+    Color previousColor = GUI.color;
+    Matrix4x4 previousMatrix = GUI.matrix;
+    int previousDepth = GUI.depth;
 
-            if (Event.current.type == EventType.Repaint)
-            {
-                DrawAtmosphere();
-            }
+    GUI.color = Color.white;
 
-            DrawHud();
-        }
+    // 탁류, 가스, 혹한기 화면 연출을 원래 크기로 그린다.
+    if (ocean != null && viewCamera != null &&
+        Event.current.type == EventType.Repaint)
+    {
+        DrawAtmosphere();
+    }
+
+    // 테스트 패널만 작게 그린다.
+    GUI.depth = -100;
+
+    const float panelScale = 0.65f;
+    GUI.matrix = previousMatrix * Matrix4x4.Scale(
+        new Vector3(panelScale, panelScale, 1f));
+
+    DrawHud();
+
+    GUI.color = previousColor;
+    GUI.matrix = previousMatrix;
+    GUI.depth = previousDepth;
+}
 
         private void DrawAtmosphere()
         {

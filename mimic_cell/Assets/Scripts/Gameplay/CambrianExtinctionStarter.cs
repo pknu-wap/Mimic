@@ -17,13 +17,26 @@ namespace MimicCell.Gameplay
                 StartExtinction();
         }
 
-        public void StartExtinction()
-        {
-            if (extinction == null || extinction.gameObject.activeSelf)
-                return;
+       [ContextMenu("Test Start Extinction")]
+public void StartExtinction()
+{
+    if (!Application.isPlaying)
+        return;
 
-            extinction.gameObject.SetActive(true);
-        }
+    if (extinction == null)
+    {
+        Debug.LogError("[대멸종 시작] Extinction 연결이 비어 있습니다.", this);
+        return;
+    }
+
+    extinction.enabled = true;
+    extinction.gameObject.SetActive(true);
+
+    Debug.Log(
+        $"[대멸종 시작] 오브젝트 활성 {extinction.gameObject.activeInHierarchy} · " +
+        $"컴포넌트 활성 {extinction.isActiveAndEnabled}",
+        this);
+}
 
         private static bool WasTestKeyPressed()
         {
