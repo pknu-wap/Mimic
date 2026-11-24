@@ -40,8 +40,8 @@ MonoBehaviour:
   reflectionDamageRange:
     min: 0
     max: 0
-  swimSpeed: 1.2
-  sprintSpeed: 2
+  swimSpeed: 1.5
+  sprintSpeed: 2.2
   wanderRadius: 4.5
   usePerceptionRadiusOverride: 0
   perceptionRadius: 5

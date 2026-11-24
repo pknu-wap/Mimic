@@ -113,9 +113,7 @@ namespace MimicCell.Creatures
         private float perceptionRadius = 5f;
 
         [Header("Spawn")]
-        [SerializeField, Min(0f)]
-        [Tooltip("Relative selection weight within this creature's food tier.")]
-        private float spawnWeight = 1f;
+        [SerializeField, Min(0f)] private float spawnWeight = 1f;
         [SerializeField, Min(1)] private int maxAlive = 4;
         [SerializeField] private CreatureIntRange groupSizeRange;
         [SerializeField, Min(0)] private int maxGroupCount;

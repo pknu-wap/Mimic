@@ -32,15 +32,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fc1be9471ae9a36479e33acad7fb0aa9, type: 2}
   spawnSettings:
     firstSpawnDelay: 2
-    spawnInterval: 3
-    maxTotalAlive: 32
-    candidateAttempts: 20
-    offscreenPadding: 15
-    maxSpawnDistance: 50
-    foodTierWeights:
-      tier1: 55
-      tier2: 30
-      tier3: 15
+    spawnInterval: 4
+    maxTotalAlive: 40
+    candidateAttempts: 12
+    offscreenPadding: 2
+    maxSpawnDistance: 30
     allowSpawnDuringCombat: 1
   perceptionSettings:
     commonPerceptionRadius: 5
@@ -50,7 +46,6 @@ MonoBehaviour:
     tier2FleeDuration: 4
     tier3ChaseDuration: 5
     tier3FleeDuration: 5
-    sensingRadiusMultiplier: 1.4
     sensingDurationMultiplier: 1.4
   groupSettings:
     targetSpacing: 1.5
@@ -62,6 +57,6 @@ MonoBehaviour:
     regroupCompletionMultiplier: 1.25
     scatterAngle: 35
   despawnSettings:
-    distance: 70
+    distance: 45
     conditionDuration: 3
     requireOffscreen: 1
