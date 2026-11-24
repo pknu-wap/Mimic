@@ -296,70 +296,133 @@ namespace MimicCell.Creatures
                 maximum + 1);
         }
 
-        private Vector2 GetGroupMemberPosition(
+        private bool TryGetGroupMemberPosition(
             Vector2 groupCenter,
-            Transform regionRoot)
+            Transform regionRoot,
+            CreatureController member,
+            List<CreatureController> placedMembers,
+            out Vector2 memberPosition)
         {
-            float targetSpacing =
+            memberPosition = groupCenter;
+
+            if (member == null ||
+                placedMembers == null ||
+                placedMembers.Count == 0)
+            {
+                return true;
+            }
+
+            float edgeSpacing =
                 ecosystem.GroupSettings.TargetSpacing;
 
-            const int attemptCount = 6;
+            int attemptCount = Mathf.Max(
+                12,
+                placedMembers.Count * 8);
 
             for (int attempt = 0;
                 attempt < attemptCount;
                 attempt++)
             {
+                CreatureController anchor =
+                    placedMembers[
+                        random.Next(placedMembers.Count)];
+
                 float angle =
                     (float)random.NextDouble() *
                     Mathf.PI *
                     2f;
-
-                float distance =
-                    targetSpacing *
-                    Mathf.Lerp(
-                        0.65f,
-                        1.25f,
-                        (float)random.NextDouble());
 
                 Vector2 direction =
                     new Vector2(
                         Mathf.Cos(angle),
                         Mathf.Sin(angle));
 
+                float requiredCenterDistance =
+                    member.GetRequiredCenterDistance(
+                        anchor,
+                        direction,
+                        edgeSpacing);
+
                 Vector2 candidate =
-                    groupCenter +
-                    direction * distance;
+                    (Vector2)anchor.transform.position +
+                    direction *
+                    requiredCenterDistance;
 
-                if (!IsOutsideCamera(
+                if (!IsGroupMemberPositionAvailable(
                         candidate,
-                        ecosystem.SpawnSettings
-                            .OffscreenPadding))
+                        regionRoot,
+                        member,
+                        placedMembers,
+                        edgeSpacing))
                 {
                     continue;
                 }
 
-                if (!environment.IsInsidePlayableArea(
-                        candidate))
-                {
-                    continue;
-                }
-
-                if (!environment.TryGetActiveRegionRoot(
-                        candidate,
-                        out Transform candidateRegionRoot))
-                {
-                    continue;
-                }
-
-                if (candidateRegionRoot != regionRoot)
-                {
-                    continue;
-                }
-
-                return candidate;
+                memberPosition = candidate;
+                return true;
             }
 
-            return groupCenter;
+            return false;
+        }
+
+        private bool IsGroupMemberPositionAvailable(
+            Vector2 candidate,
+            Transform regionRoot,
+            CreatureController member,
+            List<CreatureController> placedMembers,
+            float edgeSpacing)
+        {
+            if (!IsOutsideCamera(
+                    candidate,
+                    ecosystem.SpawnSettings
+                        .OffscreenPadding) ||
+                !environment.IsInsidePlayableArea(candidate) ||
+                !environment.TryGetActiveRegionRoot(
+                    candidate,
+                    out Transform candidateRegionRoot) ||
+                candidateRegionRoot != regionRoot)
+            {
+                return false;
+            }
+
+            for (int index = 0;
+                index < placedMembers.Count;
+                index++)
+            {
+                CreatureController other =
+                    placedMembers[index];
+
+                if (other == null)
+                {
+                    continue;
+                }
+
+                Vector2 separation =
+                    candidate -
+                    (Vector2)other.transform.position;
+
+                float centerDistance =
+                    separation.magnitude;
+
+                if (centerDistance <= 0.001f)
+                {
+                    return false;
+                }
+
+                float requiredCenterDistance =
+                    member.GetRequiredCenterDistance(
+                        other,
+                        separation / centerDistance,
+                        edgeSpacing);
+
+                if (centerDistance + 0.001f <
+                    requiredCenterDistance)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private bool IsOutsideCamera(
@@ -849,6 +912,19 @@ statusController.SetOwnerType(StatusEffectTarget.Creature);
             return controller;
         }
 
+        private void DiscardSpawnedCreature(
+            CreatureController creature)
+        {
+            if (creature == null)
+            {
+                return;
+            }
+
+            despawnTimers.Remove(creature);
+            aliveCreatures.Remove(creature);
+            Destroy(creature.gameObject);
+        }
+
         private CreatureGroupController CreateGroupController(
             CreatureDefinition definition,
             Vector2 groupCenter,
@@ -909,32 +985,69 @@ statusController.SetOwnerType(StatusEffectTarget.Creature);
 
             int spawnedCount = 0;
 
+            List<CreatureController> placedGroupMembers =
+                definition.SpawnKind == CreatureSpawnKind.Group
+                    ? new List<CreatureController>(requestedCount)
+                    : null;
+
             for (int index = 0;
                 index < requestedCount;
                 index++)
             {
-                Vector2 spawnPosition =
-                    index == 0
-                        ? groupCenter
-                        : GetGroupMemberPosition(
-                            groupCenter,
-                            regionRoot);
-
                 CreatureController creature =
                     SpawnCreature(
                         definition,
-                        spawnPosition,
+                        groupCenter,
                         regionRoot);
 
-                if (creature != null)
+                if (creature == null)
                 {
-                    spawnedCount++;
-
-                    if (groupController != null)
-                    {
-                        groupController.AddMember(creature);
-                    }
+                    continue;
                 }
+
+                if (groupController != null)
+                {
+                    if (!TryGetGroupMemberPosition(
+                            groupCenter,
+                            regionRoot,
+                            creature,
+                            placedGroupMembers,
+                            out Vector2 memberPosition))
+                    {
+                        DiscardSpawnedCreature(creature);
+                        continue;
+                    }
+
+                    creature.SetInitialGroupPosition(
+                        memberPosition);
+
+                    if (!groupController.AddMember(creature))
+                    {
+                        DiscardSpawnedCreature(creature);
+                        continue;
+                    }
+
+                    placedGroupMembers.Add(creature);
+                }
+
+                spawnedCount++;
+            }
+
+            if (groupController != null &&
+                spawnedCount < definition.GroupSizeRange.Min)
+            {
+                activeGroups.Remove(groupController);
+                groupController.Disband();
+
+                for (int index = 0;
+                    index < placedGroupMembers.Count;
+                    index++)
+                {
+                    DiscardSpawnedCreature(
+                        placedGroupMembers[index]);
+                }
+
+                return 0;
             }
 
             return spawnedCount;

@@ -114,6 +114,74 @@ namespace MimicCell.Creatures
             }
         }
 
+        public float GetColliderProjectionRadius(
+            Vector2 worldDirection)
+        {
+            if (attachedCollider == null)
+            {
+                ResolveComponents();
+            }
+
+            if (attachedCollider == null)
+            {
+                return 0f;
+            }
+
+            Vector2 extents =
+                attachedCollider.bounds.extents;
+
+            if (worldDirection.sqrMagnitude <= 0.001f)
+            {
+                return Mathf.Max(extents.x, extents.y);
+            }
+
+            Vector2 normalizedDirection =
+                worldDirection.normalized;
+
+            return
+                Mathf.Abs(normalizedDirection.x) * extents.x +
+                Mathf.Abs(normalizedDirection.y) * extents.y;
+        }
+
+        public float GetMaximumColliderDiameter()
+        {
+            if (attachedCollider == null)
+            {
+                ResolveComponents();
+            }
+
+            if (attachedCollider == null)
+            {
+                return 0f;
+            }
+
+            Vector2 extents =
+                attachedCollider.bounds.extents;
+
+            return Mathf.Max(extents.x, extents.y) * 2f;
+        }
+
+        public float GetRequiredCenterDistance(
+            CreatureController other,
+            Vector2 separationDirection,
+            float edgeSpacing)
+        {
+            if (other == null)
+            {
+                return Mathf.Max(0f, edgeSpacing);
+            }
+
+            Vector2 direction =
+                separationDirection.sqrMagnitude > 0.001f
+                    ? separationDirection.normalized
+                    : Vector2.right;
+
+            return
+                GetColliderProjectionRadius(direction) +
+                other.GetColliderProjectionRadius(-direction) +
+                Mathf.Max(0f, edgeSpacing);
+        }
+
         public CreatureFoodTier CurrentFoodTier
         {
             get
@@ -429,6 +497,24 @@ namespace MimicCell.Creatures
         {
             groupMovementDirection = Vector2.zero;
             hasGroupMovementDirection = false;
+        }
+
+        internal void SetInitialGroupPosition(
+            Vector2 position)
+        {
+            if (attachedRigidbody == null)
+            {
+                ResolveComponents();
+            }
+
+            transform.position = new Vector3(
+                position.x,
+                position.y,
+                transform.position.z);
+
+            attachedRigidbody.position = position;
+            attachedRigidbody.linearVelocity = Vector2.zero;
+            homePosition = position;
         }
 
         public void SetExtinctionBehavior(bool frenzy, Vector2 escapeDirection, bool cold)

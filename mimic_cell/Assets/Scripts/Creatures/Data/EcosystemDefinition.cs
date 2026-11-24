@@ -194,8 +194,9 @@ namespace MimicCell.Creatures
     [Serializable]
     public sealed class CreatureGroupSettings
     {
-        [SerializeField, Min(0.1f)]
-        private float targetSpacing = 1.5f;
+        [SerializeField, Min(0f)]
+        [Tooltip("무리 구성원 Collider 가장자리 사이에 유지할 기본 여백입니다.")]
+        private float targetSpacing = 0.5f;
 
         [SerializeField, Min(0.1f)]
         private float roamDirectionMinDuration = 2f;
@@ -226,22 +227,40 @@ namespace MimicCell.Creatures
         public float RoamDirectionMaxDuration =>
             roamDirectionMaxDuration;
 
-        public float ReturnDistance =>
-            targetSpacing * returnDistanceMultiplier;
-
-        public float IsolationDistance =>
-            targetSpacing * isolationDistanceMultiplier;
-
         public float GroupSearchRadius => groupSearchRadius;
-
-        public float RegroupCompletionDistance =>
-            targetSpacing * regroupCompletionMultiplier;
 
         public float ScatterAngle => scatterAngle;
 
+        public float GetReturnDistance(
+            float representativeCenterSpacing)
+        {
+            return Mathf.Max(
+                    0.1f,
+                    representativeCenterSpacing) *
+                returnDistanceMultiplier;
+        }
+
+        public float GetIsolationDistance(
+            float representativeCenterSpacing)
+        {
+            return Mathf.Max(
+                    0.1f,
+                    representativeCenterSpacing) *
+                isolationDistanceMultiplier;
+        }
+
+        public float GetRegroupCompletionDistance(
+            float representativeCenterSpacing)
+        {
+            return Mathf.Max(
+                    0.1f,
+                    representativeCenterSpacing) *
+                regroupCompletionMultiplier;
+        }
+
         public void Validate()
         {
-            targetSpacing = Mathf.Max(0.1f, targetSpacing);
+            targetSpacing = Mathf.Max(0f, targetSpacing);
 
             roamDirectionMinDuration =
                 Mathf.Max(0.1f, roamDirectionMinDuration);

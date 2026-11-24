@@ -53,7 +53,7 @@ MonoBehaviour:
     sensingRadiusMultiplier: 1.4
     sensingDurationMultiplier: 1.4
   groupSettings:
-    targetSpacing: 1.5
+    targetSpacing: 0.5
     roamDirectionMinDuration: 2
     roamDirectionMaxDuration: 4
     returnDistanceMultiplier: 3

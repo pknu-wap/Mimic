@@ -147,7 +147,7 @@ namespace MimicCell.Creatures
             Vector2 separationDirection =
                 Vector2.zero;
 
-            float targetSpacing =
+            float edgeSpacing =
                 ecosystem.GroupSettings.TargetSpacing;
 
             for (int index = 0;
@@ -169,16 +169,31 @@ namespace MimicCell.Creatures
                 float distance =
                     awayFromOther.magnitude;
 
-                if (distance <= 0.001f || distance >= targetSpacing)
+                Vector2 separationAxis =
+                    distance > 0.001f
+                        ? awayFromOther / distance
+                        : GetOverlapSeparationAxis(
+                            member,
+                            other);
+
+                float requiredCenterDistance =
+                    member.GetRequiredCenterDistance(
+                        other,
+                        separationAxis,
+                        edgeSpacing);
+
+                if (requiredCenterDistance <= 0.001f ||
+                    distance >= requiredCenterDistance)
                 {
                     continue;
                 }
 
                 float separationStrength =
-                    1f - distance / targetSpacing;
+                    1f -
+                    distance / requiredCenterDistance;
 
                 separationDirection +=
-                    awayFromOther.normalized *
+                    separationAxis *
                     separationStrength;
             }
 
@@ -188,6 +203,47 @@ namespace MimicCell.Creatures
             }
 
             return separationDirection.normalized;
+        }
+
+        private static Vector2 GetOverlapSeparationAxis(
+            CreatureController member,
+            CreatureController other)
+        {
+            return member.GetInstanceID() < other.GetInstanceID()
+                ? Vector2.left
+                : Vector2.right;
+        }
+
+        private float CalculateRepresentativeCenterSpacing()
+        {
+            float diameterSum = 0f;
+            int validMemberCount = 0;
+
+            for (int index = 0;
+                index < members.Count;
+                index++)
+            {
+                CreatureController member = members[index];
+
+                if (member == null ||
+                    member.CurrentState == CreatureState.Dead)
+                {
+                    continue;
+                }
+
+                diameterSum +=
+                    member.GetMaximumColliderDiameter();
+
+                validMemberCount++;
+            }
+
+            float averageDiameter =
+                validMemberCount > 0
+                    ? diameterSum / validMemberCount
+                    : 0f;
+
+            return averageDiameter +
+                ecosystem.GroupSettings.TargetSpacing;
         }
 
         private Vector2 GetRoamingDirectionForMember(CreatureController member)
@@ -202,7 +258,11 @@ namespace MimicCell.Creatures
                 memberPosition,
                 groupCenter);
 
-            if (distanceFromCenter < ecosystem.GroupSettings.ReturnDistance)
+            float returnDistance =
+                ecosystem.GroupSettings.GetReturnDistance(
+                    CalculateRepresentativeCenterSpacing());
+
+            if (distanceFromCenter < returnDistance)
             {
                 Vector2 separationDirection =
                     CalculateSeparationDirection(member);
@@ -456,7 +516,8 @@ namespace MimicCell.Creatures
         {
             float completionDistance =
                 ecosystem.GroupSettings
-                    .RegroupCompletionDistance;
+                    .GetRegroupCompletionDistance(
+                        CalculateRepresentativeCenterSpacing());
 
             for (int index = 0;
                 index < members.Count;
