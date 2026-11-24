@@ -1,12 +1,11 @@
 using MimicCell.Creatures;
 using MimicCell.Gameplay;
-using MimicCell.StatusEffects;
 using UnityEngine;
 
 namespace MimicCell.Player
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(PrototypePlayer), typeof(StatusEffectController))]
+    [RequireComponent(typeof(PrototypePlayer), typeof(PlayerAttackEffects))]
     [DefaultExecutionOrder(10)]
     public class PlayerTentacleAttack : MonoBehaviour
     {
@@ -17,7 +16,6 @@ namespace MimicCell.Player
         private const float ImpactTime = Windup + Lash;
 
         [SerializeField] private PlayerJellyLeg[] blueTentacles = System.Array.Empty<PlayerJellyLeg>();
-        [SerializeField] private StatusEffectDefinition dopamineRelease;
         [SerializeField, Min(0.1f)] private float attackRange = 4f;
         [SerializeField] private Vector2Int attackDamage = new Vector2Int(2, 5);
 
@@ -25,7 +23,7 @@ namespace MimicCell.Player
         private PrototypePlayer player;
         private PlayerMovementController movement;
         private PlayerDnaExtraction extraction;
-        private StatusEffectController statusEffects;
+        private PlayerAttackEffects attackEffects;
         private PlayerJellyLeg strikingTentacle;
         private TentacleTargeting.Target target;
         private Vector2 aimPoint;
@@ -39,7 +37,7 @@ namespace MimicCell.Player
             player = GetComponent<PrototypePlayer>();
             movement = GetComponent<PlayerMovementController>();
             extraction = GetComponent<PlayerDnaExtraction>();
-            statusEffects = GetComponent<StatusEffectController>();
+            attackEffects = GetComponent<PlayerAttackEffects>();
         }
 
         private void Update()
@@ -81,21 +79,16 @@ namespace MimicCell.Player
                     best = leg;
                 }
             }
-            if (best == null)
+            if (best == null || !attackEffects.TryBeginAttack())
             {
                 return;
             }
 
-            // TODO(스태미너): 시도 확정 전에 2층 10 / 3층 35를 차감하고, 부족하면 취소한다. 빗나가도 차감한다.
             strikingTentacle = best;
             target = InRange(point) ? targeting.Find(point) : default;
             aimPoint = point;
             startedAt = Time.time;
             impactPending = true;
-            if (dopamineRelease != null)
-            {
-                statusEffects.ApplyEffect(dopamineRelease);
-            }
         }
 
         private void UpdateAttack()
@@ -154,9 +147,14 @@ namespace MimicCell.Player
 
             // TODO(가시): 피격 대상의 가시 특성이 발동하면 반사 피해를 처리한다. 반사에는 스태미너를 차감하지 않는다.
             // TODO(엔딩 점수): 과잉 피해를 뺀 appliedDamage를 엔딩 집계에 전달한다.
-            // TODO(동화율): 적중한 생물과 피해량을 동화 시스템에 전달해 공격 규칙에 따라 갱신한다.
+            attackEffects.NotifyHit();
             Debug.Log($"[공격] {creature.Definition.DisplayName} 피해 {appliedDamage}", this);
         }
+
+        internal CreatureController FindAimCreature(Vector2 point) =>
+            isActiveAndEnabled && !player.IsCreatureForm && InRange(point)
+                ? targeting.Find(point).Creature
+                : null;
 
         private bool InRange(Vector2 point) =>
             (point - (Vector2)transform.position).sqrMagnitude <= attackRange * attackRange;
@@ -165,6 +163,7 @@ namespace MimicCell.Player
 
         private void EndAttack()
         {
+            target = default;
             if (strikingTentacle != null)
             {
                 strikingTentacle.SetStrikePose(default, 0f, 0f);

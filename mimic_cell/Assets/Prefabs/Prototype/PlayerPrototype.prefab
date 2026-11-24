@@ -319,8 +319,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6310024010803169380}
-  - component: {fileID: 7255633346394799211}
-  - component: {fileID: 3018243472378101962}
   - component: {fileID: 6310024010803169381}
   m_Layer: 0
   m_Name: Tentacle Aim
@@ -729,6 +727,8 @@ GameObject:
   - component: {fileID: 5901837153212775436}
   - component: {fileID: 8177809416349704630}
   - component: {fileID: 6073019043129597800}
+  - component: {fileID: 6073019043129597850}
+  - component: {fileID: 6073019043129597851}
   m_Layer: 0
   m_Name: PlayerPrototype
   m_TagString: Player
@@ -1015,8 +1015,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.PanicEffect
   panicDefinition: {fileID: 11400000, guid: 5351c5c526f3cc148ae4da7cc314c478, type: 2}
-  dashSpeed: 7
-  dashDuration: 2
+  dashSpeed: 4
+  dashDuration: 0.5
   cooldown: 3
   randomAngle: 30
 --- !u!114 &2539467558973441306
@@ -1459,41 +1459,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!95 &7255633346394799211
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6310024010803169379}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d13b809dc6e1fc74eabd8596521545f0, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage:
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!114 &3018243472378101962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6310024010803169379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c3392672df15584dac7eda68f6fd0a2, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerJellyAnimation
-  fullSwimSpeed: 4
 --- !u!1 &5363905228328044211
 GameObject:
   m_ObjectHideFlags: 0
@@ -1538,12 +1503,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1364bab8ded94994938b6778fc51f428, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerJellyBodyContact
-  contactShape: {fileID: 5363905228328044212}
-  terrainLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  compression: 0.22
-  recoverySeconds: 0.16
+  bodyRenderer: {fileID: 1163149879768469176}
+  core: {fileID: 2728273293877189270}
 --- !u!1 &460959167445543173
 GameObject:
   m_ObjectHideFlags: 0
@@ -2628,7 +2589,6 @@ MonoBehaviour:
   - {fileID: 4685501863155567676}
   - {fileID: 4169532866655476949}
   - {fileID: 8796288455283138775}
-  dopamineRelease: {fileID: 11400000, guid: 5b61560198cae734184348c31f65cc5a, type: 2}
   attackRange: 4
   attackDamage: {x: 2, y: 5}
 --- !u!114 &6073019043129597801
@@ -2974,3 +2934,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6073019043129597927}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6073019043129597850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21371a7957d64635b8daa18d3f56742a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerAttackEffects
+  dopamineRelease: {fileID: 11400000, guid: 5b61560198cae734184348c31f65cc5a, type: 2}
+--- !u!114 &6073019043129597851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c91e743d18e84411ae5a2f641b011a1e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleFocus

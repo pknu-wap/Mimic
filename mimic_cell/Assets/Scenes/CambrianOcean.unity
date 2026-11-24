@@ -619,6 +619,21 @@ MonoBehaviour:
   fixedTestSeed: 12345
   logSpawnEvents: 1
   logDespawnEvents: 1
+--- !u!114 &1175212831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175212826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb0264cf39a74c76a2ac30e1273ce3d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.CambrianOceanSurface
+  waterHighlight: {r: 0.67, g: 0.9, b: 0.94, a: 1}
+  skyHorizon: {r: 0.88, g: 0.96, b: 0.97, a: 1}
+  skyHigh: {r: 0.32, g: 0.65, b: 0.84, a: 1}
 --- !u!1001 &1196324023
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -699,12 +714,19 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerPrototype
       objectReference: {fileID: 0}
+    - target: {fileID: 8784220054850352270, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      propertyPath: anoxiaBubbleAnimation
+      value: 
+      objectReference: {fileID: 1514800421}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 5270640567023923783, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1918069292}
+    - targetCorrespondingSourceObject: {fileID: 5270640567023923783, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1514800424}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
@@ -849,6 +871,16 @@ MonoBehaviour:
   backWallTexture: {fileID: 0}
   cellSize: 1.5
   streamingInterval: 0.2
+--- !u!1 &1514800421 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5208191466303176384, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+  m_PrefabInstance: {fileID: 5837018101402370648}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1514800424 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+  m_PrefabInstance: {fileID: 5837018101402370648}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1918069291
 GameObject:
   m_ObjectHideFlags: 0
@@ -1070,21 +1102,67 @@ SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 375565811458019847, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
   m_PrefabInstance: {fileID: 1196324023}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1175212831
-MonoBehaviour:
+--- !u!1001 &5837018101402370648
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1175212826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb0264cf39a74c76a2ac30e1273ce3d5, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.CambrianOceanSurface
-  waterHighlight: {r: 0.67, g: 0.9, b: 0.94, a: 1}
-  skyHorizon: {r: 0.88, g: 0.96, b: 0.97, a: 1}
-  skyHigh: {r: 0.32, g: 0.65, b: 0.84, a: 1}
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1196324024}
+    m_Modifications:
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 873252366597102491, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_SortingOrder
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5208191466303176384, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_Name
+      value: PoisonVFX
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

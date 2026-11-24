@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dd08f11111d8394abb7f979c6e619e2, type: 3}
+  m_Name: CambrianEcosystem
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.EcosystemDefinition
+  ecosystemId: Cambrian
+  displayName: "\uCE84\uBE0C\uB9AC\uC544\uAE30"
+  creatures:
+  - {fileID: 11400000, guid: 98f6b35a84ead0e479b05795f93dbec8, type: 2}
+  - {fileID: 11400000, guid: 8143815d75cf5e146829c4d1af1dfaed, type: 2}
+  - {fileID: 11400000, guid: 9b1dad70da20fd14da8ab11ba97c5bdd, type: 2}
+  - {fileID: 11400000, guid: c1483d1d102b8b84dafd86fa43c2c643, type: 2}
+  - {fileID: 11400000, guid: a4f7d7e42c45fcb4881863cf16961b9a, type: 2}
+  - {fileID: 11400000, guid: 4dfc1a01796967240a9ab273c73d9c03, type: 2}
+  - {fileID: 11400000, guid: a487bde7b8fe1e44c89be4ff1d36e43e, type: 2}
+  - {fileID: 11400000, guid: 96357d3a8b4a65c44be50ed57b33bf70, type: 2}
+  - {fileID: 11400000, guid: 58ada217901325642ada598f389e371f, type: 2}
+  - {fileID: 11400000, guid: 7b17282320db20e4fa46db46d420c849, type: 2}
+  - {fileID: 11400000, guid: c90e50377dd4f034b841802263c984c3, type: 2}
+  - {fileID: 11400000, guid: b6e709b197a43684c989ffa3d8413565, type: 2}
+  - {fileID: 11400000, guid: da2e9d91ab4c6bb4b87f2f118b7570f6, type: 2}
+  - {fileID: 11400000, guid: 244ba4a33fa8f5c48911800e5396ec59, type: 2}
+  - {fileID: 11400000, guid: fc1be9471ae9a36479e33acad7fb0aa9, type: 2}
+  spawnSettings:
+    firstSpawnDelay: 2
+    spawnInterval: 4
+    maxTotalAlive: 40
+    candidateAttempts: 12
+    offscreenPadding: 2
+    maxSpawnDistance: 30
+    allowSpawnDuringCombat: 1
+  perceptionSettings:
+    commonPerceptionRadius: 5
+    decisionInterval: 0.15
+    tier1FleeDuration: 3
+    tier2ChaseDuration: 3
+    tier2FleeDuration: 4
+    tier3ChaseDuration: 5
+    tier3FleeDuration: 5
+    sensingDurationMultiplier: 1.4
+  groupSettings:
+    targetSpacing: 0.5
+    roamDirectionMinDuration: 2
+    roamDirectionMaxDuration: 4
+    returnDistanceMultiplier: 3
+    isolationDistanceMultiplier: 6
+    groupSearchRadius: 5
+    regroupCompletionMultiplier: 1.25
+    scatterAngle: 35
+  despawnSettings:
+    distance: 45
+    conditionDuration: 3
+    requireOffscreen: 1

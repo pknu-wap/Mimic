@@ -17,7 +17,7 @@ namespace MimicCell.Prologue
 
         private Coroutine typing;
         private readonly Queue<string> remainingLines = new Queue<string>();
-
+public bool IsSequencePlaying { get; private set; }
 
 public void ShowText(string message)
 {
@@ -36,14 +36,19 @@ public void ShowSequence(params string[] messages)
         if (!string.IsNullOrWhiteSpace(message))
             remainingLines.Enqueue(message);
     }
-
+IsSequencePlaying = true;
     ShowNextLine();
 }
 
 private void ShowNextLine()
 {
     if (remainingLines.Count > 0)
+    {
         DisplayText(remainingLines.Dequeue());
+        return;
+    }
+
+    IsSequencePlaying = false;
 }
 private void DisplayText(string message)        {
             if (dialogueText == null || !isActiveAndEnabled)
@@ -100,12 +105,12 @@ private void DisplayText(string message)        {
                 dialogueText.maxVisibleCharacters = int.MaxValue;
         }
 
-        private void OnDisable()
-        {
-            FinishTyping();
-            remainingLines.Clear();
-
-        }
+       private void OnDisable()
+{
+    FinishTyping();
+    remainingLines.Clear();
+    IsSequencePlaying = false;
+}
 
         private static bool WasConfirmPressed()
         {

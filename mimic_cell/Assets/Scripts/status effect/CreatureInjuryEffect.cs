@@ -16,15 +16,21 @@ namespace MimicCell.StatusEffects
     [RequireComponent(typeof(CreatureController), typeof(ActorHealth))]
     public sealed class CreatureInjuryEffect : MonoBehaviour
     {
+        [Header("Injured Movement")]
+[SerializeField, Min(1f)] private float referenceTurnSpeed = 360f;
+[SerializeField, Range(0f, 30f)] private float wobbleAngle = 10f;
         private ActorHealth health;
 
-        public CreatureInjuryStage Stage { get; private set; }
+[SerializeField] private CreatureInjuryStage stage;
 
+public CreatureInjuryStage Stage => stage;
         public float TurnSpeedMultiplier =>
             Stage >= CreatureInjuryStage.Minor ? 0.4f : 1f;
 
         public float ViewAngleMultiplier =>
             Stage >= CreatureInjuryStage.Severe ? 0.2f : 1f;
+            public float PerceptionRadiusMultiplier =>
+    Stage >= CreatureInjuryStage.Severe ? 0.5f : 1f;
 
         public bool HasUnstableMovement =>
             Stage >= CreatureInjuryStage.Minor;
@@ -48,7 +54,33 @@ namespace MimicCell.StatusEffects
         {
             health.HealthChanged -= RefreshStage;
         }
+public Vector2 AdjustMovement(
+    Vector2 desiredDirection, Vector2 currentVelocity, float deltaTime)
+{
+    if (!HasUnstableMovement || desiredDirection.sqrMagnitude <= 0.0001f)
+        return desiredDirection;
 
+    float magnitude = Mathf.Min(1f, desiredDirection.magnitude);
+
+    float targetAngle =
+        Mathf.Atan2(desiredDirection.y, desiredDirection.x) * Mathf.Rad2Deg;
+
+    float phase = (GetInstanceID() % 1024) * 0.1f;
+    targetAngle += Mathf.Sin(Time.time * 2f + phase) * wobbleAngle;
+
+    float currentAngle = currentVelocity.sqrMagnitude > 0.0001f
+        ? Mathf.Atan2(currentVelocity.y, currentVelocity.x) * Mathf.Rad2Deg
+        : targetAngle;
+
+    float angle = Mathf.MoveTowardsAngle(
+        currentAngle,
+        targetAngle,
+        referenceTurnSpeed * TurnSpeedMultiplier * deltaTime);
+
+    float radians = angle * Mathf.Deg2Rad;
+
+    return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * magnitude;
+}
         private void RefreshStage(ActorHealth actor)
         {
             if (!actor.IsAlive)
@@ -70,7 +102,7 @@ namespace MimicCell.StatusEffects
             if (nextStage <= Stage)
                 return;
 
-            Stage = nextStage;
+stage = nextStage;
             Debug.Log(
                 $"[부상] {name}: {Stage} · 체력 {actor.CurrentHealth}/{actor.MaxHealth}",
                 this);
