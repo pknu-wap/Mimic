@@ -1,3 +1,4 @@
+using System.Collections;
 using MimicCell.Player;
 using UnityEngine;
 
@@ -9,37 +10,77 @@ namespace MimicCell.Prologue
     public sealed class PrologueMoveGoal : MonoBehaviour
     {
 [SerializeField] private PrologueDialogue dialogue;
+[SerializeField] private PrologueControlHint controlHint;
         private bool completed;
+        private bool movementReady;
         public bool IsCompleted => completed;
 
-        private void Start()
+private IEnumerator Start()
 {
-    if (dialogue != null)
+    CircleCollider2D goalArea = GetComponent<CircleCollider2D>();
+    SpriteRenderer goalMarker = GetComponent<SpriteRenderer>();
+
+    goalArea.enabled = false;
+
+    if (goalMarker != null)
+        goalMarker.enabled = false;
+
+    if (dialogue == null || controlHint == null)
     {
-        dialogue.ShowText(
-            "연구원: 탐사 개체, 기초 유영 훈련을 시작한다.\n" +
-            "WASD로 초록색 목표 지점까지 이동하라.");
+        Debug.LogError(
+            "[프롤로그] MoveGoal의 Dialogue와 Control Hint를 연결해 주세요.",
+            this);
+        yield break;
     }
+
+    dialogue.ShowText(
+        "미믹세포, 활성화 확인. 지시가 들리면 반응하십시오.");
+
+    controlHint.ShowHint("Enter — 응답");
+
+    yield return new WaitUntil(() => !dialogue.IsSequencePlaying);
+
+    dialogue.ShowText(
+        "파견 전 최종 점검 프로토콜을 개시합니다.");
+
+    controlHint.ShowHint("Enter — 계속");
+
+    yield return new WaitUntil(() => !dialogue.IsSequencePlaying);
+
+    dialogue.ShowText(
+        "운동 기능 확인. 지정된 위치로 이동하십시오.");
+
+    controlHint.ShowHint("WASD — 이동");
+
+    movementReady = true;
+
+    if (goalMarker != null)
+        goalMarker.enabled = true;
+
+    goalArea.enabled = true;
 }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (completed)
-                return;
+            if (!movementReady || completed)
+    return;
 
             PrototypePlayer player = other.GetComponentInParent<PrototypePlayer>();
             if (player == null)
                 return;
 
-                       completed = true;
+                                   completed = true;
 
             if (dialogue != null)
             {
-                dialogue.ShowSequence(
-                    "기초 유영 능력 확인.\n[Enter] 계속",
-                    "너는 지구 탐사를 위해 파견될 미믹세포다.\n[Enter] 계속",
-                    "현지 생명체의 유전 정보를 확보하고, 그 몸을 모방해야 한다.\n[Enter] 계속",
-                    "다음은 유전 정보 획득 훈련이다. 훈련 개체를 준비하겠다.\n[Enter] 훈련 시작");
+                dialogue.ShowText(
+                    "운동 반응 정상. 다음 항목으로 진행합니다.");
+            }
+
+            if (controlHint != null)
+            {
+                controlHint.ShowHint(
+                    "Enter — 다음 항목으로 진행");
             }
 
             Debug.Log("[프롤로그] 이동 훈련 완료!", this);

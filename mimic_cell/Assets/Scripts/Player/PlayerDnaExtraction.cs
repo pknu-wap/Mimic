@@ -28,6 +28,13 @@ namespace MimicCell.Player
         private float discardTime;
 
         internal bool IsExtracting => strike != null;
+        public bool HasStoredDna => sample.Species != null;
+        public bool ExtractionAllowed { get; set; } = true;
+
+        public float ExtractionPercent =>
+    sample.Species != null && sample.RequiredHits > 0
+        ? (float)sample.Hits / sample.RequiredHits * 100f
+        : 0f;
 
         private void Awake()
         {
@@ -60,6 +67,8 @@ namespace MimicCell.Player
             {
                 return;
             }
+            if (!ExtractionAllowed)
+    return;
 
             if (IsExtracting || sample.IsComplete || (attack != null && attack.IsAttacking) ||
                 tentacle == null || !tentacle.isActiveAndEnabled ||
@@ -97,10 +106,19 @@ namespace MimicCell.Player
 
             yield return new WaitForSeconds(tentacle.RecoveryTime);
             strike = null;
-            if (sample.IsComplete && health.IsAlive && player.TryApplyCreatureForm(sample.Species))
-            {
-                Debug.Log($"[DNA] {sample.Species.DisplayName} 추출 완료. 복제했습니다.", this);
-            }
+          if (sample.IsComplete && health.IsAlive)
+{
+    CreatureDefinition species = sample.Species;
+
+    if (player.TryApplyCreatureForm(species))
+    {
+        sample.Clear();
+
+        Debug.Log(
+            $"[DNA] {species.DisplayName} 추출 완료. 복제했습니다.",
+            this);
+    }
+}
         }
 
         private bool CanExtract(CreatureDefinition species) =>
