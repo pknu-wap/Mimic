@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
   creatureId: training_alien_a
   displayName: "\uD6C8\uB828\uAC1C\uCCB4"
-  prefab: {fileID: 2513940238013089828, guid: e3da0740cf1be0745921619c99cc61a7, type: 3}
+  prefab: {fileID: 2513940238013089828, guid: fb893b24e2560a14493ea01a801807b4, type: 3}
   playerForm:
     sprite: {fileID: 21300000, guid: 35b18bfddae0f7a448acb7fa421def1a, type: 3}
     movementController: {fileID: 9100000, guid: fbf82340166648847813970393d97230, type: 2}
