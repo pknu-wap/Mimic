@@ -41,7 +41,7 @@ MonoBehaviour:
     min: 3
     max: 5
   swimSpeed: 0.6
-  sprintSpeed: 0.9
+  sprintSpeed: 0.8
   wanderRadius: 3
   usePerceptionRadiusOverride: 1
   perceptionRadius: 5

@@ -11,46 +11,43 @@ using UnityEngine.InputSystem;
 namespace MimicCell.Player
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(PrototypePlayer))]
+    [RequireComponent(typeof(PrototypePlayer), typeof(TentacleTargeting))]
     public class PlayerDnaExtraction : MonoBehaviour
     {
         private const float DiscardSeconds = 2f;
 
         [SerializeField, Min(0.1f)] private float extractionRange = 6f;
 
-[SerializeField, Min(0.1f)] private float smallExtractionRange = 7f;
-[SerializeField, Min(0.1f)] private float mediumExtractionRange = 9f;
-[SerializeField, Min(0.1f)] private float largeExtractionRange = 12f;
+        [SerializeField, Min(0.1f)] private float smallExtractionRange = 7f;
+        [SerializeField, Min(0.1f)] private float mediumExtractionRange = 9f;
+        [SerializeField, Min(0.1f)] private float largeExtractionRange = 12f;
 
-private float EffectiveExtractionRange
-{
-    get
-    {
-        if (player == null ||
-            !player.IsCreatureForm ||
-            player.CurrentCreatureDefinition == null)
+        private float EffectiveExtractionRange
         {
-            return extractionRange;
+            get
+            {
+                if (player == null ||
+                    !player.IsCreatureForm ||
+                    player.CurrentCreatureDefinition == null)
+                {
+                    return extractionRange;
+                }
+
+                switch (player.CurrentCreatureDefinition.BodySize)
+                {
+                    case CreatureBodySize.Small:
+                        return smallExtractionRange;
+                    case CreatureBodySize.Medium:
+                        return mediumExtractionRange;
+                    case CreatureBodySize.Large:
+                        return largeExtractionRange;
+                    default:
+                        return extractionRange;
+                }
+            }
         }
-
-        switch (player.CurrentCreatureDefinition.BodySize)
-        {
-            case CreatureBodySize.Small:
-                return smallExtractionRange;
-
-            case CreatureBodySize.Medium:
-                return mediumExtractionRange;
-
-            case CreatureBodySize.Large:
-                return largeExtractionRange;
-
-            default:
-                return extractionRange;
-        }
-    }
-}
         private readonly DnaSample sample = new DnaSample();
-        private readonly TentacleTargeting targeting = new TentacleTargeting();
+        private TentacleTargeting targeting;
         private ActorHealth health;
         private PrototypePlayer player;
         private PlayerMovementController movement;
@@ -64,6 +61,11 @@ private float EffectiveExtractionRange
         public bool HasStoredDna => sample.Species != null;
         public bool ExtractionAllowed { get; set; } = true;
 
+        public float ExtractionPercent =>
+    sample.Species != null && sample.RequiredHits > 0
+        ? (float)sample.Hits / sample.RequiredHits * 100f
+        : 0f;
+
         private void Awake()
         {
             player = GetComponent<PrototypePlayer>();
@@ -71,6 +73,7 @@ private float EffectiveExtractionRange
             movement = GetComponent<PlayerMovementController>();
             tentacle = GetComponentInChildren<PlayerTentacleStrike>(true);
             attack = GetComponent<PlayerTentacleAttack>();
+            targeting = GetComponent<TentacleTargeting>();
             canExtract = CanExtract;
         }
 
@@ -99,12 +102,12 @@ private float EffectiveExtractionRange
 
             if (IsExtracting || sample.IsComplete || (attack != null && attack.IsAttacking) ||
                 tentacle == null || !tentacle.isActiveAndEnabled ||
-                !TentacleTargeting.TryReadClick(0, transform.position, out Vector2 point) || !IsInRange(point))
+                !TentacleTargeting.TryReadClick(0, transform.position, out Vector2 point))
             {
                 return;
             }
 
-            TentacleTargeting.Target target = targeting.Find(point, canExtract);
+            TentacleTargeting.Target target = targeting.Find(point, canExtract, EffectiveExtractionRange);
             if (target.IsAlive && tentacle.Play(point))
             {
                 strike = StartCoroutine(Extract(target));
@@ -120,10 +123,8 @@ private float EffectiveExtractionRange
                 if (target.IsAlive)
                 {
                     Vector2 origin = transform.position;
-tentacle.Track(
-    origin + Vector2.ClampMagnitude(
-        target.Point - origin, EffectiveExtractionRange));                
-                
+                    tentacle.Track(origin + Vector2.ClampMagnitude(
+                        target.Point - origin, EffectiveExtractionRange));
                 }
             }
             while (Time.time < hitAt);
@@ -156,17 +157,15 @@ tentacle.Track(
             sample.Accepts(species) && species.PlayerForm != null && species.PlayerForm.IsConfigured;
 
         internal CreatureController FindAimCreature(Vector2 point) =>
-            isActiveAndEnabled && !sample.IsComplete && tentacle != null && tentacle.isActiveAndEnabled && IsInRange(point)
-                ? targeting.Find(point, canExtract).Creature
+            isActiveAndEnabled && !sample.IsComplete && tentacle != null && tentacle.isActiveAndEnabled
+                ? targeting.Find(point, canExtract, EffectiveExtractionRange).Creature
                 : null;
 
-      private bool IsInRange(Vector2 point)
-{
-    float range = EffectiveExtractionRange;
-
-    return (point - (Vector2)transform.position).sqrMagnitude
-        <= range * range;
-}
+        private bool IsInRange(Vector2 point)
+        {
+            float range = EffectiveExtractionRange;
+            return (point - (Vector2)transform.position).sqrMagnitude <= range * range;
+        }
 
         private bool UpdateDiscard()
         {

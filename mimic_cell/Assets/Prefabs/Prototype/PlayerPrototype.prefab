@@ -1248,6 +1248,7 @@ GameObject:
   m_Component:
   - component: {fileID: 863170592103518615}
   - component: {fileID: 15394247759710400}
+  - component: {fileID: 7743802245176446391}
   m_Layer: 0
   m_Name: StrikePivot
   m_TagString: Untagged
@@ -2157,6 +2158,7 @@ GameObject:
   - component: {fileID: 5901837153212775436}
   - component: {fileID: 8177809416349704630}
   - component: {fileID: 6073019043129597800}
+  - component: {fileID: 7715843721440692031}
   - component: {fileID: 6073019043129597850}
   - component: {fileID: 6073019043129597851}
   m_Layer: 0
@@ -2355,7 +2357,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17ccca83d25c4e53a41999d0c22be346, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerDnaExtraction
-  extractionRange: 6
+--- !u!114 &7715843721440692031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1340454e1f6e4a028b98f40931272375, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.TentacleTargeting
+  interactionRange: 6
 --- !u!114 &9003527612338714761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3151,3 +3165,17 @@ Transform:
   - {fileID: 3887450735944763778}
   m_Father: {fileID: 893048163493472495}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7743802245176446391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4868562528222580474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3ce40938b8d43eebc9c0280e1e37213, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleBodyAim
+  bodyLean: 0.22
+  facingReference: {fileID: 6073019043129597920}

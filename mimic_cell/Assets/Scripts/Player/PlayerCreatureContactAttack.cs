@@ -14,7 +14,7 @@ namespace MimicCell.Player
 [SerializeField, Min(0.01f)] private float dashDuration = 0.8f;
         [SerializeField, Min(0f)] private float contactCooldown = 0.8f;
 
-        private readonly TentacleTargeting targeting = new TentacleTargeting();
+        private TentacleTargeting targeting;
 
         private PrototypePlayer player;
         private PlayerAttackEffects attackEffects;
@@ -39,6 +39,7 @@ namespace MimicCell.Player
             movement = GetComponent<WasdSwimMovement>();
             form = GetComponent<PlayerCreatureFormController>();
             extraction = GetComponent<PlayerDnaExtraction>();
+            targeting = GetComponent<TentacleTargeting>();
         }
 
         private bool CanAttack()
@@ -91,7 +92,12 @@ namespace MimicCell.Player
                 return;
             }
 
-            TentacleTargeting.Target clicked = targeting.Find(point);
+            if (targeting == null)
+                return;
+
+            Vector3 bodyExtents = form.CreatureFormCollider.bounds.extents;
+            float clickRange = attackRange + Mathf.Max(bodyExtents.x, bodyExtents.y);
+            TentacleTargeting.Target clicked = targeting.Find(point, rangeOverride: clickRange);
 
             if (!clicked.IsAlive)
                 return;
