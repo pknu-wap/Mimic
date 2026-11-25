@@ -33,6 +33,11 @@ namespace MimicCell.Player
         public bool HasStoredDna => sample.Species != null;
         public bool ExtractionAllowed { get; set; } = true;
 
+        public float ExtractionPercent =>
+    sample.Species != null && sample.RequiredHits > 0
+        ? (float)sample.Hits / sample.RequiredHits * 100f
+        : 0f;
+
         private void Awake()
         {
             player = GetComponent<PrototypePlayer>();
