@@ -44,6 +44,10 @@ namespace MimicCell.Creatures
             activeGroups =
                 new List<CreatureGroupController>();
 
+        private readonly List<CreatureDefinition>
+            eligibleDefinitions =
+                new List<CreatureDefinition>();
+
         private readonly Dictionary<CreatureController, float> 
             despawnTimers =
                 new Dictionary<CreatureController, float>();
@@ -653,7 +657,11 @@ namespace MimicCell.Creatures
                 environment.GetHabitatAt(
                     spawnPosition);
 
-            float totalWeight = 0f;
+            eligibleDefinitions.Clear();
+
+            bool hasTier1Candidates = false;
+            bool hasTier2Candidates = false;
+            bool hasTier3Candidates = false;
 
             for (
                 int index = 0;
@@ -667,8 +675,47 @@ namespace MimicCell.Creatures
                         candidate,
                         habitat))
                 {
-                    totalWeight +=
-                        candidate.SpawnWeight;
+                    eligibleDefinitions.Add(candidate);
+
+                    switch (candidate.FoodTier)
+                    {
+                        case CreatureFoodTier.Tier1:
+                            hasTier1Candidates = true;
+                            break;
+
+                        case CreatureFoodTier.Tier2:
+                            hasTier2Candidates = true;
+                            break;
+
+                        case CreatureFoodTier.Tier3:
+                            hasTier3Candidates = true;
+                            break;
+                    }
+                }
+            }
+
+            if (eligibleDefinitions.Count == 0 ||
+                !TryChooseFoodTier(
+                    hasTier1Candidates,
+                    hasTier2Candidates,
+                    hasTier3Candidates,
+                    out CreatureFoodTier selectedTier))
+            {
+                return false;
+            }
+
+            float totalWeight = 0f;
+
+            for (int index = 0;
+                index < eligibleDefinitions.Count;
+                index++)
+            {
+                CreatureDefinition candidate =
+                    eligibleDefinitions[index];
+
+                if (candidate.FoodTier == selectedTier)
+                {
+                    totalWeight += candidate.SpawnWeight;
                 }
             }
 
@@ -683,17 +730,14 @@ namespace MimicCell.Creatures
 
             CreatureDefinition lastEligible = null;
 
-            for (
-                int index = 0;
-                index < ecosystem.Creatures.Count;
+            for (int index = 0;
+                index < eligibleDefinitions.Count;
                 index++)
             {
                 CreatureDefinition candidate =
-                    ecosystem.Creatures[index];
+                    eligibleDefinitions[index];
 
-                if (!CanSpawnDefinition(
-                        candidate,
-                        habitat))
+                if (candidate.FoodTier != selectedTier)
                 {
                     continue;
                 }
@@ -710,6 +754,82 @@ namespace MimicCell.Creatures
 
             selected = lastEligible;
             return selected != null;
+        }
+
+        private bool TryChooseFoodTier(
+            bool hasTier1Candidates,
+            bool hasTier2Candidates,
+            bool hasTier3Candidates,
+            out CreatureFoodTier selectedTier)
+        {
+            selectedTier = default;
+
+            CreatureFoodTierSpawnWeights weights =
+                ecosystem.SpawnSettings.FoodTierWeights;
+
+            if (weights == null)
+            {
+                return false;
+            }
+
+            float tier1Weight =
+                hasTier1Candidates
+                    ? weights.GetWeight(CreatureFoodTier.Tier1)
+                    : 0f;
+
+            float tier2Weight =
+                hasTier2Candidates
+                    ? weights.GetWeight(CreatureFoodTier.Tier2)
+                    : 0f;
+
+            float tier3Weight =
+                hasTier3Candidates
+                    ? weights.GetWeight(CreatureFoodTier.Tier3)
+                    : 0f;
+
+            float totalWeight =
+                tier1Weight +
+                tier2Weight +
+                tier3Weight;
+
+            if (totalWeight <= 0f)
+            {
+                return false;
+            }
+
+            float roll =
+                (float)random.NextDouble() *
+                totalWeight;
+
+            if (tier1Weight > 0f)
+            {
+                roll -= tier1Weight;
+
+                if (roll <= 0f)
+                {
+                    selectedTier = CreatureFoodTier.Tier1;
+                    return true;
+                }
+            }
+
+            if (tier2Weight > 0f)
+            {
+                roll -= tier2Weight;
+
+                if (roll <= 0f)
+                {
+                    selectedTier = CreatureFoodTier.Tier2;
+                    return true;
+                }
+            }
+
+            if (tier3Weight > 0f)
+            {
+                selectedTier = CreatureFoodTier.Tier3;
+                return true;
+            }
+
+            return false;
         }
 
         private CreatureController SpawnCreature(
