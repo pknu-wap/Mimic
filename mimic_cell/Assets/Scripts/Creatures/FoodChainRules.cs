@@ -64,6 +64,11 @@ namespace MimicCell.Creatures
                 return false;
             }
 
+            if (!CreatureColliderRole.IsBodyCollider(sourceCollider))
+            {
+                return false;
+            }
+
             CreatureController creature = sourceCollider.GetComponentInParent<CreatureController>();
 
             if (creature != null)

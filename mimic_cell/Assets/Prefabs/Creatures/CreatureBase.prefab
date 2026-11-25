@@ -10,9 +10,15 @@ GameObject:
   m_Component:
   - component: {fileID: 5734956684617622415}
   - component: {fileID: 4391366151360848901}
-  - component: {fileID: 8079473695124305364}
   - component: {fileID: 7429043174824704514}
   - component: {fileID: 5824003858303212285}
+  - component: {fileID: 2458949277765202324}
+  - component: {fileID: 4813284225175065928}
+  - component: {fileID: 2863506110311615357}
+  - component: {fileID: 1593012905926074991}
+  - component: {fileID: -6146987992315376813}
+  - component: {fileID: 1012354889735977938}
+  - component: {fileID: -6371114792628346635}
   m_Layer: 0
   m_Name: CreatureBase
   m_TagString: Untagged
@@ -34,6 +40,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 434553515257665297}
+  - {fileID: 2794434518535229305}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &4391366151360848901
@@ -63,52 +70,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!61 &8079473695124305364
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5100830523769901341}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1.5, y: 0.5}
-  m_EdgeRadius: 0
 --- !u!114 &7429043174824704514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,6 +110,100 @@ MonoBehaviour:
   movementBoundsMax: {x: 21, y: 8.5}
   visualRoot: {fileID: 434553515257665297}
   currentState: 0
+  attachedCollider: {fileID: 3781528017207073054}
+--- !u!114 &2458949277765202324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5100830523769901341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04bf05e22c0f82e4cbbf1fd9db285b30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureMovementTraitController
+--- !u!114 &4813284225175065928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5100830523769901341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4380fd621f870254db598ee99b0cc6a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreaturePerceptionTraitController
+--- !u!114 &2863506110311615357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5100830523769901341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7d3be86ff49bf34ea8ebc89689752f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureCombatTraitController
+--- !u!114 &1593012905926074991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5100830523769901341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6284bd0bef14d0e47a97b85e53fac2dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.CreatureInjuryEffect
+  referenceTurnSpeed: 360
+  wobbleAngle: 10
+  stage: 0
+--- !u!114 &-6146987992315376813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5100830523769901341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 836e1f7c6c98c2342b1bc4114354b4e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.CreatureAnoxiaVisual
+  bubbleEffect: {fileID: 5208191466303176384, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+--- !u!114 &1012354889735977938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5100830523769901341}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d09c6f4a357ad343808628484c14219, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.CreatureFreezingVisual
+  body: {fileID: 6021030491659640245}
+  frozenTint: {r: 0.55, g: 0.8, b: 1, a: 1}
+--- !u!114 &-6371114792628346635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5100830523769901341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccf25b265bdae6f4f88800cc87bc3eb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.CreatureStatusTintVisual
+  body: {fileID: 6021030491659640245}
+  frozenTint: {r: 0.55, g: 0.8, b: 1, a: 1}
+  mudTint: {r: 0.7, g: 0.45, b: 0.25, a: 1}
 --- !u!1 &6162547733366903643
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,6 +214,8 @@ GameObject:
   m_Component:
   - component: {fileID: 434553515257665297}
   - component: {fileID: 6021030491659640245}
+  - component: {fileID: 3781528017207073054}
+  - component: {fileID: 5849331182101468933}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -240,3 +297,139 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
+--- !u!60 &3781528017207073054
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6162547733366903643}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0, y: 0.45729417}
+      - {x: -0.42339957, y: 0.39128286}
+      - {x: -0.95105654, y: 0.30901697}
+      - {x: -0.5877852, y: -0.80901706}
+      - {x: 0.58778536, y: -0.80901694}
+      - {x: 0.9510565, y: 0.30901712}
+  m_UseDelaunayMesh: 1
+--- !u!114 &5849331182101468933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6162547733366903643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fb73614f50e95547826f72467f515fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureColliderRole
+  purpose: 0
+--- !u!1001 &2462737015171262297
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5734956684617622415}
+    m_Modifications:
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 873252366597102491, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_SortingOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5208191466303176384, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_Name
+      value: PoisonVFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 5208191466303176384, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+--- !u!4 &2794434518535229305 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 354294704056887328, guid: 49ff1469e11cd8e4a8d8eac73fea0189, type: 3}
+  m_PrefabInstance: {fileID: 2462737015171262297}
+  m_PrefabAsset: {fileID: 0}

@@ -1,5 +1,5 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using MimicCell.Creatures;
 using MimicCell.Gameplay;
 using UnityEngine;
@@ -11,7 +11,7 @@ using UnityEngine.InputSystem;
 namespace MimicCell.Player
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(ActorHealth), typeof(PlayerMovementController))]
+    [RequireComponent(typeof(PrototypePlayer))]
     public class PlayerDnaExtraction : MonoBehaviour
     {
         private const float DiscardSeconds = 2f;
@@ -19,18 +19,26 @@ namespace MimicCell.Player
         [SerializeField, Min(0.1f)] private float extractionRange = 6f;
 
         private readonly DnaSample sample = new DnaSample();
-        private readonly List<Collider2D> clickHits = new List<Collider2D>(8);
+        private readonly TentacleTargeting targeting = new TentacleTargeting();
         private ActorHealth health;
+        private PrototypePlayer player;
         private PlayerMovementController movement;
         private PlayerTentacleStrike tentacle;
+        private PlayerTentacleAttack attack;
         private Coroutine strike;
+        private Predicate<CreatureDefinition> canExtract;
         private float discardTime;
+
+        internal bool IsExtracting => strike != null;
 
         private void Awake()
         {
+            player = GetComponent<PrototypePlayer>();
             health = GetComponent<ActorHealth>();
             movement = GetComponent<PlayerMovementController>();
             tentacle = GetComponentInChildren<PlayerTentacleStrike>(true);
+            attack = GetComponent<PlayerTentacleAttack>();
+            canExtract = CanExtract;
         }
 
         private void OnEnable() => health.Died += OnDeath;
@@ -54,91 +62,60 @@ namespace MimicCell.Player
                 return;
             }
 
-            if (strike != null || sample.IsComplete || tentacle == null || !tentacle.isActiveAndEnabled ||
-                !TryReadClick(out Vector2 screenPosition) ||
-                !TryGetWorldPoint(screenPosition, out Vector2 point) || !IsInRange(point))
+            if (IsExtracting || sample.IsComplete || (attack != null && attack.IsAttacking) ||
+                tentacle == null || !tentacle.isActiveAndEnabled ||
+                !TentacleTargeting.TryReadClick(0, transform.position, out Vector2 point) || !IsInRange(point))
             {
                 return;
             }
 
-            Collider2D hit = FindTarget(point, out CreatureDefinition species, out ActorHealth targetHealth);
-            if (hit != null && tentacle.Play(point))
+            TentacleTargeting.Target target = targeting.Find(point, canExtract);
+            if (target.IsAlive && tentacle.Play(point))
             {
-                Vector2 localPoint = hit.transform.InverseTransformPoint(point);
-                strike = StartCoroutine(Extract(hit, species, targetHealth, localPoint));
+                strike = StartCoroutine(Extract(target));
             }
         }
 
-        private IEnumerator Extract(Collider2D hit, CreatureDefinition species, ActorHealth targetHealth, Vector2 localPoint)
+        private IEnumerator Extract(TentacleTargeting.Target target)
         {
             float hitAt = Time.time + tentacle.ImpactTime;
             do
             {
                 yield return null;
-                if (IsTargetAlive(hit, targetHealth))
+                if (target.IsAlive)
                 {
-                    Vector2 point = hit.transform.TransformPoint(localPoint);
                     Vector2 origin = transform.position;
-                    tentacle.Track(origin + Vector2.ClampMagnitude(point - origin, extractionRange));
+                    tentacle.Track(origin + Vector2.ClampMagnitude(target.Point - origin, extractionRange));
                 }
             }
             while (Time.time < hitAt);
 
-            if (movement.ControlsEnabled && IsTargetAlive(hit, targetHealth) &&
-                IsInRange(hit.transform.TransformPoint(localPoint)))
+            if (movement.ControlsEnabled && target.IsAlive && IsInRange(target.Point))
             {
-                sample.AddHit(species, targetHealth.MaxHealth);
+                CreatureDefinition species = target.Creature.Definition;
+                sample.AddHit(species, target.Creature.Health.MaxHealth);
                 Debug.Log($"[DNA] {species.DisplayName} 적중 ({sample.Hits}/{sample.RequiredHits})", this);
-                if (sample.IsComplete)
-                {
-                    Debug.Log($"[DNA] {species.DisplayName} 추출 완료. 복제 가능.", this);
-                }
             }
 
             yield return new WaitForSeconds(tentacle.RecoveryTime);
             strike = null;
-        }
-
-        private Collider2D FindTarget(Vector2 point, out CreatureDefinition species, out ActorHealth targetHealth)
-        {
-            Physics2D.OverlapPoint(point, new ContactFilter2D { useTriggers = true }, clickHits);
-            Collider2D bestHit = null;
-            float bestDistance = float.PositiveInfinity;
-            species = null;
-            targetHealth = null;
-
-            foreach (Collider2D hit in clickHits)
+            if (sample.IsComplete && health.IsAlive && player.TryApplyCreatureForm(sample.Species))
             {
-                CreatureController creature = hit.GetComponentInParent<CreatureController>();
-                CreatureDefinition definition = creature != null ? creature.Definition : null;
-                if (!sample.Accepts(definition))
-                {
-                    continue;
-                }
-
-                ActorHealth candidateHealth = creature.GetComponent<ActorHealth>();
-                float distance = (point - (Vector2)creature.transform.position).sqrMagnitude;
-                if (distance < bestDistance && IsTargetAlive(hit, candidateHealth))
-                {
-                    bestHit = hit;
-                    bestDistance = distance;
-                    species = definition;
-                    targetHealth = candidateHealth;
-                }
+                Debug.Log($"[DNA] {sample.Species.DisplayName} 추출 완료. 복제했습니다.", this);
             }
-
-            return bestHit;
         }
+
+        private bool CanExtract(CreatureDefinition species) =>
+            sample.Accepts(species) && species.PlayerForm != null && species.PlayerForm.IsConfigured;
+
+        internal CreatureController FindAimCreature(Vector2 point) =>
+            isActiveAndEnabled && !sample.IsComplete && tentacle != null && tentacle.isActiveAndEnabled && IsInRange(point)
+                ? targeting.Find(point, canExtract).Creature
+                : null;
 
         private bool IsInRange(Vector2 point)
         {
             return (point - (Vector2)transform.position).sqrMagnitude <= extractionRange * extractionRange;
-        }
-
-        private static bool IsTargetAlive(Collider2D hit, ActorHealth targetHealth)
-        {
-            return hit != null && hit.enabled && hit.gameObject.activeInHierarchy &&
-                targetHealth != null && targetHealth.IsAlive;
         }
 
         private bool UpdateDiscard()
@@ -173,44 +150,6 @@ namespace MimicCell.Player
             {
                 tentacle.Cancel();
             }
-        }
-
-        private bool TryGetWorldPoint(Vector2 screenPosition, out Vector2 point)
-        {
-            point = default;
-            Camera camera = Camera.main;
-            if (camera == null)
-            {
-                return false;
-            }
-
-            Ray ray = camera.ScreenPointToRay(screenPosition);
-            Plane swimPlane = new Plane(Vector3.forward, transform.position);
-            if (!swimPlane.Raycast(ray, out float distance))
-            {
-                return false;
-            }
-
-            point = ray.GetPoint(distance);
-            return true;
-        }
-
-        private static bool TryReadClick(out Vector2 point)
-        {
-#if ENABLE_INPUT_SYSTEM
-            if (Mouse.current != null)
-            {
-                point = Mouse.current.position.ReadValue();
-                return Mouse.current.leftButton.wasPressedThisFrame;
-            }
-#endif
-#if ENABLE_LEGACY_INPUT_MANAGER
-            point = Input.mousePosition;
-            return Input.GetMouseButtonDown(0);
-#else
-            point = default;
-            return false;
-#endif
         }
 
         private static bool IsDiscardHeld()

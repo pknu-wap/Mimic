@@ -79,6 +79,9 @@ namespace MimicCell.Creatures
         private float tier3FleeDuration = 5f;
 
         [SerializeField, Min(1f)]
+        private float sensingRadiusMultiplier = 1.4f;
+
+        [SerializeField, Min(1f)]
         private float sensingDurationMultiplier = 1.4f;
 
         public float CommonPerceptionRadius =>
@@ -96,8 +99,9 @@ namespace MimicCell.Creatures
 
         public float Tier3FleeDuration => tier3FleeDuration;
 
-        public float SensingDurationMultiplier =>
-            sensingDurationMultiplier;
+        public float SensingRadiusMultiplier => sensingRadiusMultiplier;
+
+        public float SensingDurationMultiplier => sensingDurationMultiplier;
 
         public void Validate()
         {
@@ -121,6 +125,9 @@ namespace MimicCell.Creatures
 
             tier3FleeDuration =
                 Mathf.Max(0f, tier3FleeDuration);
+
+            sensingRadiusMultiplier =
+                Mathf.Max(1f, sensingRadiusMultiplier);
 
             sensingDurationMultiplier =
                 Mathf.Max(1f, sensingDurationMultiplier);

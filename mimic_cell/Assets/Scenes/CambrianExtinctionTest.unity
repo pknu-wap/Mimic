@@ -376,6 +376,7 @@ GameObject:
   - component: {fileID: 1175212827}
   - component: {fileID: 1175212828}
   - component: {fileID: 1175212829}
+  - component: {fileID: 1175212831}
   m_Layer: 0
   m_Name: Cambrian Ocean World
   m_TagString: Untagged
@@ -952,6 +953,21 @@ MonoBehaviour:
   ocean: {fileID: 1175212828}
   terrain: {fileID: 1452000003}
   cameraFollow: {fileID: 519420033}
+--- !u!114 &1175212831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175212826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb0264cf39a74c76a2ac30e1273ce3d5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.World.CambrianOceanSurface
+  waterHighlight: {r: 0.67, g: 0.9, b: 0.94, a: 1}
+  skyHorizon: {r: 0.88, g: 0.96, b: 0.97, a: 1}
+  skyHigh: {r: 0.32, g: 0.65, b: 0.84, a: 1}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

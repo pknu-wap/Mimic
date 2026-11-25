@@ -1,10 +1,11 @@
 using MimicCell.Creatures;
 using UnityEngine;
+using MimicCell.Gameplay;
 
 namespace MimicCell.Player
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(PrototypePlayer))]
+    [RequireComponent(typeof(PrototypePlayer), typeof(PlayerAttackEffects))]
     public sealed class PlayerCreatureContactAttack : MonoBehaviour
     {
         [Header("Creature Form Contact Attack")]
@@ -12,11 +13,13 @@ namespace MimicCell.Player
         private float contactCooldown = 0.8f;
 
         private PrototypePlayer player;
+        private PlayerAttackEffects attackEffects;
         private float cooldownRemaining;
 
         private void Awake()
         {
             player = GetComponent<PrototypePlayer>();
+            attackEffects = GetComponent<PlayerAttackEffects>();
         }
 
         private void Update()
@@ -30,6 +33,11 @@ namespace MimicCell.Player
                 player == null ||
                 player.Health == null ||
                 !player.Health.IsAlive)
+            {
+                return;
+            }
+
+            if (!CreatureColliderRole.IsBodyCollider(other))
             {
                 return;
             }
@@ -58,13 +66,26 @@ namespace MimicCell.Player
             }
 
             int finalDamage = CreatureCombatRules.CalculateDamage(
-                attackDamage, 
+                attackDamage,
                 player.CurrentFoodTier,
                 target.CurrentFoodTier,
                 target.CurrentTraits);
 
-            if (target.Health.TakeDamage(finalDamage))
+            if (finalDamage <= 0 || !attackEffects.TryBeginAttack())
             {
+                return;
+            }
+
+            ActorDamageContext damageContext =
+                new ActorDamageContext(
+                    finalDamage,
+                    player.Health,
+                    ActorDamageType.Contact);
+
+            if (target.Health.TakeDamage(damageContext))
+            {
+                cooldownRemaining = contactCooldown;
+                attackEffects.NotifyHit();
                 Debug.Log(
                     "복제 몬스터 공격 성공: " +
                     target.SpeciesName +
@@ -77,8 +98,6 @@ namespace MimicCell.Player
                     "/" +
                     target.Health.MaxHealth,
                     this);
-
-                cooldownRemaining = contactCooldown;
             }
         }
     }

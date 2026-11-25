@@ -1,11 +1,8 @@
 using MimicCell.Creatures;
 using MimicCell.Gameplay;
-using MimicCell.Player;
 using MimicCell.Prototype;
-using MimicCell.StatusEffects;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace MimicCell.EditorTools
 {
@@ -13,10 +10,8 @@ namespace MimicCell.EditorTools
     {
         private const string PrototypePrefabFolder = "Assets/Prefabs/Prototype";
         private const string PlayerPrefabPath = PrototypePrefabFolder + "/PlayerPrototype.prefab";
-        private const string PlayerSpritePath = "Assets/Sprites/Player/플레이어 (초기 버전).psd";
         private const string AimMaterialPath = PrototypePrefabFolder + "/PrototypeAimLine.mat";
         private const float PixelsPerUnit = 16f;
-        private const float PlayerVisualScale = 0.5f;
 
         private sealed class CreatureSpec
         {
@@ -111,7 +106,6 @@ namespace MimicCell.EditorTools
 
             EnsureAssetFolders();
             EnsureAimMaterial();
-            CreatePlayerPrefab();
 
             for (int i = 0; i < CambrianCreatures.Length; i++)
             {
@@ -120,24 +114,13 @@ namespace MimicCell.EditorTools
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("Mimic prototype prefabs and scene objects were built successfully.");
+            Debug.Log("Mimic prototype creature prototype prefabs were built successfully.");
         }
 
-        [MenuItem("Mimic/Rebuild Player Prototype", priority = 11)]
-        public static void RebuildPlayerPrototype()
+        [MenuItem("Mimic/Select Player Prototype", priority = 11)]
+        public static void SelectPlayerPrototype()
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                Debug.LogWarning("Stop Play Mode before rebuilding the Mimic player prototype.");
-                return;
-            }
-
-            EnsureAssetFolders();
-            GameObject playerPrefab = CreatePlayerPrefab();
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-            Selection.activeObject = playerPrefab;
-            Debug.Log("Mimic player sprite prefab was rebuilt successfully.");
+            Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
         }
 
         private static void EnsureAssetFolders()
@@ -168,163 +151,6 @@ namespace MimicCell.EditorTools
             };
             AssetDatabase.CreateAsset(material, AimMaterialPath);
             return material;
-        }
-
-        private static GameObject CreatePlayerPrefab()
-        {
-            GameObject player = new GameObject("Player_MimicCell");
-
-            try
-            {
-                TrySetTag(player, "Player");
-
-                Rigidbody2D body = player.AddComponent<Rigidbody2D>();
-                body.gravityScale = 0f;
-                body.freezeRotation = true;
-                body.interpolation = RigidbodyInterpolation2D.Interpolate;
-
-                CircleCollider2D playerCollider = player.AddComponent<CircleCollider2D>();
-                playerCollider.radius = 0.5f;
-
-                GameObject visual = CreatePlayerSpriteVisual(player.transform);
-
-                player.AddComponent<WasdSwimMovement>();
-                player.AddComponent<MouseHoldMovement>();
-                PlayerMovementController movement = player.AddComponent<PlayerMovementController>();
-                movement.Configure(null, visual.transform, null);
-                movement.SetMovementMode(PlayerMovementMode.WasdSwim);
-
-                player.AddComponent<ActorHealth>().Configure(20);
-                player.AddComponent<StatusEffectController>();
-                player.AddComponent<PrototypePlayer>();
-                player.AddComponent<PlayerDnaExtraction>();
-
-                return PrefabUtility.SaveAsPrefabAsset(player, PlayerPrefabPath);
-            }
-            finally
-            {
-                Object.DestroyImmediate(player);
-            }
-        }
-
-        private static GameObject CreatePlayerSpriteVisual(Transform parent)
-        {
-            UnityEngine.Object[] spriteAssets = AssetDatabase.LoadAllAssetsAtPath(PlayerSpritePath);
-            Sprite bodySprite = RequirePlayerLayerSprite(spriteAssets, 7);
-            Sprite coreSprite = RequirePlayerLayerSprite(spriteAssets, 11);
-            Sprite extractionSprite = RequirePlayerLayerSprite(spriteAssets, 9);
-            Sprite legOneSprite = RequirePlayerLayerSprite(spriteAssets, 1);
-            Sprite legThreeSprite = RequirePlayerLayerSprite(spriteAssets, 3);
-            Sprite legFiveSprite = RequirePlayerLayerSprite(spriteAssets, 5);
-
-            GameObject visual = new GameObject("Visual");
-            visual.transform.SetParent(parent, false);
-            visual.transform.localScale = Vector3.one * PlayerVisualScale;
-
-            SortingGroup sortingGroup = visual.AddComponent<SortingGroup>();
-            sortingGroup.sortingOrder = 10;
-
-            Transform aimPivot = new GameObject("Tentacle Aim").transform;
-            aimPivot.SetParent(visual.transform, false);
-            aimPivot.gameObject.AddComponent<PlayerTentacleStrike>();
-
-            Vector2 bodyLowerLeft = new Vector2(282f, 495f);
-            Vector2 bodyCenter = bodyLowerLeft + (bodySprite.rect.size * 0.5f);
-
-            GameObject bodyRoot = new GameObject("Body Jelly");
-            bodyRoot.transform.SetParent(aimPivot, false);
-            SpriteRenderer bodyRenderer = CreatePlayerLayer(
-                bodyRoot.transform,
-                "Layer 7 - Body",
-                bodySprite,
-                Vector2.zero,
-                7);
-            SpriteRenderer coreRenderer = CreatePlayerLayer(
-                bodyRoot.transform,
-                "Layer 11 - Core",
-                coreSprite,
-                CalculatePlayerLayerOffset(coreSprite, new Vector2(344f, 525f), bodyCenter),
-                11);
-
-            SpriteRenderer[] legs =
-            {
-                CreatePlayerLayer(
-                    aimPivot,
-                    "Layer 1 - Leg",
-                    legOneSprite,
-                    CalculatePlayerLayerOffset(legOneSprite, new Vector2(339f, 83f), bodyCenter),
-                    1),
-                CreatePlayerLayer(
-                    aimPivot,
-                    "Layer 3 - Leg",
-                    legThreeSprite,
-                    CalculatePlayerLayerOffset(legThreeSprite, new Vector2(174f, 71f), bodyCenter),
-                    3),
-                CreatePlayerLayer(
-                    aimPivot,
-                    "Layer 5 - Leg",
-                    legFiveSprite,
-                    CalculatePlayerLayerOffset(legFiveSprite, new Vector2(391f, 83f), bodyCenter),
-                    5)
-            };
-
-            SpriteRenderer extractionTentacle = CreatePlayerLayer(
-                aimPivot,
-                "Layer 9 - Extraction Tentacle",
-                extractionSprite,
-                CalculatePlayerLayerOffset(extractionSprite, new Vector2(376f, 146f), bodyCenter),
-                9);
-
-            PlayerJellyVisual jellyVisual = parent.gameObject.AddComponent<PlayerJellyVisual>();
-            jellyVisual.Configure(
-                aimPivot,
-                bodyRoot.transform,
-                bodyRenderer,
-                coreRenderer.transform,
-                legs,
-                extractionTentacle);
-            return visual;
-        }
-
-        private static Sprite RequirePlayerLayerSprite(UnityEngine.Object[] assets, int layerNumber)
-        {
-            string layerName = "레이어 " + layerNumber;
-            for (int i = 0; i < assets.Length; i++)
-            {
-                if (assets[i] is Sprite sprite && sprite.name == layerName)
-                {
-                    return sprite;
-                }
-            }
-
-            throw new System.InvalidOperationException(
-                "Player PSD is missing the required sprite layer '" + layerName + "'.");
-        }
-
-        private static SpriteRenderer CreatePlayerLayer(
-            Transform parent,
-            string objectName,
-            Sprite sprite,
-            Vector2 localPosition,
-            int layerOrder)
-        {
-            GameObject layer = new GameObject(objectName);
-            layer.transform.SetParent(parent, false);
-            layer.transform.localPosition = new Vector3(localPosition.x, localPosition.y, 0f);
-
-            SpriteRenderer renderer = layer.AddComponent<SpriteRenderer>();
-            renderer.sprite = sprite;
-            renderer.sortingOrder = layerOrder;
-            return renderer;
-        }
-
-        private static Vector2 CalculatePlayerLayerOffset(
-            Sprite sprite,
-            Vector2 sourceLowerLeft,
-            Vector2 bodyCenter)
-        {
-            Vector2 layerCenter = sourceLowerLeft + (sprite.rect.size * 0.5f);
-            return (layerCenter - bodyCenter) / sprite.pixelsPerUnit;
         }
 
         private static void CreateCreaturePrefab(CreatureSpec spec)
@@ -388,18 +214,6 @@ namespace MimicCell.EditorTools
             PlaceholderSprite placeholder = visual.AddComponent<PlaceholderSprite>();
             placeholder.Apply(pixelSize, fillColor, outlineColor, PixelsPerUnit);
             return visual;
-        }
-
-        private static void TrySetTag(GameObject target, string tagName)
-        {
-            try
-            {
-                target.tag = tagName;
-            }
-            catch (UnityException)
-            {
-                Debug.LogWarning("Unity tag '" + tagName + "' is not available yet.");
-            }
         }
     }
 }

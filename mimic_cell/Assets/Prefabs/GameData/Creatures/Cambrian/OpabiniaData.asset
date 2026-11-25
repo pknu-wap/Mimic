@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
+  m_Name: OpabiniaData
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
+  creatureId: Opabinia
+  displayName: "\uC624\uD30C\uBE44\uB2C8\uC544"
+  prefab: {fileID: 7524175620898974430, guid: b4bf9a4d3431c8c48a467f4d41f85952, type: 3}
+  playerForm:
+    sprite: {fileID: 4856847405467277849, guid: cf220738b1eb34e48a77443aecc95cff, type: 3}
+    movementController: {fileID: 9100000, guid: 05ceb8e83c50890419ee4ea0e4dc1298, type: 2}
+    visualScale: {x: 1.386, y: 1.386}
+    colliderSize: {x: 9.24, y: 3.96}
+    colliderOffset: {x: 0, y: 0}
+    flipXToFaceRight: 1
+  spawnKind: 0
+  foodTier: 2
+  bodySize: 0
+  allowedHabitats: 24
+  traits: 21
+  disposition: 2
+  designSizeRange:
+    min: {x: 25, y: 10}
+    max: {x: 31, y: 14}
+  healthRange:
+    min: 35
+    max: 40
+  attackRange:
+    min: 3
+    max: 5
+  reflectionDamageRange:
+    min: 0
+    max: 0
+  swimSpeed: 1.5
+  sprintSpeed: 3.3
+  wanderRadius: 8
+  usePerceptionRadiusOverride: 1
+  perceptionRadius: 14
+  spawnWeight: 1
+  maxAlive: 4
+  groupSizeRange:
+    min: 0
+    max: 0
+  maxGroupCount: 0
