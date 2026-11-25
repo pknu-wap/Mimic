@@ -943,8 +943,7 @@ statusController.SetOwnerType(StatusEffectTarget.Creature);
             bool initializedGroup = groupController.Initialize(
                 definition,
                 ecosystem,
-                environment,
-                player);
+                environment);
 
             if (!initializedGroup)
             {

@@ -78,6 +78,11 @@ namespace MimicCell.Creatures
 
         private Vector2 groupMovementDirection;
         private bool hasGroupMovementDirection;
+        private bool isGroupFleeing;
+
+        private FoodChainTarget detectedThreat;
+        private Vector2 detectedThreatPosition;
+        private float threatDetectedAt = float.NegativeInfinity;
 
         private float stateTimeRemaining;
         private float decisionTimeRemaining;
@@ -255,6 +260,13 @@ namespace MimicCell.Creatures
             }
         }
 
+        private void OnDisable()
+        {
+            detectedThreat = default;
+            threatDetectedAt = float.NegativeInfinity;
+            ClearGroupMovementDirection();
+        }
+
         private void HandleDamaged(ActorHealth health, int damageAmount)
         {
             if (damageAmount <= 0 || !CurrentTraits.HasTrait(CreatureTraits.Sprinting))
@@ -428,6 +440,9 @@ namespace MimicCell.Creatures
             ecosystem = newEcosystem;
             environment = newEnvironment;
             player = targetPlayer;
+            detectedThreat = default;
+            threatDetectedAt = float.NegativeInfinity;
+            ClearGroupMovementDirection();
 
             if (movementTraitController != null)
             {
@@ -493,7 +508,9 @@ namespace MimicCell.Creatures
             BeginWanderCycle();
         }
 
-        public void SetGroupMovementDirection(Vector2 direction)
+        public void SetGroupMovementDirection(
+            Vector2 direction,
+            bool fleeing = false)
         {
             if (CurrentState == CreatureState.Dead)
             {
@@ -508,12 +525,50 @@ namespace MimicCell.Creatures
 
             groupMovementDirection = direction.normalized;
             hasGroupMovementDirection = true;
+            isGroupFleeing = fleeing;
         }
 
         public void ClearGroupMovementDirection()
         {
             groupMovementDirection = Vector2.zero;
             hasGroupMovementDirection = false;
+            isGroupFleeing = false;
+        }
+
+        internal bool TryGetDetectedThreat(
+            out FoodChainTarget threat,
+            out Vector2 position,
+            out float detectedAt)
+        {
+            threat = detectedThreat;
+            position = detectedThreatPosition;
+            detectedAt = threatDetectedAt;
+
+            return isActiveAndEnabled &&
+                CurrentState != CreatureState.Dead &&
+                !extinctionFrenzy &&
+                threat.IsValid;
+        }
+
+        internal void EndGroupFlee()
+        {
+            isGroupFleeing = false;
+
+            if (CurrentState != CreatureState.Flee ||
+                (TryGetDetectedThreat(out _, out _, out float detectedAt) &&
+                 ecosystem != null &&
+                 Time.time - detectedAt <
+                     ecosystem.PerceptionSettings.Tier1FleeDuration))
+            {
+                return;
+            }
+
+            // Do not add the member's remaining flee memory after
+            // the group's last real sighting deadline has passed.
+            behaviorMemoryTimeRemaining = 0f;
+            coldPursuitMemory = 0f;
+            currentFoodChainTarget = default;
+            BeginWanderCycle();
         }
 
         internal void SetInitialGroupPosition(
@@ -741,8 +796,16 @@ float radius = GetCurrentPerceptionRadius();
                 }
             }
 
+            // Only an actual perception result counts as a new sighting.
+            // Remembered Flee and shared group movement never update this.
+            detectedThreat = closestThreat;
+
             if (closestThreat.IsValid)
             {
+                detectedThreatPosition =
+                    closestThreat.Transform.position;
+
+                threatDetectedAt = Time.time;
                 coldPrey = null;
 
                 currentFoodChainTarget = closestThreat;
@@ -871,13 +934,26 @@ float distance = offset.sqrMagnitude;
 
             Vector2 currentPosition = attachedRigidbody.position;
 
+            if (isGroupFleeing &&
+                CurrentState != CreatureState.Flee)
+            {
+                return groupMovementDirection;
+            }
+
             switch (CurrentState)
             {
                 case CreatureState.Chase:
                     return DirectionToFoodChainTarget(currentPosition);
 
                 case CreatureState.Flee:
-                    return -DirectionToFoodChainTarget(currentPosition);
+                    Vector2 fleeDirection =
+                        -DirectionToFoodChainTarget(currentPosition);
+
+                    return fleeDirection.sqrMagnitude > 0.001f
+                        ? fleeDirection
+                        : isGroupFleeing
+                            ? groupMovementDirection
+                            : Vector2.zero;
 
                 case CreatureState.Idle:
                     return hasGroupMovementDirection
@@ -937,7 +1013,7 @@ float distance = offset.sqrMagnitude;
 
             float stateSpeed;
 
-            if (extinctionFrenzy)
+            if (extinctionFrenzy || isGroupFleeing)
             {
                 stateSpeed = sprintSpeed;
             }
@@ -1077,6 +1153,7 @@ float distance = offset.sqrMagnitude;
                 environment == null ||
                 attachedCollider == null ||
                 extinctionFrenzy ||
+                isGroupFleeing ||
                 definition.AllowedHabitats ==
                     CreatureHabitatMask.None)
             {
