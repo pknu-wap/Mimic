@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
   creatureId: Training_Alien
   displayName: "\uD6C8\uB828\uAC1C\uCCB4"
-  prefab: {fileID: 2513940238013089828, guid: 97ee90fae06db5c4ba13c3a092a1b874, type: 3}
+  prefab: {fileID: 2513940238013089828, guid: e3da0740cf1be0745921619c99cc61a7, type: 3}
   playerForm:
-    sprite: {fileID: 21300000, guid: 0689ace28c70db04ca6554e783080052, type: 3}
-    movementController: {fileID: 9100000, guid: 7c460fd3e8b979040bf3b5dca621ee1a, type: 2}
-    visualScale: {x: 1.32, y: 1.32}
+    sprite: {fileID: 21300000, guid: 35b18bfddae0f7a448acb7fa421def1a, type: 3}
+    movementController: {fileID: 9100000, guid: fbf82340166648847813970393d97230, type: 2}
+    visualScale: {x: 3, y: 3}
     colliderSize: {x: 9.57, y: 3.135}
     colliderOffset: {x: 0, y: 0}
-    flipXToFaceRight: 1
+    flipXToFaceRight: 0
   spawnKind: 0
   foodTier: 1
   bodySize: 0
