@@ -58,8 +58,7 @@ namespace MimicCell.Player
             float reach = cast * cast * released;
             float curl = Mathf.Lerp(-0.7f, 0.12f, cast) + recovery * 0.65f;
 
-            extractionVisual.TryGetAttachmentDirection(out Vector2 attachment);
-            bodyAim.ApplyPose(target, attachment, elapsed, windup, cast, reach, recovery);
+            bodyAim.ApplyPose(target, elapsed, windup, cast, reach, recovery);
 
             extractionVisual.SetPose(target, reach, curl);
         }

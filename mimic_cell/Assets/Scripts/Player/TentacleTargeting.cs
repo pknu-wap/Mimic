@@ -9,12 +9,29 @@ using UnityEngine.InputSystem;
 
 namespace MimicCell.Player
 {
-    internal class TentacleTargeting
+    [DisallowMultipleComponent]
+    public class TentacleTargeting : MonoBehaviour
     {
+        [SerializeField, Min(0.1f)] private float interactionRange = 6f;
+
         private readonly List<Collider2D> clickHits = new List<Collider2D>(8);
 
-        public Target Find(Vector2 point, Predicate<CreatureDefinition> accepts = null)
+        internal bool IsInRange(Vector2 point) =>
+            (point - (Vector2)transform.position).sqrMagnitude <= interactionRange * interactionRange;
+
+        internal Vector2 ClampToRange(Vector2 point)
         {
+            Vector2 origin = transform.position;
+            return origin + Vector2.ClampMagnitude(point - origin, interactionRange);
+        }
+
+        internal Target Find(Vector2 point, Predicate<CreatureDefinition> accepts = null)
+        {
+            if (!IsInRange(point))
+            {
+                return default;
+            }
+
             Physics2D.OverlapPoint(point, new ContactFilter2D { useTriggers = true }, clickHits);
             Target best = default;
             float nearest = float.PositiveInfinity;

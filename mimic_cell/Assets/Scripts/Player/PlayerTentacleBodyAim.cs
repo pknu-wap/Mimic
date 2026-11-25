@@ -6,19 +6,25 @@ namespace MimicCell.Player
     public class PlayerTentacleBodyAim : MonoBehaviour
     {
         [SerializeField, Min(0f)] private float bodyLean = 0.22f;
+        [SerializeField] private Transform facingReference;
 
         private Vector3 restPosition;
         private Quaternion restRotation;
         private Quaternion lastAimRotation;
+        private Vector2 localFacingDirection;
 
         private void Awake()
         {
             restPosition = transform.localPosition;
             restRotation = transform.localRotation;
             lastAimRotation = restRotation;
+            // The body's forward direction stays the same whichever tentacle strikes.
+            localFacingDirection = facingReference != null
+                ? (Vector2)transform.InverseTransformPoint(facingReference.position)
+                : Vector2.down;
         }
 
-        internal void ApplyPose(Vector2 target, Vector2 attachment, float elapsed, float windup,
+        internal void ApplyPose(Vector2 target, float elapsed, float windup,
             float cast, float reach, float recovery)
         {
             if (!isActiveAndEnabled)
@@ -39,13 +45,14 @@ namespace MimicCell.Player
                 return;
             }
 
-            if (direction.sqrMagnitude <= 0.0001f || attachment.sqrMagnitude <= 0.0001f)
+            if (direction.sqrMagnitude <= 0.0001f || localFacingDirection.sqrMagnitude <= 0.0001f)
             {
                 return;
             }
 
             Quaternion currentRotation = transform.localRotation;
-            float angle = Vector2.SignedAngle(parent.InverseTransformVector(attachment),
+            Vector3 facing = transform.TransformVector(localFacingDirection);
+            float angle = Vector2.SignedAngle(parent.InverseTransformVector(facing),
                 parent.InverseTransformVector(direction));
             Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward) * currentRotation;
             float turnTime = Mathf.Min(elapsed, Time.deltaTime);
