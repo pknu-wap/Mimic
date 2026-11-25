@@ -29,6 +29,20 @@ namespace MimicCell.Gameplay
         public event Action<ActorHealth> Died;
         public event Action<ActorHealth> DamageTaken;
         public event Action<ActorHealth, ActorDamageContext, int> DamageApplied;
+private readonly System.Collections.Generic.HashSet<UnityEngine.Object>
+    damageImmunitySources =
+        new System.Collections.Generic.HashSet<UnityEngine.Object>();
+
+public void SetDamageImmunity(UnityEngine.Object source, bool active)
+{
+    if (source == null)
+        return;
+
+    if (active)
+        damageImmunitySources.Add(source);
+    else
+        damageImmunitySources.Remove(source);
+}
 
         private void Awake()
         {
@@ -63,8 +77,7 @@ namespace MimicCell.Gameplay
         {
             int amount = context.Amount;
 
-            if (amount <= 0 || !IsAlive)
-            {
+if (amount <= 0 || !IsAlive || damageImmunitySources.Count > 0)            {
                 return false;
             }
 

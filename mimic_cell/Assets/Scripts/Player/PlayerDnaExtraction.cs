@@ -18,6 +18,37 @@ namespace MimicCell.Player
 
         [SerializeField, Min(0.1f)] private float extractionRange = 6f;
 
+[SerializeField, Min(0.1f)] private float smallExtractionRange = 7f;
+[SerializeField, Min(0.1f)] private float mediumExtractionRange = 9f;
+[SerializeField, Min(0.1f)] private float largeExtractionRange = 12f;
+
+private float EffectiveExtractionRange
+{
+    get
+    {
+        if (player == null ||
+            !player.IsCreatureForm ||
+            player.CurrentCreatureDefinition == null)
+        {
+            return extractionRange;
+        }
+
+        switch (player.CurrentCreatureDefinition.BodySize)
+        {
+            case CreatureBodySize.Small:
+                return smallExtractionRange;
+
+            case CreatureBodySize.Medium:
+                return mediumExtractionRange;
+
+            case CreatureBodySize.Large:
+                return largeExtractionRange;
+
+            default:
+                return extractionRange;
+        }
+    }
+}
         private readonly DnaSample sample = new DnaSample();
         private readonly TentacleTargeting targeting = new TentacleTargeting();
         private ActorHealth health;
@@ -89,7 +120,10 @@ namespace MimicCell.Player
                 if (target.IsAlive)
                 {
                     Vector2 origin = transform.position;
-                    tentacle.Track(origin + Vector2.ClampMagnitude(target.Point - origin, extractionRange));
+tentacle.Track(
+    origin + Vector2.ClampMagnitude(
+        target.Point - origin, EffectiveExtractionRange));                
+                
                 }
             }
             while (Time.time < hitAt);
@@ -126,10 +160,13 @@ namespace MimicCell.Player
                 ? targeting.Find(point, canExtract).Creature
                 : null;
 
-        private bool IsInRange(Vector2 point)
-        {
-            return (point - (Vector2)transform.position).sqrMagnitude <= extractionRange * extractionRange;
-        }
+      private bool IsInRange(Vector2 point)
+{
+    float range = EffectiveExtractionRange;
+
+    return (point - (Vector2)transform.position).sqrMagnitude
+        <= range * range;
+}
 
         private bool UpdateDiscard()
         {
