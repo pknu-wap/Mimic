@@ -31,6 +31,11 @@ namespace MimicCell.Player
 
         internal bool IsExtracting => strike != null;
 
+        public float ExtractionPercent =>
+    sample.Species != null && sample.RequiredHits > 0
+        ? (float)sample.Hits / sample.RequiredHits * 100f
+        : 0f;
+
         private void Awake()
         {
             player = GetComponent<PrototypePlayer>();
