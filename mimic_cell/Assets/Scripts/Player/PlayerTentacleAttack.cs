@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MimicCell.Player
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(PrototypePlayer), typeof(PlayerAttackEffects))]
+    [RequireComponent(typeof(PrototypePlayer), typeof(PlayerAttackEffects), typeof(TentacleTargeting))]
     [DefaultExecutionOrder(10)]
     public class PlayerTentacleAttack : MonoBehaviour
     {
@@ -16,10 +16,10 @@ namespace MimicCell.Player
         private const float ImpactTime = Windup + Lash;
 
         [SerializeField] private PlayerJellyLeg[] blueTentacles = System.Array.Empty<PlayerJellyLeg>();
-        [SerializeField, Min(0.1f)] private float attackRange = 4f;
+        [SerializeField] private PlayerTentacleBodyAim bodyAim;
         [SerializeField] private Vector2Int attackDamage = new Vector2Int(2, 5);
 
-        private readonly TentacleTargeting targeting = new TentacleTargeting();
+        private TentacleTargeting targeting;
         private PrototypePlayer player;
         private PlayerMovementController movement;
         private PlayerDnaExtraction extraction;
@@ -38,6 +38,7 @@ namespace MimicCell.Player
             movement = GetComponent<PlayerMovementController>();
             extraction = GetComponent<PlayerDnaExtraction>();
             attackEffects = GetComponent<PlayerAttackEffects>();
+            targeting = GetComponent<TentacleTargeting>();
         }
 
         private void Update()
@@ -85,7 +86,7 @@ namespace MimicCell.Player
             }
 
             strikingTentacle = best;
-            target = InRange(point) ? targeting.Find(point) : default;
+            target = targeting.Find(point);
             aimPoint = point;
             startedAt = Time.time;
             impactPending = true;
@@ -121,13 +122,17 @@ namespace MimicCell.Player
             float cast = Mathf.Clamp01((elapsed - Windup) / Lash);
             float reach = Mathf.SmoothStep(0f, 1f, cast) * (1f - Mathf.SmoothStep(0f, 1f, recovery));
             float curl = Mathf.Lerp(-0.55f, 0.13f, cast) + recovery * 0.32f;
-            Vector2 origin = transform.position;
-            strikingTentacle.SetStrikePose(origin + Vector2.ClampMagnitude(aimPoint - origin, attackRange), reach, curl);
+            Vector2 strikePoint = targeting.ClampToRange(aimPoint);
+            if (bodyAim != null)
+            {
+                bodyAim.ApplyPose(strikePoint, elapsed, Windup, cast, reach, recovery);
+            }
+            strikingTentacle.SetStrikePose(strikePoint, reach, curl);
         }
 
         private void ApplyHit()
         {
-            if (!target.IsAlive || !InRange(target.Point))
+            if (!target.IsAlive || !targeting.IsInRange(target.Point))
             {
                 return;
             }
@@ -140,7 +145,7 @@ namespace MimicCell.Player
             int damage = CreatureCombatRules.CalculateDamage(
                 rolledDamage, player.CurrentFoodTier, creature.CurrentFoodTier, creature.CurrentTraits);
             int appliedDamage = Mathf.Min(damage, health.CurrentHealth);
-            if (!health.TakeDamage(damage))
+            if (!health.TakeDamage(new ActorDamageContext(damage, player.Health, ActorDamageType.Tentacle)))
             {
                 return;
             }
@@ -152,12 +157,9 @@ namespace MimicCell.Player
         }
 
         internal CreatureController FindAimCreature(Vector2 point) =>
-            isActiveAndEnabled && !player.IsCreatureForm && InRange(point)
+            isActiveAndEnabled && !player.IsCreatureForm
                 ? targeting.Find(point).Creature
                 : null;
-
-        private bool InRange(Vector2 point) =>
-            (point - (Vector2)transform.position).sqrMagnitude <= attackRange * attackRange;
 
         private void OnDisable() => EndAttack();
 
@@ -168,6 +170,10 @@ namespace MimicCell.Player
             {
                 strikingTentacle.SetStrikePose(default, 0f, 0f);
                 strikingTentacle = null;
+                if (bodyAim != null)
+                {
+                    bodyAim.Restore();
+                }
             }
         }
     }

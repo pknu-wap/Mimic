@@ -11,15 +11,13 @@ using UnityEngine.InputSystem;
 namespace MimicCell.Player
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(PrototypePlayer))]
+    [RequireComponent(typeof(PrototypePlayer), typeof(TentacleTargeting))]
     public class PlayerDnaExtraction : MonoBehaviour
     {
         private const float DiscardSeconds = 2f;
 
-        [SerializeField, Min(0.1f)] private float extractionRange = 6f;
-
         private readonly DnaSample sample = new DnaSample();
-        private readonly TentacleTargeting targeting = new TentacleTargeting();
+        private TentacleTargeting targeting;
         private ActorHealth health;
         private PrototypePlayer player;
         private PlayerMovementController movement;
@@ -45,6 +43,7 @@ namespace MimicCell.Player
             movement = GetComponent<PlayerMovementController>();
             tentacle = GetComponentInChildren<PlayerTentacleStrike>(true);
             attack = GetComponent<PlayerTentacleAttack>();
+            targeting = GetComponent<TentacleTargeting>();
             canExtract = CanExtract;
         }
 
@@ -73,7 +72,7 @@ namespace MimicCell.Player
 
             if (IsExtracting || sample.IsComplete || (attack != null && attack.IsAttacking) ||
                 tentacle == null || !tentacle.isActiveAndEnabled ||
-                !TentacleTargeting.TryReadClick(0, transform.position, out Vector2 point) || !IsInRange(point))
+                !TentacleTargeting.TryReadClick(0, transform.position, out Vector2 point))
             {
                 return;
             }
@@ -93,13 +92,12 @@ namespace MimicCell.Player
                 yield return null;
                 if (target.IsAlive)
                 {
-                    Vector2 origin = transform.position;
-                    tentacle.Track(origin + Vector2.ClampMagnitude(target.Point - origin, extractionRange));
+                    tentacle.Track(targeting.ClampToRange(target.Point));
                 }
             }
             while (Time.time < hitAt);
 
-            if (movement.ControlsEnabled && target.IsAlive && IsInRange(target.Point))
+            if (movement.ControlsEnabled && target.IsAlive && targeting.IsInRange(target.Point))
             {
                 CreatureDefinition species = target.Creature.Definition;
                 sample.AddHit(species, target.Creature.Health.MaxHealth);
@@ -127,14 +125,9 @@ namespace MimicCell.Player
             sample.Accepts(species) && species.PlayerForm != null && species.PlayerForm.IsConfigured;
 
         internal CreatureController FindAimCreature(Vector2 point) =>
-            isActiveAndEnabled && !sample.IsComplete && tentacle != null && tentacle.isActiveAndEnabled && IsInRange(point)
+            isActiveAndEnabled && !sample.IsComplete && tentacle != null && tentacle.isActiveAndEnabled
                 ? targeting.Find(point, canExtract).Creature
                 : null;
-
-        private bool IsInRange(Vector2 point)
-        {
-            return (point - (Vector2)transform.position).sqrMagnitude <= extractionRange * extractionRange;
-        }
 
         private bool UpdateDiscard()
         {

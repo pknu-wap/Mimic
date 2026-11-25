@@ -207,17 +207,22 @@ namespace MimicCell.Player
         private void ApplyStrikePose()
         {
             strikePoints ??= new Vector2[joints.Length];
-            Vector2 root = joints[0].position;
-            Vector2 span = strikeTip - root;
-            Vector2 bow = Vector2.Perpendicular(span) * strikeCurl;
-            for (int i = 0; i < joints.Length; i++)
+            // Keep the first bone and the sprite seam in their body-relative swim pose.
+            Vector2 attachment = joints[1].position;
+            Vector2 span = strikeTip - attachment;
+            Vector2 startHandle = Vector2.ClampMagnitude(attachment - GetJointPosition(0), span.magnitude / 3f);
+            Vector2 endHandle = span * (2f / 3f) + Vector2.Perpendicular(span) * (2f * strikeCurl);
+            strikePoints[1] = attachment;
+            for (int i = 2; i < joints.Length; i++)
             {
-                float t = i / (float)(joints.Length - 1);
-                Vector2 stretched = root + span * t + bow * (4f * t * (1f - t));
+                float t = (i - 1f) / (joints.Length - 2f);
+                float remaining = 1f - t;
+                Vector2 stretched = attachment + 3f * remaining * t * (remaining * startHandle + t * endHandle)
+                    + t * t * t * span;
                 strikePoints[i] = Vector2.Lerp(joints[i].position, stretched, strikeReach);
             }
 
-            for (int i = 0; i < poses.Length; i++)
+            for (int i = 1; i < poses.Length; i++)
             {
                 Transform joint = joints[i];
                 Transform next = joints[i + 1];
@@ -239,7 +244,7 @@ namespace MimicCell.Player
                 return;
             }
 
-            for (int i = 0; i < poses.Length; i++)
+            for (int i = 1; i < poses.Length; i++)
             {
                 joints[i].localRotation = poses[i].SwimRotation;
                 joints[i + 1].localPosition = poses[i].RestOffset;
