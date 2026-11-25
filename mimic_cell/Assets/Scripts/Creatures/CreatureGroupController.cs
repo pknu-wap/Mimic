@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using MimicCell.Player;
 using UnityEngine;
 
 namespace MimicCell.Creatures
@@ -24,10 +23,10 @@ namespace MimicCell.Creatures
         private CreatureDefinition definition;
         private EcosystemDefinition ecosystem;
         private ICreatureEnvironment environment;
-        private PrototypePlayer player;
         private Vector2 roamingDirection;
         private float roamingDirectionTimer;
-        private float scatterTimeRemaining;
+        private Vector2 lastThreatPosition;
+        private float lastThreatDetectedAt = float.NegativeInfinity;
 
         public CreatureGroupState CurrentState => currentState;
 
@@ -58,13 +57,11 @@ namespace MimicCell.Creatures
         public bool Initialize(
             CreatureDefinition newDefinition,
             EcosystemDefinition newEcosystem,
-            ICreatureEnvironment newEnvironment,
-            PrototypePlayer targetPlayer)
+            ICreatureEnvironment newEnvironment)
         {
             if (newDefinition == null ||
                 newEcosystem == null ||
-                newEnvironment == null ||
-                targetPlayer == null)
+                newEnvironment == null)
             {
                 Debug.LogError(
                     "CreatureGroupController requires complete initialization data.",
@@ -85,8 +82,8 @@ namespace MimicCell.Creatures
             definition = newDefinition;
             ecosystem = newEcosystem;
             environment = newEnvironment;
-            player = targetPlayer;
             currentState = CreatureGroupState.Roaming;
+            lastThreatDetectedAt = float.NegativeInfinity;
             ChooseNewRoamingDirection();
 
             return true;
@@ -147,7 +144,7 @@ namespace MimicCell.Creatures
             Vector2 separationDirection =
                 Vector2.zero;
 
-            float targetSpacing =
+            float edgeSpacing =
                 ecosystem.GroupSettings.TargetSpacing;
 
             for (int index = 0;
@@ -169,16 +166,31 @@ namespace MimicCell.Creatures
                 float distance =
                     awayFromOther.magnitude;
 
-                if (distance <= 0.001f || distance >= targetSpacing)
+                Vector2 separationAxis =
+                    distance > 0.001f
+                        ? awayFromOther / distance
+                        : GetOverlapSeparationAxis(
+                            member,
+                            other);
+
+                float requiredCenterDistance =
+                    member.GetRequiredCenterDistance(
+                        other,
+                        separationAxis,
+                        edgeSpacing);
+
+                if (requiredCenterDistance <= 0.001f ||
+                    distance >= requiredCenterDistance)
                 {
                     continue;
                 }
 
                 float separationStrength =
-                    1f - distance / targetSpacing;
+                    1f -
+                    distance / requiredCenterDistance;
 
                 separationDirection +=
-                    awayFromOther.normalized *
+                    separationAxis *
                     separationStrength;
             }
 
@@ -188,6 +200,47 @@ namespace MimicCell.Creatures
             }
 
             return separationDirection.normalized;
+        }
+
+        private static Vector2 GetOverlapSeparationAxis(
+            CreatureController member,
+            CreatureController other)
+        {
+            return member.GetInstanceID() < other.GetInstanceID()
+                ? Vector2.left
+                : Vector2.right;
+        }
+
+        private float CalculateRepresentativeCenterSpacing()
+        {
+            float diameterSum = 0f;
+            int validMemberCount = 0;
+
+            for (int index = 0;
+                index < members.Count;
+                index++)
+            {
+                CreatureController member = members[index];
+
+                if (member == null ||
+                    member.CurrentState == CreatureState.Dead)
+                {
+                    continue;
+                }
+
+                diameterSum +=
+                    member.GetMaximumColliderDiameter();
+
+                validMemberCount++;
+            }
+
+            float averageDiameter =
+                validMemberCount > 0
+                    ? diameterSum / validMemberCount
+                    : 0f;
+
+            return averageDiameter +
+                ecosystem.GroupSettings.TargetSpacing;
         }
 
         private Vector2 GetRoamingDirectionForMember(CreatureController member)
@@ -202,7 +255,11 @@ namespace MimicCell.Creatures
                 memberPosition,
                 groupCenter);
 
-            if (distanceFromCenter < ecosystem.GroupSettings.ReturnDistance)
+            float returnDistance =
+                ecosystem.GroupSettings.GetReturnDistance(
+                    CalculateRepresentativeCenterSpacing());
+
+            if (distanceFromCenter < returnDistance)
             {
                 Vector2 separationDirection =
                     CalculateSeparationDirection(member);
@@ -276,6 +333,18 @@ namespace MimicCell.Creatures
 
         public void Disband()
         {
+            ClearMemberMovement();
+            members.Clear();
+            Destroy(gameObject);
+        }
+
+        private void OnDisable()
+        {
+            ClearMemberMovement();
+        }
+
+        private void ClearMemberMovement()
+        {
             for (int index = 0;
                 index < members.Count;
                 index++)
@@ -287,12 +356,9 @@ namespace MimicCell.Creatures
                     member.ClearGroupMovementDirection();
                 }
             }
-
-            members.Clear();
-            Destroy(gameObject);
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             CleanupMembers();
 
@@ -339,35 +405,64 @@ namespace MimicCell.Creatures
             }
         }
 
-        private bool IsAnyMemberFleeing()
+        private bool TryGetClosestReportedThreat(
+            out Vector2 threatPosition,
+            out float latestDetectionTime)
         {
+            threatPosition = Vector2.zero;
+            latestDetectionTime = float.NegativeInfinity;
+            float closestDistanceSquared = float.PositiveInfinity;
+            bool found = false;
+
             for (int index = 0;
                 index < members.Count;
                 index++)
             {
                 CreatureController member = members[index];
 
-                if (member != null &&
-                    member.CurrentState == CreatureState.Flee)
+                if (member == null ||
+                    !member.TryGetDetectedThreat(
+                        out FoodChainTarget threat,
+                        out Vector2 detectedPosition,
+                        out float detectedAt) ||
+                    !threat.IsValid ||
+                    Time.time - detectedAt >=
+                        ecosystem.PerceptionSettings.Tier1FleeDuration)
                 {
-                    return true;
+                    continue;
+                }
+
+                latestDetectionTime = Mathf.Max(
+                    latestDetectionTime,
+                    detectedAt);
+
+                float distanceSquared =
+                    (detectedPosition -
+                        (Vector2)transform.position).sqrMagnitude;
+
+                if (distanceSquared < closestDistanceSquared)
+                {
+                    closestDistanceSquared = distanceSquared;
+                    threatPosition = detectedPosition;
+                    found = true;
                 }
             }
 
-            return false;
+            return found;
         }
 
         private void UpdateGroupState()
         {
-            if (IsAnyMemberFleeing())
+            if (TryGetClosestReportedThreat(
+                    out Vector2 threatPosition,
+                    out float latestDetectionTime))
             {
+                lastThreatPosition = threatPosition;
+                lastThreatDetectedAt = Mathf.Max(
+                    lastThreatDetectedAt,
+                    latestDetectionTime);
+
                 currentState = CreatureGroupState.Scattered;
-
-                scatterTimeRemaining =
-                    ecosystem.PerceptionSettings
-                        .Tier1FleeDuration;
-
-                return;
             }
 
             if (currentState != CreatureGroupState.Scattered)
@@ -375,24 +470,28 @@ namespace MimicCell.Creatures
                 return;
             }
 
-            scatterTimeRemaining -= Time.deltaTime;
-
-            if (scatterTimeRemaining <= 0f)
+            if (Time.time - lastThreatDetectedAt >=
+                ecosystem.PerceptionSettings.Tier1FleeDuration)
             {
                 currentState = CreatureGroupState.Regrouping;
+
+                for (int index = 0;
+                    index < members.Count;
+                    index++)
+                {
+                    if (members[index] != null)
+                    {
+                        members[index].EndGroupFlee();
+                    }
+                }
             }
         }
 
-        private Vector2 GetDirectionAwayFromPlayer()
+        private Vector2 GetDirectionAwayFromThreat()
         {
-            if (player == null)
-            {
-                return -roamingDirection;
-            }
-
             Vector2 direction =
                 (Vector2)transform.position -
-                (Vector2)player.transform.position;
+                lastThreatPosition;
 
             if (direction.sqrMagnitude <= 0.001f)
             {
@@ -405,7 +504,7 @@ namespace MimicCell.Creatures
         private Vector2 GetScatterDirection(int memberIndex)
         {
             Vector2 awayDirection =
-                GetDirectionAwayFromPlayer();
+                GetDirectionAwayFromThreat();
 
             float memberRatio =
                 members.Count <= 1
@@ -448,7 +547,8 @@ namespace MimicCell.Creatures
                     GetScatterDirection(index);
 
                 member.SetGroupMovementDirection(
-                    scatterDirection);
+                    scatterDirection,
+                    fleeing: true);
             }
         }
 
@@ -456,7 +556,8 @@ namespace MimicCell.Creatures
         {
             float completionDistance =
                 ecosystem.GroupSettings
-                    .RegroupCompletionDistance;
+                    .GetRegroupCompletionDistance(
+                        CalculateRepresentativeCenterSpacing());
 
             for (int index = 0;
                 index < members.Count;
@@ -497,6 +598,7 @@ namespace MimicCell.Creatures
                     CreatureGroupState.Roaming;
 
                 ChooseNewRoamingDirection();
+                UpdateRoaming();
                 return;
             }
 
