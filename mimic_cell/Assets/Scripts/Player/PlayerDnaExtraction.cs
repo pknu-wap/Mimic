@@ -66,6 +66,11 @@ namespace MimicCell.Player
         ? (float)sample.Hits / sample.RequiredHits * 100f
         : 0f;
 
+        public float DiscardPercent =>
+    HasStoredDna
+        ? Mathf.Clamp01(discardTime / DiscardSeconds) * 100f
+        : 0f;
+
         private void Awake()
         {
             player = GetComponent<PrototypePlayer>();

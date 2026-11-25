@@ -23,7 +23,7 @@ MonoBehaviour:
     colliderOffset: {x: 0, y: 0}
     flipXToFaceRight: 1
   spawnKind: 0
-  foodTier: 1
+  foodTier: 3
   bodySize: 0
   allowedHabitats: 15
   traits: 3
