@@ -6,7 +6,8 @@ namespace MimicCell.Gameplay
         Contact,
         Reflection,
         StatusEffect,
-        Environment
+        Environment,
+        Tentacle
     }
 
     public readonly struct ActorDamageContext

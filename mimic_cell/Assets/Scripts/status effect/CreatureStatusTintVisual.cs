@@ -6,6 +6,8 @@ namespace MimicCell.StatusEffects
     [DisallowMultipleComponent]
     public sealed class CreatureStatusTintVisual : MonoBehaviour
     {
+        private const float HitFlashDuration = 0.16f;
+
         [SerializeField] private SpriteRenderer body;
 
         [SerializeField] private Color frozenTint =
@@ -18,6 +20,9 @@ namespace MimicCell.StatusEffects
         private ExtinctionStatusEffects effects;
         private Color originalColor;
         private bool tintApplied;
+        private float hitFlashEndTime;
+
+        internal float HitFlashRemaining => Mathf.Max(0f, hitFlashEndTime - Time.time);
 
         private void Awake()
         {
@@ -41,6 +46,18 @@ namespace MimicCell.StatusEffects
             }
         }
 
+        private void OnEnable()
+        {
+            if (health != null)
+                health.DamageApplied += HandleDamageApplied;
+        }
+
+        private void HandleDamageApplied(ActorHealth damagedHealth, ActorDamageContext context, int appliedDamage)
+        {
+            if (appliedDamage > 0 && context.Source != null)
+                hitFlashEndTime = Time.time + HitFlashDuration;
+        }
+
         private void LateUpdate()
         {
             if (body == null)
@@ -61,7 +78,8 @@ namespace MimicCell.StatusEffects
             bool muddy = canShow &&
                 effects.IsActive(ExtinctionStatus.MudCoating);
 
-            if (!frozen && !muddy)
+            float hitFlash = HitFlashRemaining / HitFlashDuration;
+            if (!frozen && !muddy && hitFlash <= 0f)
             {
                 RestoreColor();
                 return;
@@ -85,7 +103,7 @@ namespace MimicCell.StatusEffects
             color.r = originalColor.r * tint.r;
             color.g = originalColor.g * tint.g;
             color.b = originalColor.b * tint.b;
-            body.color = color;
+            body.color = Color.Lerp(color, new Color(1f, 0.18f, 0.18f, color.a), hitFlash);
         }
 
         private void RestoreColor()
@@ -105,6 +123,10 @@ namespace MimicCell.StatusEffects
 
         private void OnDisable()
         {
+            if (health != null)
+                health.DamageApplied -= HandleDamageApplied;
+
+            hitFlashEndTime = 0f;
             RestoreColor();
         }
     }

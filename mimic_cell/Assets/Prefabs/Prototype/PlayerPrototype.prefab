@@ -320,6 +320,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6310024010803169380}
   - component: {fileID: 6310024010803169381}
+  - component: {fileID: 7743802245176446391}
   m_Layer: 0
   m_Name: Tentacle Aim
   m_TagString: Untagged
@@ -358,8 +359,21 @@ MonoBehaviour:
   windup: 0.28
   lash: 0.12
   retract: 0.45
-  bodyLean: 0.22
   extractionVisual: {fileID: 926807752335523832}
+--- !u!114 &7743802245176446391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6310024010803169379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3ce40938b8d43eebc9c0280e1e37213, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerTentacleBodyAim
+  bodyLean: 0.22
+  facingReference: {fileID: 6073019043129597920}
 --- !u!210 &2782922287327151865
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -727,6 +741,7 @@ GameObject:
   - component: {fileID: 5901837153212775436}
   - component: {fileID: 8177809416349704630}
   - component: {fileID: 6073019043129597800}
+  - component: {fileID: 7715843721440692031}
   - component: {fileID: 6073019043129597850}
   - component: {fileID: 6073019043129597851}
   m_Layer: 0
@@ -910,7 +925,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17ccca83d25c4e53a41999d0c22be346, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerDnaExtraction
-  extractionRange: 6
+--- !u!114 &7715843721440692031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1340454e1f6e4a028b98f40931272375, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.TentacleTargeting
+  interactionRange: 6
 --- !u!114 &9003527612338714761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2589,7 +2616,7 @@ MonoBehaviour:
   - {fileID: 4685501863155567676}
   - {fileID: 4169532866655476949}
   - {fileID: 8796288455283138775}
-  attackRange: 4
+  bodyAim: {fileID: 7743802245176446391}
   attackDamage: {x: 2, y: 5}
 --- !u!114 &6073019043129597801
 MonoBehaviour:

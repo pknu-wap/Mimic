@@ -1676,7 +1676,8 @@ float distance = offset.sqrMagnitude;
 
             SetState(CreatureState.Dead);
 
-            Destroy(gameObject);
+            TryGetComponent(out CreatureStatusTintVisual tintVisual);
+            Destroy(gameObject, tintVisual != null ? tintVisual.HitFlashRemaining : 0f);
         }
 
         private void RestoreVisualColor()
