@@ -44,7 +44,7 @@ MonoBehaviour:
   sprintSpeed: 14
   wanderRadius: 14
   usePerceptionRadiusOverride: 1
-  perceptionRadius: 20
+  perceptionRadius: 11
   spawnWeight: 1
   maxAlive: 4
   groupSizeRange:
