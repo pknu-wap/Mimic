@@ -26,8 +26,43 @@ private float highAssimilationRateMultiplier = 0.25f;
 private StatusEffectController statusController;
 private StatusEffectDefinition activeAssimilationEffect;
 
-        public float Percent => assimilationPercent;
+private bool trainingLimitActive;
 
+public float Percent => assimilationPercent;
+
+private float AssimilationLimit => trainingLimitActive ? 80f : 100f;
+
+public void SetTrainingLimit(bool active)
+{
+    trainingLimitActive = active;
+
+    assimilationPercent = Mathf.Min(
+        assimilationPercent, AssimilationLimit);
+
+    if (formController != null && health != null)
+    {
+        RefreshAssimilationEffect(
+            health.IsAlive ? formController.CurrentDefinition : null);
+    }
+}
+
+public void AddTrainingAssimilation(float amount)
+{
+    if (!trainingLimitActive ||
+        !isActiveAndEnabled ||
+        health == null ||
+        !health.IsAlive ||
+        formController.CurrentDefinition == null)
+    {
+        return;
+    }
+
+    assimilationPercent = Mathf.Min(
+        AssimilationLimit,
+        assimilationPercent + Mathf.Max(0f, amount));
+
+    RefreshAssimilationEffect(formController.CurrentDefinition);
+}
         private void Awake()
         {
             formController = GetComponent<PlayerCreatureFormController>();
@@ -82,7 +117,7 @@ private StatusEffectDefinition activeAssimilationEffect;
             : 1f;
 
         assimilationPercent = Mathf.Min(
-            100f,
+    AssimilationLimit,
             assimilationPercent +
             GetIncreasePerSecond(definition.FoodTier) *
             rateMultiplier * Time.deltaTime);
@@ -125,8 +160,8 @@ private void HandleDamageTaken(ActorHealth actor)
     if (isArmored)
         increase *= 0.5f;
 
-    assimilationPercent = Mathf.Min(100f, assimilationPercent + increase);
-
+assimilationPercent = Mathf.Min(
+    AssimilationLimit, assimilationPercent + increase);
     Debug.Log(
         $"[동화율] 피격 +{increase}%p · 현재 {assimilationPercent:F1}%",
         this);
@@ -160,8 +195,8 @@ public void NotifyAttackHit(bool isReflectedDamage = false)
     if (isReflectedDamage)
         increase *= 0.5f;
 
-    assimilationPercent = Mathf.Min(100f, assimilationPercent + increase);
-    RefreshAssimilationEffect(definition);
+assimilationPercent = Mathf.Min(
+    AssimilationLimit, assimilationPercent + increase);    RefreshAssimilationEffect(definition);
 
     Debug.Log(
         $"[동화율] 공격 적중 +{increase}%p · 현재 {assimilationPercent:F1}%",

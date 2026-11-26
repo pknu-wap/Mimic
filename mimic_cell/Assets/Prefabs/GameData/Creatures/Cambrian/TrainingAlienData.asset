@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb24abb3a7506ba468ab224c7af2c3f0, type: 3}
   m_Name: TrainingAlienData
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
-  creatureId: Training_Alien
+  creatureId: training_alien_a
   displayName: "\uD6C8\uB828\uAC1C\uCCB4"
-  prefab: {fileID: 2513940238013089828, guid: e3da0740cf1be0745921619c99cc61a7, type: 3}
+  prefab: {fileID: 2513940238013089828, guid: fb893b24e2560a14493ea01a801807b4, type: 3}
   playerForm:
     sprite: {fileID: 21300000, guid: 35b18bfddae0f7a448acb7fa421def1a, type: 3}
     movementController: {fileID: 9100000, guid: fbf82340166648847813970393d97230, type: 2}
-    visualScale: {x: 3, y: 3}
+    visualScale: {x: 1, y: 1}
     colliderSize: {x: 9.57, y: 3.135}
     colliderOffset: {x: 0, y: 0}
-    flipXToFaceRight: 0
+    flipXToFaceRight: 1
   spawnKind: 0
-  foodTier: 1
+  foodTier: 2
   bodySize: 0
   allowedHabitats: 15
   traits: 3
