@@ -225,6 +225,22 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8600128000000011, guid: a370beb791b8c8d46a4cd7fc47bacdf3, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8600128000000011, guid: a370beb791b8c8d46a4cd7fc47bacdf3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -2.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8600128000000013, guid: a370beb791b8c8d46a4cd7fc47bacdf3, type: 3}
+      propertyPath: m_fontSize
+      value: 23.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8600128000000013, guid: a370beb791b8c8d46a4cd7fc47bacdf3, type: 3}
+      propertyPath: m_textAlignment
+      value: 65535
+      objectReference: {fileID: 0}
     - target: {fileID: 160333615326446239, guid: a370beb791b8c8d46a4cd7fc47bacdf3, type: 3}
       propertyPath: m_Name
       value: UICanvas
