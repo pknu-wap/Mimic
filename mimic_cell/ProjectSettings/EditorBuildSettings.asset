@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/StartMenu.unity
     guid: f8d1d5b78c0c4cf9807f6ed64e75fa01
   - enabled: 1
+    path: Assets/Scenes/Title.unity
+    guid: 0302a152983834e4b9c8251e19253a58
+  - enabled: 1
+    path: Assets/Scenes/Prologue.unity
+    guid: a07b9df3147545e4fbf978539687479b
+  - enabled: 1
     path: Assets/Scenes/CambrianOcean.unity
     guid: 2b4ef7d6e0834a39a2c7da8a53a9f15a
   - enabled: 0
