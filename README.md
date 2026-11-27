@@ -1,5 +1,8 @@
 
 # 미믹세포
+<img width="657" height="370" alt="image" src="https://github.com/user-attachments/assets/4e642dae-8ea5-4207-b8a8-63c474ec45b5" />
+
+
 
 <br>
 
