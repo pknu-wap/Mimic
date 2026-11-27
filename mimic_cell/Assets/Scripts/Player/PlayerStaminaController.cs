@@ -12,6 +12,7 @@ namespace MimicCell.Player
         [SerializeField, Min(0f)] private float maxStamina = 100f;
         [SerializeField, Min(0f)] private float recoveryPerSecond = 45f;
         [SerializeField, Min(0f)] private float recoveryDelay = 0.3f;
+        [SerializeField, Min(0.1f)] private float baseAttackCost = 10f;
 
         [SerializeField] private float currentStamina;
 
@@ -78,16 +79,7 @@ private void HandleFormChanged(CreatureDefinition definition)
     if (maxStamina > 0f)
         storedStaminaRatio = Mathf.Clamp01(currentStamina / maxStamina);
 
-    if (definition == null)
-    {
-        maxStamina = 0f;
-        currentStamina = 0f;
-        recoveryPerSecond = 0f;
-        recoveryDelay = 0f;
-        return;
-    }
-
-    switch (definition.BodySize)
+    switch (definition != null ? definition.BodySize : CreatureBodySize.Small)
     {
         case CreatureBodySize.Small:
             maxStamina = 100f;
@@ -110,7 +102,7 @@ private void HandleFormChanged(CreatureDefinition definition)
         default:
             return;
     }
-bool isSprintingType =
+bool isSprintingType = definition != null &&
     (definition.Traits & CreatureTraits.Sprinting) != CreatureTraits.None;
 
 if (isSprintingType)
@@ -119,7 +111,7 @@ if (isSprintingType)
     recoveryStartsAt = Time.time + recoveryDelay;
 
     Debug.Log(
-        $"[스태미나] {definition.DisplayName} · " +
+        $"[스태미나] {(definition != null ? definition.DisplayName : "미믹세포")} · " +
         $"{currentStamina:F1}/{maxStamina:F1}",
         this);
 }
@@ -152,7 +144,6 @@ private void ApplyExhaustionIfDepleted()
     CreatureDefinition definition = formController.CurrentDefinition;
 
     if (currentStamina > 0f ||
-        definition == null ||
         statusController == null ||
         exhaustionDefinition == null ||
         IsExhausted)
@@ -160,15 +151,16 @@ private void ApplyExhaustionIfDepleted()
         return;
     }
 
+   float swimSpeed = definition != null ? definition.SwimSpeed : baseFormSwimSpeed;
    float calculatedDuration =
-    Mathf.Abs((definition.SwimSpeed - baseFormSwimSpeed) * 0.8f) + 1f;
+    Mathf.Abs((swimSpeed - baseFormSwimSpeed) * 0.8f) + 1f;
 
 float duration = Mathf.Max(6f, calculatedDuration * 3f);
     statusController.ApplyEffect(exhaustionDefinition, duration);
 
     Debug.Log(
         $"[탈진] 지속시간 {duration:F2}초 · " +
-        $"생물 속도 {definition.SwimSpeed}, 기본 속도 {baseFormSwimSpeed}",
+        $"생물 속도 {swimSpeed}, 기본 속도 {baseFormSwimSpeed}",
         this);
 }
 public void ReleaseSprint()
@@ -236,28 +228,15 @@ return !IsExhausted;
 }        
 public bool TrySpendForAttack()
 {
-    if (formController == null)
+    if (IsExhausted)
         return false;
 
-    CreatureDefinition definition = formController.CurrentDefinition;
-    if (definition == null)
-        return false;
-
-    float cost;
-
-    switch (definition.FoodTier)
+    float cost = formController?.CurrentDefinition?.FoodTier switch
     {
-        case CreatureFoodTier.Tier2:
-            cost = 10f;
-            break;
-
-        case CreatureFoodTier.Tier3:
-            cost = 35f;
-            break;
-
-        default:
-            return false;
-    }
+        CreatureFoodTier.Tier2 => 10f,
+        CreatureFoodTier.Tier3 => 35f,
+        _ => Mathf.Max(0.1f, baseAttackCost)
+    };
 
     return TrySpend(cost);
 }

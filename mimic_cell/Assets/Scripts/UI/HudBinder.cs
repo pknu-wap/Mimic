@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using MimicCell.Player;
 using MimicCell.Gameplay;
+using MimicCell.Creatures;
 
 public class HudBinder : MonoBehaviour
 {
@@ -31,7 +32,10 @@ public class HudBinder : MonoBehaviour
         }
 
         if (stamina == null)
+        {
+            RefreshExtractionPanel();
             return;
+        }
 
         if (!loggedFound)
         {
@@ -58,11 +62,22 @@ public class HudBinder : MonoBehaviour
         if (dna == null)
             dna = stamina.GetComponent<PlayerDnaExtraction>();
 
-        if (dna != null && extractGauge != null)
-{
-    extractGauge.SetPercent(dna.ExtractionPercent);
-    extractGauge.SetDiscardPercent(dna.DiscardPercent);
-}
+        RefreshExtractionPanel();
+    }
+
+    private void RefreshExtractionPanel()
+    {
+        if (extractGauge == null)
+            return;
+
+        extractGauge.SetPercent(dna != null ? dna.ExtractionPercent : 0f);
+        extractGauge.SetDiscardPercent(dna != null ? dna.DiscardPercent : 0f);
+
+        CreatureDefinition species = dna != null ? dna.StoredSpecies : null;
+        Sprite sprite = species != null && species.PlayerForm != null
+            ? species.PlayerForm.Sprite
+            : null;
+        extractGauge.SetTargetSprite(sprite, species != null ? species.ExtractionPortrait : null);
     }
 
     public void SetHp(float current, float max)

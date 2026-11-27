@@ -267,9 +267,16 @@ namespace MimicCell.World
             }
         }
 
-        public bool TryGetHabitatBottomY(CreatureHabitatMask allowedHabitats, float worldX, out float bottomY)
+        public bool TryGetHabitatBottomY(CreatureHabitatMask allowedHabitats, Vector2 position, out float bottomY)
         {
+            float worldX = position.x;
             OceanColumnProfile column = GetColumnProfile(worldX);
+            if (terrainWorld != null && terrainWorld.TryGetFloorBelow(position, out float nearbyFloor) &&
+                (allowedHabitats & GetHabitatAt(new Vector2(worldX, nearbyFloor + 1f))) != 0)
+            {
+                bottomY = nearbyFloor;
+                return true;
+            }
 
             if ((allowedHabitats & CreatureHabitatMask.OceanCC) != 0)
             {

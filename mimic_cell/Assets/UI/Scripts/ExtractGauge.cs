@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using MimicCell.Creatures;
+using MimicCell.UI;
 
 public class ExtractGauge : MonoBehaviour
 {
@@ -8,12 +10,14 @@ public class ExtractGauge : MonoBehaviour
     [SerializeField] private Image redFill;           // RedFill
     [SerializeField] private TMP_Text percentText;    // PercentText
     [SerializeField] private Transform segmentsParent; // Segments
+    [SerializeField] private Image targetPortrait;     // 복제 대상 사진
 
     [Header("칸 스프라이트")]
     [SerializeField] private Sprite segOn;   // 켜진 칸 (청록)
     [SerializeField] private Sprite segOff;  // 꺼진 칸 (남색)
 
     private Image[] segments;
+    private readonly PortraitLayout portraitLayout = new PortraitLayout();
 
     void Awake()
     {
@@ -23,6 +27,28 @@ public class ExtractGauge : MonoBehaviour
 
         SetPercent(0f);
         SetDiscardPercent(0f);
+        SetTargetSprite(null);
+    }
+
+    public void SetTargetSprite(Sprite sprite)
+    {
+        SetTargetSprite(sprite, null);
+    }
+
+    public void SetTargetSprite(Sprite sprite, CreaturePortraitSettings settings)
+    {
+        if (targetPortrait == null)
+            return;
+
+        targetPortrait.sprite = sprite;
+        targetPortrait.preserveAspect = true;
+        targetPortrait.enabled = sprite != null;
+        portraitLayout.Apply(targetPortrait.rectTransform, sprite != null ? settings : null);
+    }
+
+    private void OnDisable()
+    {
+        portraitLayout.Reset();
     }
 
     // DNA 폐기 진행률: 빨간 채움만 변경한다.
