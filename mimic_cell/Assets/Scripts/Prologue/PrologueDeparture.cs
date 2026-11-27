@@ -59,7 +59,7 @@ namespace MimicCell.Prologue
                 () => !dialogue.IsSequencePlaying);
 
             controlHint.HideHint();
-
+yield return dialogue.HidePanel();
             fadeGroup.blocksRaycasts = true;
 
             float elapsed = 0f;

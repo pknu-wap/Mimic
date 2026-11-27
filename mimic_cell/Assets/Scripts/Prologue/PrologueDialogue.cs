@@ -14,6 +14,7 @@ namespace MimicCell.Prologue
     {
         [SerializeField] private TMP_Text dialogueText;
         [SerializeField, Min(1f)] private float charactersPerSecond = 30f;
+        [SerializeField] private DialoguePanelMotion panelMotion;
 
         private Coroutine typing;
         private readonly Queue<string> remainingLines = new Queue<string>();
@@ -55,6 +56,8 @@ private void DisplayText(string message)        {
                 return;
 
             FinishTyping();
+            if (panelMotion != null)
+    panelMotion.Show();
 
 dialogueText.richText = true;
 dialogueText.text = System.Text.RegularExpressions.Regex.Replace(
@@ -63,9 +66,19 @@ dialogueText.text = System.Text.RegularExpressions.Regex.Replace(
 
             typing = StartCoroutine(TypeText());
         }
+public IEnumerator HidePanel()
+{
+    if (panelMotion == null)
+        yield break;
 
+    panelMotion.Hide();
+
+    yield return new WaitUntil(() => !panelMotion.IsAnimating);
+}
         private IEnumerator TypeText()
         {
+            while (panelMotion != null && panelMotion.IsAnimating)
+    yield return null;
             int characterCount = dialogueText.textInfo.characterCount;
             float visibleCharacters = 0f;
 
