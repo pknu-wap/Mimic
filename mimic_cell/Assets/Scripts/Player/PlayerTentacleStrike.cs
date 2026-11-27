@@ -20,6 +20,7 @@ namespace MimicCell.Player
 
         public float ImpactTime => windup + lash;
         public float RecoveryTime => ContactHold + retract;
+        public bool IsPlaying => playing;
 
         private void Awake() => bodyAim = GetComponent<PlayerTentacleBodyAim>();
 

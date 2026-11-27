@@ -40,7 +40,7 @@ MonoBehaviour:
     foodTierWeights:
       tier1: 10
       tier2: 4
-      tier3: 1
+      tier3: 0.5
     allowSpawnDuringCombat: 1
   perceptionSettings:
     commonPerceptionRadius: 5
@@ -50,6 +50,7 @@ MonoBehaviour:
     tier2FleeDuration: 4
     tier3ChaseDuration: 5
     tier3FleeDuration: 5
+    sensingRadiusMultiplier: 1.4
     sensingDurationMultiplier: 1.4
   groupSettings:
     targetSpacing: 0.5

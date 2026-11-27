@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MediumTrilobitaData
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Creatures.CreatureDefinition
   creatureId: MediumTrilobita
-  displayName: "\uC911\uD615\uC0BC\uC5FD\uCDA9"
+  displayName: "\uC911\uD615 \uC0BC\uC5FD\uCDA9"
   prefab: {fileID: 570124166551080890, guid: b26827970266090468d2b3c9df7dea20, type: 3}
   playerForm:
     sprite: {fileID: 21300000, guid: a8abb79e6d41b694eb8be584fcac8ca9, type: 3}
@@ -22,6 +22,12 @@ MonoBehaviour:
     colliderSize: {x: 7.59, y: 4.29}
     colliderOffset: {x: 0, y: 0}
     flipXToFaceRight: 1
+  playerPortrait:
+    scale: 1
+    offset: {x: -2.22, y: -3.58}
+  extractionPortrait:
+    scale: 1.2
+    offset: {x: -2.25, y: 6.54}
   spawnKind: 1
   foodTier: 1
   bodySize: 1
@@ -44,7 +50,7 @@ MonoBehaviour:
   sprintSpeed: 1.6
   wanderRadius: 3
   usePerceptionRadiusOverride: 1
-  perceptionRadius: 7
+  perceptionRadius: 6
   spawnWeight: 1
   maxAlive: 10
   groupSizeRange:

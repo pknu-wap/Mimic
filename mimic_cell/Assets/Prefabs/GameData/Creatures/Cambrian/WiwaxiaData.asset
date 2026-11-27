@@ -22,6 +22,12 @@ MonoBehaviour:
     colliderSize: {x: 5.445, y: 3.795}
     colliderOffset: {x: 0, y: 0}
     flipXToFaceRight: 1
+  playerPortrait:
+    scale: 1.2
+    offset: {x: -2.76, y: -7.75}
+  extractionPortrait:
+    scale: 1.2
+    offset: {x: -5.24, y: 3}
   spawnKind: 0
   foodTier: 1
   bodySize: 0

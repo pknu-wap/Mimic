@@ -21,6 +21,13 @@ namespace MimicCell.Prologue
 [SerializeField] private CreatureDefinition replacementDefinition;        [SerializeField] private PrologueMoveGoal moveGoal;
 [SerializeField] private PrologueDialogue dialogue;
 [SerializeField] private PrologueControlHint controlHint;
+[SerializeField] private PrologueDeparture departure;
+
+[SerializeField, Min(0.1f)]
+private float trainingAssimilationPerSecond = 10f;
+
+private PlayerAssimilationController assimilation;
+private bool ownsTrainingLimit;
 
         private CreatureController target;
 
@@ -59,13 +66,18 @@ namespace MimicCell.Prologue
         ? player.GetComponent<PlayerDnaExtraction>()
         : null;
 
-    if (moveGoal == null ||
-        dialogue == null ||
-        controlHint == null ||
-        dna == null ||
-        trainingDefinition == null ||
-        replacementTarget == null ||
-        replacementDefinition == null)
+        assimilation = player != null
+    ? player.GetComponent<PlayerAssimilationController>()
+    : null;
+
+   if (moveGoal == null ||
+    dialogue == null ||
+    controlHint == null ||
+    dna == null ||
+    assimilation == null ||
+    trainingDefinition == null ||
+    replacementTarget == null ||
+    replacementDefinition == null)
     {
         Debug.LogError(
             "[프롤로그] 훈련 진행에 필요한 연결을 확인해 주세요.",
@@ -225,14 +237,122 @@ yield return new WaitUntil(() =>
 
 dna.ExtractionAllowed = false;
 
+// A 복제 이후부터 훈련용 상한을 적용한다.
+assimilation.SetTrainingLimit(true);
+ownsTrainingLimit = true;
+
 dialogue.ShowText(
     "유전자 교체 정상. 동화율 점검으로 전환합니다.");
 
 controlHint.ShowHint("Enter — 계속");
 
-Debug.Log("[프롤로그] 유전자 교체 훈련 완료!", this);
+yield return new WaitUntil(() => !dialogue.IsSequencePlaying);
+
+dialogue.ShowSequence(
+    "복제한 신체를 유지하면 동화율이 상승합니다.",
+    "동화율이 80%에 도달하면 복제한 생물체와의 동기화로 이상 증상이 발생합니다.",
+    "현재 신체를 유지하며 동화율 변화를 관찰하십시오.");
+
+controlHint.ShowHint("Enter — 계속");
+
+yield return new WaitUntil(() => !dialogue.IsSequencePlaying);
+
+controlHint.ShowHint("복제 상태 유지 — 동화율 80% 도달");
+
+// 훈련 중에만 빠르게 올린다.
+while (assimilation.Percent < 80f)
+{
+    if (player == null || !player.Health.IsAlive)
+        yield break;
+
+    assimilation.AddTrainingAssimilation(
+        trainingAssimilationPerSecond * Time.deltaTime);
+
+    yield return null;
 }
 
+// 이후 B로 복제할 때까지 80% 상한은 계속 유지된다.
+dialogue.ShowSequence(
+    "임계치 도달. 이상 반응이 관찰됩니다.",
+    "즉시 다른 생물체로 복제하십시오. 필요한 경우, 보유 중인 유전자를 먼저 폐기하십시오.");
+
+controlHint.ShowHint("Enter — 계속");
+
+yield return new WaitUntil(() => !dialogue.IsSequencePlaying);
+
+// B를 다시 추출할 수 있도록 준비한다.
+replacementTarget.SpawnTarget();
+
+if (replacementTarget.target == null)
+{
+    assimilation.SetTrainingLimit(false);
+    ownsTrainingLimit = false;
+    yield break;
+}
+
+replacementTarget.target.gameObject.SetActive(true);
+
+controlHint.ShowHint(
+    "왼쪽 생물 좌클릭 — DNA 추출·복제");
+
+dna.ExtractionAllowed = true;
+
+// B로 실제 복제했는지 확인한다.
+yield return new WaitUntil(() =>
+    player != null &&
+    player.CurrentCreatureDefinition == replacementDefinition);
+
+dna.ExtractionAllowed = false;
+
+// 복제에 따른 동화율과 상태이상 갱신을 기다린다.
+yield return null;
+
+if (assimilation.Percent >= 80f)
+{
+    assimilation.SetTrainingLimit(false);
+    ownsTrainingLimit = false;
+
+    Debug.LogError(
+        "[프롤로그] B 복제 후 동화율이 초기화되지 않았습니다. A·B의 Creature Id를 확인해 주세요.",
+        this);
+
+    yield break;
+}
+
+// B 복제 성공 후 일반 동화율 규칙으로 돌려놓는다.
+assimilation.SetTrainingLimit(false);
+ownsTrainingLimit = false;
+
+dialogue.ShowText(
+    "이상 반응 해소 확인. 파견 후에도 동화율을 지속적으로 확인하십시오.");
+
+controlHint.ShowHint("Enter — 계속");
+
+yield return new WaitUntil(() => !dialogue.IsSequencePlaying);
+
+controlHint.HideHint();
+
+Debug.Log("[프롤로그] 동화율 훈련 완료!", this);
+
+if (departure == null)
+{
+    Debug.LogError(
+        "[프롤로그] Departure 연결을 확인해 주세요.", this);
+    yield break;
+}
+
+yield return departure.Play(dialogue, controlHint, player);
+}
+
+private void OnDisable()
+{
+    StopAllCoroutines();
+
+    if (ownsTrainingLimit && assimilation != null)
+        assimilation.SetTrainingLimit(false);
+
+    ownsTrainingLimit = false;
+}
         public void SpawnTarget()
         {
             if (target != null)
