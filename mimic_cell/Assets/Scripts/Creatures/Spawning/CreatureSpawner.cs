@@ -13,6 +13,8 @@ namespace MimicCell.Creatures
         [SerializeField]
         private EcosystemDefinition ecosystem;
 
+        internal EcosystemDefinition Ecosystem => ecosystem;
+
         [SerializeField]
         private MonoBehaviour environmentSource;
 
@@ -376,7 +378,7 @@ namespace MimicCell.Creatures
                     candidate,
                     ecosystem.SpawnSettings
                         .OffscreenPadding) ||
-                !environment.IsInsidePlayableArea(candidate) ||
+                !HasTerrainClearance(candidate, member) ||
                 !environment.TryGetActiveRegionRoot(
                     candidate,
                     out Transform candidateRegionRoot) ||
@@ -902,7 +904,7 @@ statusController.SetOwnerType(StatusEffectTarget.Creature);
                     environment,
                     player);
 
-            if (!initializedCreature)
+            if (!initializedCreature || !HasTerrainClearance(spawnPosition, controller))
             {
                 Destroy(instance);
                 return null;
@@ -910,6 +912,22 @@ statusController.SetOwnerType(StatusEffectTarget.Creature);
 
             aliveCreatures.Add(controller);
             return controller;
+        }
+
+        private bool HasTerrainClearance(Vector2 position, CreatureController creature)
+        {
+            PolygonCollider2D body = creature.BodyCollider;
+            if (body == null)
+                return environment.IsInsidePlayableArea(position);
+
+            Bounds bounds = body.bounds;
+            Vector2 center = position + (Vector2)(bounds.center - creature.transform.position);
+            Vector2 halfSize = bounds.extents;
+            for (int x = -1; x <= 1; x++)
+                for (int y = -1; y <= 1; y++)
+                    if (!environment.IsInsidePlayableArea(center + new Vector2(x * halfSize.x, y * halfSize.y)))
+                        return false;
+            return true;
         }
 
         private void DiscardSpawnedCreature(

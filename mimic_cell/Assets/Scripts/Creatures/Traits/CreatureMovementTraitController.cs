@@ -23,7 +23,7 @@ namespace MimicCell.Creatures
                 return direction;
             }
 
-            if (!environment.TryGetHabitatBottomY(allowedHabitats, position.x, out float habitatBottomY))
+            if (!environment.TryGetHabitatBottomY(allowedHabitats, position, out float habitatBottomY))
             {
                 return direction;
             }

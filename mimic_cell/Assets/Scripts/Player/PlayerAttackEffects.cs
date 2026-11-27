@@ -1,11 +1,10 @@
-using MimicCell.Creatures;
 using MimicCell.StatusEffects;
 using UnityEngine;
 
 namespace MimicCell.Player
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(PrototypePlayer), typeof(StatusEffectController))]
+    [RequireComponent(typeof(PrototypePlayer), typeof(StatusEffectController), typeof(PlayerStaminaController))]
     public class PlayerAttackEffects : MonoBehaviour
     {
         [SerializeField] private StatusEffectDefinition dopamineRelease;
@@ -24,7 +23,7 @@ namespace MimicCell.Player
         }
 
         public bool TryBeginAttack() =>
-            player.CurrentFoodTier == CreatureFoodTier.Tier1 || stamina == null || stamina.TrySpendForAttack();
+            stamina != null && stamina.TrySpendForAttack();
 
         public void NotifyHit()
         {

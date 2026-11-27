@@ -301,13 +301,13 @@ Debug.Log("[프롤로그] 유전자 교체 훈련 완료!", this);
 
         public bool TryGetHabitatBottomY(
             CreatureHabitatMask allowedHabitats,
-            float worldX,
+            Vector2 position,
             out float bottomY)
         {
             bottomY = tankBounds.yMin;
 
-            return worldX >= tankBounds.xMin &&
-                   worldX <= tankBounds.xMax &&
+            return position.x >= tankBounds.xMin &&
+                   position.x <= tankBounds.xMax &&
                    (allowedHabitats & CreatureHabitatMask.OceanBB) != 0;
         }
 

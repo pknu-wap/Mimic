@@ -1454,9 +1454,6 @@ PrefabInstance:
       addedObject: {fileID: 1196324068}
     - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1196324069}
-    - targetCorrespondingSourceObject: {fileID: 8258282004123880317, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1196324096}
   m_SourcePrefab: {fileID: 100100000, guid: 5955e147d2c373e4d80f139eeeccbf6e, type: 3}
 --- !u!4 &1196324024 stripped
@@ -1504,25 +1501,6 @@ MonoBehaviour:
   panic: {fileID: 11400000, guid: 5351c5c526f3cc148ae4da7cc314c478, type: 2}
   tunnelVision: {fileID: 11400000, guid: 7ea99e1b393cd6e4faceae8339660e0a, type: 2}
   berserk: {fileID: 11400000, guid: c0dd5fe92fad8a348a2f4646d64eaa1b, type: 2}
---- !u!114 &1196324069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8711956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b316554c0365d564aaa3b6ed6bb2654d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerStaminaController
-  maxStamina: 100
-  recoveryPerSecond: 45
-  recoveryDelay: 0.3
-  currentStamina: 0
-  exhaustionDefinition: {fileID: 11400000, guid: 7db89a17be7dfef4094595a6cdd8673b, type: 2}
-  dopamineDefinition: {fileID: 11400000, guid: 5b61560198cae734184348c31f65cc5a, type: 2}
-  baseFormSwimSpeed: 3
 --- !u!114 &1196324096
 MonoBehaviour:
   m_ObjectHideFlags: 0

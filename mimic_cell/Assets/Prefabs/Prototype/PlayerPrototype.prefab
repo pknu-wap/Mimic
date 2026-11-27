@@ -741,6 +741,7 @@ GameObject:
   - component: {fileID: 5901837153212775436}
   - component: {fileID: 8177809416349704630}
   - component: {fileID: 6073019043129597800}
+  - component: {fileID: 2138109746145998301}
   - component: {fileID: 7715843721440692031}
   - component: {fileID: 6073019043129597850}
   - component: {fileID: 6073019043129597851}
@@ -1192,6 +1193,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MimicCell.StatusEffects.ExhaustionEffect
   exhaustionDefinition: {fileID: 11400000, guid: 7db89a17be7dfef4094595a6cdd8673b, type: 2}
+--- !u!114 &2138109746145998301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8258282004123880317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b316554c0365d564aaa3b6ed6bb2654d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MimicCell.Player.PlayerStaminaController
+  maxStamina: 100
+  recoveryPerSecond: 45
+  recoveryDelay: 0.3
+  baseAttackCost: 10
+  currentStamina: 0
+  exhaustionDefinition: {fileID: 11400000, guid: 7db89a17be7dfef4094595a6cdd8673b, type: 2}
+  dopamineDefinition: {fileID: 11400000, guid: 5b61560198cae734184348c31f65cc5a, type: 2}
+  baseFormSwimSpeed: 3
 --- !u!114 &685834636763645069
 MonoBehaviour:
   m_ObjectHideFlags: 0
