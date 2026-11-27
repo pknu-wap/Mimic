@@ -25,9 +25,11 @@ namespace MimicCell.Player
             return origin + Vector2.ClampMagnitude(point - origin, interactionRange);
         }
 
-        internal Target Find(Vector2 point, Predicate<CreatureDefinition> accepts = null)
+        internal Target Find(Vector2 point, Predicate<CreatureDefinition> accepts = null,
+            float? rangeOverride = null)
         {
-            if (!IsInRange(point))
+            float range = rangeOverride ?? interactionRange;
+            if ((point - (Vector2)transform.position).sqrMagnitude > range * range)
             {
                 return default;
             }
