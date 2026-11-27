@@ -59,6 +59,7 @@ namespace MimicCell.Player
 
         internal bool IsExtracting => strike != null;
         public bool HasStoredDna => sample.Species != null;
+        public CreatureDefinition StoredSpecies => sample.Species;
         public bool ExtractionAllowed { get; set; } = true;
 
         public float ExtractionPercent =>
