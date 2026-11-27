@@ -2746,7 +2746,7 @@ MonoBehaviour:
   - {fileID: 4685501863155567676}
   - {fileID: 4169532866655476949}
   - {fileID: 8796288455283138775}
-  attackRange: 4
+  bodyAim: {fileID: 7743802245176446391}
   attackDamage: {x: 2, y: 5}
 --- !u!114 &6073019043129597850
 MonoBehaviour:

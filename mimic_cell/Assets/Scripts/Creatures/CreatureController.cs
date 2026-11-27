@@ -2,6 +2,7 @@ using MimicCell.StatusEffects;
 using System;
 using MimicCell.Gameplay;
 using MimicCell.Player;
+using MimicCell.World;
 using UnityEngine;
 
 namespace MimicCell.Creatures
@@ -67,6 +68,7 @@ namespace MimicCell.Creatures
         private CreatureDefinition definition;
         private EcosystemDefinition ecosystem;
         private ICreatureEnvironment environment;
+        private readonly CreatureTerrainMotion terrainMotion = new CreatureTerrainMotion();
 
         private float instanceVariation;
         private int spawnRegionId;
@@ -384,6 +386,9 @@ namespace MimicCell.Creatures
                     ConstrainRoamingVelocityToAllowedHabitats(
                         nextVelocity);
             }
+
+            if (environment is CambrianOceanWorld)
+                nextVelocity = terrainMotion.ConstrainVelocity(attachedCollider, nextVelocity, Time.fixedDeltaTime);
 
             attachedRigidbody.linearVelocity = nextVelocity;
 

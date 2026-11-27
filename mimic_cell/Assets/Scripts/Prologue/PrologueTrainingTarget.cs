@@ -421,13 +421,13 @@ private void OnDisable()
 
         public bool TryGetHabitatBottomY(
             CreatureHabitatMask allowedHabitats,
-            float worldX,
+            Vector2 position,
             out float bottomY)
         {
             bottomY = tankBounds.yMin;
 
-            return worldX >= tankBounds.xMin &&
-                   worldX <= tankBounds.xMax &&
+            return position.x >= tankBounds.xMin &&
+                   position.x <= tankBounds.xMax &&
                    (allowedHabitats & CreatureHabitatMask.OceanBB) != 0;
         }
 

@@ -9,7 +9,7 @@ namespace MimicCell.Creatures
 
         event Action<int> RegionDeactivated;
 
-        bool TryGetHabitatBottomY(CreatureHabitatMask allowedHabitats, float worldX, out float bottomY);
+        bool TryGetHabitatBottomY(CreatureHabitatMask allowedHabitats, Vector2 position, out float bottomY);
 
         CreatureHabitatMask GetHabitatAt(Vector2 worldPosition);
 

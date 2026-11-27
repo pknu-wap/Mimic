@@ -93,7 +93,7 @@ namespace MimicCell.Player
 
             if (!environment.TryGetHabitatBottomY(
                     activeDefinition.AllowedHabitats,
-                    position.x,
+                    position,
                     out float habitatBottomY))
             {
                 return;
