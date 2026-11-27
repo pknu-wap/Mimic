@@ -22,6 +22,12 @@ MonoBehaviour:
     colliderSize: {x: 8.25, y: 2.508}
     colliderOffset: {x: 0, y: 0}
     flipXToFaceRight: 1
+  playerPortrait:
+    scale: 1.3
+    offset: {x: -1.23, y: 1.24}
+  extractionPortrait:
+    scale: 1.5
+    offset: {x: -15.49, y: 21.2}
   spawnKind: 1
   foodTier: 1
   bodySize: 0
@@ -44,7 +50,7 @@ MonoBehaviour:
   sprintSpeed: 6.5
   wanderRadius: 7
   usePerceptionRadiusOverride: 1
-  perceptionRadius: 10
+  perceptionRadius: 9
   spawnWeight: 1
   maxAlive: 14
   groupSizeRange:

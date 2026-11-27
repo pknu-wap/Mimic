@@ -3,6 +3,27 @@ using UnityEngine;
 namespace MimicCell.Creatures
 {
     [System.Serializable]
+    public sealed class CreaturePortraitSettings
+    {
+        [SerializeField, Min(0.01f)]
+        [Tooltip("UI 사진의 확대 배율입니다. 1이면 기존 크기를 유지합니다.")]
+        private float scale = 1f;
+
+        [SerializeField]
+        [Tooltip("기존 사진 위치에서 이동할 UI 좌표입니다. X 양수는 오른쪽, Y 양수는 위쪽입니다.")]
+        private Vector2 offset = Vector2.zero;
+
+        public float Scale => Mathf.Max(0.01f, scale);
+
+        public Vector2 Offset => offset;
+
+        public void Validate()
+        {
+            scale = Mathf.Max(0.01f, scale);
+        }
+    }
+
+    [System.Serializable]
     public sealed class CreaturePlayerFormSettings
     {
         [SerializeField]
@@ -69,6 +90,15 @@ namespace MimicCell.Creatures
         [SerializeField]
         private CreaturePlayerFormSettings playerForm = new CreaturePlayerFormSettings();
 
+        [Header("UI Portraits")]
+        [SerializeField]
+        [Tooltip("원형 플레이어 UI에 복제 형태로 표시할 때의 사진 배율과 위치입니다.")]
+        private CreaturePortraitSettings playerPortrait = new CreaturePortraitSettings();
+
+        [SerializeField]
+        [Tooltip("사각형 복제 게이지에 추출 대상으로 표시할 때의 사진 배율과 위치입니다.")]
+        private CreaturePortraitSettings extractionPortrait = new CreaturePortraitSettings();
+
         [Header("Ecology")]
         [SerializeField]
         private CreatureSpawnKind spawnKind =
@@ -128,6 +158,10 @@ namespace MimicCell.Creatures
 
         public CreaturePlayerFormSettings PlayerForm => playerForm;
 
+        public CreaturePortraitSettings PlayerPortrait => playerPortrait;
+
+        public CreaturePortraitSettings ExtractionPortrait => extractionPortrait;
+
         public CreatureSpawnKind SpawnKind => spawnKind;
 
         public CreatureFoodTier FoodTier => foodTier;
@@ -186,6 +220,11 @@ namespace MimicCell.Creatures
             playerForm ??= new CreaturePlayerFormSettings();
 
             playerForm.Validate();
+
+            playerPortrait ??= new CreaturePortraitSettings();
+            extractionPortrait ??= new CreaturePortraitSettings();
+            playerPortrait.Validate();
+            extractionPortrait.Validate();
 
             designSizeRange.Validate();
             healthRange.Validate(1);
