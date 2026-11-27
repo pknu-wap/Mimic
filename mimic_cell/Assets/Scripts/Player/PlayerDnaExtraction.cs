@@ -16,6 +16,36 @@ namespace MimicCell.Player
     {
         private const float DiscardSeconds = 2f;
 
+        [SerializeField, Min(0.1f)] private float extractionRange = 6f;
+
+        [SerializeField, Min(0.1f)] private float smallExtractionRange = 7f;
+        [SerializeField, Min(0.1f)] private float mediumExtractionRange = 9f;
+        [SerializeField, Min(0.1f)] private float largeExtractionRange = 12f;
+
+        private float EffectiveExtractionRange
+        {
+            get
+            {
+                if (player == null ||
+                    !player.IsCreatureForm ||
+                    player.CurrentCreatureDefinition == null)
+                {
+                    return extractionRange;
+                }
+
+                switch (player.CurrentCreatureDefinition.BodySize)
+                {
+                    case CreatureBodySize.Small:
+                        return smallExtractionRange;
+                    case CreatureBodySize.Medium:
+                        return mediumExtractionRange;
+                    case CreatureBodySize.Large:
+                        return largeExtractionRange;
+                    default:
+                        return extractionRange;
+                }
+            }
+        }
         private readonly DnaSample sample = new DnaSample();
         private TentacleTargeting targeting;
         private ActorHealth health;
@@ -34,6 +64,11 @@ namespace MimicCell.Player
         public float ExtractionPercent =>
     sample.Species != null && sample.RequiredHits > 0
         ? (float)sample.Hits / sample.RequiredHits * 100f
+        : 0f;
+
+        public float DiscardPercent =>
+    HasStoredDna
+        ? Mathf.Clamp01(discardTime / DiscardSeconds) * 100f
         : 0f;
 
         private void Awake()
@@ -77,7 +112,7 @@ namespace MimicCell.Player
                 return;
             }
 
-            TentacleTargeting.Target target = targeting.Find(point, canExtract);
+            TentacleTargeting.Target target = targeting.Find(point, canExtract, EffectiveExtractionRange);
             if (target.IsAlive && tentacle.Play(point))
             {
                 strike = StartCoroutine(Extract(target));
@@ -92,12 +127,14 @@ namespace MimicCell.Player
                 yield return null;
                 if (target.IsAlive)
                 {
-                    tentacle.Track(targeting.ClampToRange(target.Point));
+                    Vector2 origin = transform.position;
+                    tentacle.Track(origin + Vector2.ClampMagnitude(
+                        target.Point - origin, EffectiveExtractionRange));
                 }
             }
             while (Time.time < hitAt);
 
-            if (movement.ControlsEnabled && target.IsAlive && targeting.IsInRange(target.Point))
+            if (movement.ControlsEnabled && target.IsAlive && IsInRange(target.Point))
             {
                 CreatureDefinition species = target.Creature.Definition;
                 sample.AddHit(species, target.Creature.Health.MaxHealth);
@@ -126,8 +163,14 @@ namespace MimicCell.Player
 
         internal CreatureController FindAimCreature(Vector2 point) =>
             isActiveAndEnabled && !sample.IsComplete && tentacle != null && tentacle.isActiveAndEnabled
-                ? targeting.Find(point, canExtract).Creature
+                ? targeting.Find(point, canExtract, EffectiveExtractionRange).Creature
                 : null;
+
+        private bool IsInRange(Vector2 point)
+        {
+            float range = EffectiveExtractionRange;
+            return (point - (Vector2)transform.position).sqrMagnitude <= range * range;
+        }
 
         private bool UpdateDiscard()
         {

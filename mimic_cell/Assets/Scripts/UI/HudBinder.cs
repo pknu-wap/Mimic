@@ -59,7 +59,10 @@ public class HudBinder : MonoBehaviour
             dna = stamina.GetComponent<PlayerDnaExtraction>();
 
         if (dna != null && extractGauge != null)
-            extractGauge.SetPercent(dna.ExtractionPercent);
+{
+    extractGauge.SetPercent(dna.ExtractionPercent);
+    extractGauge.SetDiscardPercent(dna.DiscardPercent);
+}
     }
 
     public void SetHp(float current, float max)

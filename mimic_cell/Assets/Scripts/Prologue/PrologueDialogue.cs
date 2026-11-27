@@ -56,8 +56,9 @@ private void DisplayText(string message)        {
 
             FinishTyping();
 
-            dialogueText.text = message;
-            dialogueText.maxVisibleCharacters = 0;
+dialogueText.richText = true;
+dialogueText.text = System.Text.RegularExpressions.Regex.Replace(
+    message, @"[가-힣]+", "<nobr>$0</nobr>");            dialogueText.maxVisibleCharacters = 0;
             dialogueText.ForceMeshUpdate();
 
             typing = StartCoroutine(TypeText());

@@ -162,6 +162,7 @@ GameObject:
   - component: {fileID: 9168031289130931232}
   - component: {fileID: 1300724430639722396}
   - component: {fileID: 4788369648533014889}
+  - component: {fileID: 1802373660846544944}
   m_Layer: 5
   m_Name: UICanvas
   m_TagString: Untagged
@@ -253,6 +254,22 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &1802373660846544944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160333615326446239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31132a4c3c321434aa27207f1040cd64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HudBinder
+  staminaGauge: {fileID: 1446046225886294129}
+  stamina: {fileID: 0}
+  hpFill: {fileID: 1015417588694457307}
+  extractGauge: {fileID: 4822289789469318196}
 --- !u!1 &160439865124670154
 GameObject:
   m_ObjectHideFlags: 0
@@ -1703,7 +1720,7 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 1
-  m_FillAmount: 1
+  m_FillAmount: 0
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
@@ -2635,7 +2652,6 @@ MonoBehaviour:
   segmentsParent: {fileID: 5792776254326031892}
   segOn: {fileID: 1113787485480967637, guid: 5943b42e0b41147489ebbff9255368e0, type: 3}
   segOff: {fileID: 6063022727024272668, guid: aa3be017162f0b449ada057210392cf2, type: 3}
-  testPercent: 65
 --- !u!1 &2779160201242920007
 GameObject:
   m_ObjectHideFlags: 0
@@ -6479,7 +6495,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8325149373500461547}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a75ec94fd6f462848baa1fffcd2f1188, type: 3}
   m_Name: 

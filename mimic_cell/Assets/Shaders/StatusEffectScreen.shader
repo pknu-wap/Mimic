@@ -35,11 +35,11 @@ half4 ApplyAssimilationDarkening(half4 color, float2 screenUV)
 
     float assimilation = saturate(_MimicCellAssimilation);
 
-    float amount = smoothstep(0.60, 0.95, assimilation);
-    float2 fromCenter = (screenUV - 0.5) * 2.0;
-    float edge = smoothstep(0.65, 1.3, length(fromCenter));
+    float amount = smoothstep(0.60, 0.80, assimilation);
+float2 fromCenter = (screenUV - 0.5) * 2.0;
+float edge = smoothstep(0.40, 1.15, length(fromCenter));
 
-    float edgeDarkness = edge * amount * 0.25;
+float edgeDarkness = edge * amount * 0.55;
     float fullDarkness = smoothstep(0.95, 1.0, assimilation);
 
     color.rgb *= (1.0 - edgeDarkness) * (1.0 - fullDarkness);

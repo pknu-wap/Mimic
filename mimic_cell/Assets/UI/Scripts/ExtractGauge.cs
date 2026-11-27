@@ -22,9 +22,17 @@ public class ExtractGauge : MonoBehaviour
             segments[i] = segmentsParent.GetChild(i).GetComponent<Image>();
 
         SetPercent(0f);
+        SetDiscardPercent(0f);
     }
 
-    // 게임 시스템에서는 이 함수만 호출하면 됨 (0 ~ 100)
+    // DNA 폐기 진행률: 빨간 채움만 변경한다.
+public void SetDiscardPercent(float percent)
+{
+    if (redFill != null)
+        redFill.fillAmount = Mathf.Clamp01(percent / 100f);
+}
+
+// DNA 추출 진행률: 숫자와 칸을 변경한다.
     public void SetPercent(float percent)
     {
         if (segments == null)
@@ -33,15 +41,12 @@ public class ExtractGauge : MonoBehaviour
         percent = Mathf.Clamp(percent, 0f, 100f);
         float ratio = percent / 100f;
 
-        // 1) 빨간 채움 (아래 -> 위)
-        if (redFill != null)
-            redFill.fillAmount = ratio;
 
-        // 2) 글자
+        // 1) 글자
         if (percentText != null)
             percentText.text = Mathf.RoundToInt(percent) + "%";
 
-        // 3) 칸 (왼쪽부터 켜짐)
+        // 2) 칸 (왼쪽부터 켜짐)
         int on = Mathf.CeilToInt(ratio * segments.Length);
         for (int i = 0; i < segments.Length; i++)
             segments[i].sprite = (i < on) ? segOn : segOff;

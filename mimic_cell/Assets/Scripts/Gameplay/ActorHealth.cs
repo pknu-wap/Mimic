@@ -30,6 +30,36 @@ namespace MimicCell.Gameplay
         public event Action<ActorHealth> DamageTaken;
         public event Action<ActorHealth, ActorDamageContext, int> DamageApplied;
 
+private readonly System.Collections.Generic.HashSet<UnityEngine.Object>
+    deathProtectionSources =
+        new System.Collections.Generic.HashSet<UnityEngine.Object>();
+
+public void SetDeathProtection(UnityEngine.Object source, bool active)
+{
+    if (source == null)
+        return;
+
+    if (active)
+        deathProtectionSources.Add(source);
+    else
+        deathProtectionSources.Remove(source);
+}
+
+private readonly System.Collections.Generic.HashSet<UnityEngine.Object>
+    damageImmunitySources =
+        new System.Collections.Generic.HashSet<UnityEngine.Object>();
+
+public void SetDamageImmunity(UnityEngine.Object source, bool active)
+{
+    if (source == null)
+        return;
+
+    if (active)
+        damageImmunitySources.Add(source);
+    else
+        damageImmunitySources.Remove(source);
+}
+
         private void Awake()
         {
             maxHealth = Mathf.Max(1, maxHealth);
@@ -63,16 +93,20 @@ namespace MimicCell.Gameplay
         {
             int amount = context.Amount;
 
-            if (amount <= 0 || !IsAlive)
-            {
+if (amount <= 0 || !IsAlive || damageImmunitySources.Count > 0)            {
                 return false;
             }
 
             int previousHealth = currentHealth;
 
-            currentHealth = Mathf.Max(0, currentHealth - amount);
+            int minimumHealth = deathProtectionSources.Count > 0 ? 1 : 0;
 
-            int appliedDamage = previousHealth - currentHealth;
+currentHealth = Mathf.Max(minimumHealth, currentHealth - amount);
+
+int appliedDamage = previousHealth - currentHealth;
+
+if (appliedDamage <= 0)
+    return false;
 
             HealthChanged?.Invoke(this);
             DamageTaken?.Invoke(this);
