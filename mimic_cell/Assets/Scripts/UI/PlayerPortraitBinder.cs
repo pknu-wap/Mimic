@@ -1,6 +1,7 @@
 using MimicCell.Creatures;
 using MimicCell.Player;
 using MimicCell.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,10 @@ public sealed class PlayerPortraitBinder : MonoBehaviour
 
     [Header("기본 미믹세포 사진 조절")]
     [SerializeField] private CreaturePortraitSettings basePortraitSettings = new CreaturePortraitSettings();
+
+    [Header("플레이어 이름")]
+    [SerializeField] private TMP_Text creatureNameText;
+    [SerializeField] private string baseFormDisplayName = "미믹세포";
 
     private PlayerCreatureFormController formController;
     private readonly PortraitLayout portraitLayout = new PortraitLayout();
@@ -63,6 +68,13 @@ public sealed class PlayerPortraitBinder : MonoBehaviour
 
     private void RefreshPortrait(CreatureDefinition definition)
     {
+        if (creatureNameText != null)
+        {
+            string displayName = definition != null ? definition.DisplayName : baseFormDisplayName;
+            if (creatureNameText.text != displayName)
+                creatureNameText.text = displayName;
+        }
+
         Sprite sprite = definition != null && definition.PlayerForm != null
             ? definition.PlayerForm.Sprite
             : null;
